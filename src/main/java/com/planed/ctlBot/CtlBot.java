@@ -1,12 +1,12 @@
 package com.planed.ctlBot;
 
+import com.planed.ctlBot.commands.BotCommandParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import sx.blah.discord.api.ClientBuilder;
 import sx.blah.discord.api.IDiscordClient;
-import sx.blah.discord.handle.obj.IChannel;
-import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.util.DiscordException;
 
 @Component
@@ -15,15 +15,18 @@ public class CtlBot {
 
     private final IDiscordClient client;
 
-    public CtlBot() {
+    BotCommandParser botCommandParser;
+    @Autowired
+    public CtlBot(BotCommandParser botCommandParser) {
+        this.botCommandParser = botCommandParser;
         this.client = getClient();
         registerClient();
     }
 
     private void registerClient() {
-        client.getDispatcher().registerListener(new InterfaceListener());
+        client.getDispatcher().registerListener(new HelloWorldCommandListener(botCommandParser));
+        client.getDispatcher().registerListener(new LogOnListener());
     }
-
 
     private IDiscordClient getClient() {
         final ClientBuilder clientBuilder = new ClientBuilder();
