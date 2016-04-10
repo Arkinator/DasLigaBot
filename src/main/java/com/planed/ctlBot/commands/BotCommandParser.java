@@ -1,14 +1,14 @@
 package com.planed.ctlBot.commands;
 
-import com.planed.ctlBot.CtlDataStore;
-import com.planed.ctlBot.InterfaceListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import sx.blah.discord.handle.impl.events.MessageReceivedEvent;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * Created by Julian Peters on 09.04.16.
@@ -17,30 +17,36 @@ import java.util.Optional;
  */
 @Component
 public class BotCommandParser {
-    private Logger LOG = LoggerFactory.getLogger(InterfaceListener.class);
+    private Logger LOG = LoggerFactory.getLogger(BotCommandParser.class);
 
     private final String COMMAND_START_SYMBOL = "!";
-    private CtlDataStore ctlDataStore;
+    private HashMap<String, BotCommand> commandMap;
 
-    @Autowired
-    BotCommandParser(CtlDataStore ctlDataStore){
-        this.ctlDataStore = ctlDataStore;
+    BotCommandParser(){
+        commandMap = new HashMap<>();
     }
-    public BotCommand parse(MessageReceivedEvent event) {
+
+    public void register(String commandName, BotCommand command){
+        if (commandMap.get(commandName) == null){
+            commandMap.put(commandName.toLowerCase(), command);
+        }
+    }
+
+    public void parseAndExecute(MessageReceivedEvent event) {
         Optional<String> commandText = getCommandText(event.getMessage().getContent());
         if (commandText.isPresent()){
-            switch (commandText.get()) {
-                case HelloWorldCommand.COMMAND_STRING:
-                    return new HelloWorldCommand(event);
-                case AddMatchCommand.COMMAND_STRING:
-                    return new AddMatchCommand(ctlDataStore, event);
-                default:
-                    LOG.info("Command not recognized: '"+commandText.get()+"'");
-                    return new NoCommand(event);
+            BotCommand command = commandMap.get(commandText.get().toLowerCase());
+            if (command != null) {
+                if (command.doesUserHaveNecessaryLevel(event)) {
+                    command.execute(event);
+                }else{
+                    LOG.info("No command authorization: '"+commandText.get()+"' for user "+event.getMessage().getAuthor().getName());
+                }
+            }else{
+                LOG.info("Command not recognized: '"+commandText.get()+"'");
             }
         }else{
             LOG.info("no command found in message '"+event.getMessage().getContent());
-            return new NoCommand(event);
         }
     }
 
@@ -52,5 +58,9 @@ public class BotCommandParser {
             String[] parts = trimmedMessage.substring(1).split(" ");
             return Optional.of(parts[0]);
         }
+    }
+
+    public Set<Map.Entry<String, BotCommand>> getAllRegisteredCommands() {
+        return commandMap.entrySet();
     }
 }

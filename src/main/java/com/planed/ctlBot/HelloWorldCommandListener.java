@@ -1,6 +1,5 @@
 package com.planed.ctlBot;
 
-import com.planed.ctlBot.commands.BotCommand;
 import com.planed.ctlBot.commands.BotCommandParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,10 +21,7 @@ public class HelloWorldCommandListener {
 
     @EventSubscriber
     public void helloWorldMessage(MessageReceivedEvent message) {
-        BotCommand command = parser.parse(message);
-        LOG.info("Message received: '"+message.getMessage().getContent()+"'. Resulting in command "+command.getClass().getCanonicalName());
-        if (command.isValidCommand()){
-            command.execute();
-        }
+        LOG.debug("Message received: '"+message.getMessage().getContent());
+        parser.parseAndExecute(message);
     }
 }

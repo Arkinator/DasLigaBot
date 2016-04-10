@@ -1,43 +1,30 @@
 package com.planed.ctlBot.commands;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import sx.blah.discord.handle.impl.events.MessageReceivedEvent;
-import sx.blah.discord.util.DiscordException;
-import sx.blah.discord.util.HTTP429Exception;
-import sx.blah.discord.util.MissingPermissionsException;
 
 /**
  * Created by Julian Peters on 09.04.16.
  *
  * @author julian.peters@westernacher.com
  */
+@Component
 public class HelloWorldCommand extends AbstractBotCommand {
+    private Logger LOG = LoggerFactory.getLogger(HelloWorldCommand.class);
     public static final String COMMAND_STRING = "hello";
-    private static final String HELLO_WORLD_MESSAGE = "Hello World!";
 
-    HelloWorldCommand(MessageReceivedEvent event){
-        super(event);
+    @Autowired
+    HelloWorldCommand(BotCommandParser parser) {
+        parser.register(COMMAND_STRING, this);
     }
 
     @Override
-    public boolean isValidCommand() {
-        return true;
-    }
-
-    @Override
-    public String getCommandAsString() {
-        return getMessage().getContent();
-    }
-
-    @Override
-    public void execute() {
-        try {
-            getMessage().getChannel().sendMessage(HELLO_WORLD_MESSAGE);
-        } catch (MissingPermissionsException e) {
-            e.printStackTrace();
-        } catch (HTTP429Exception e) {
-            e.printStackTrace();
-        } catch (DiscordException e) {
-            e.printStackTrace();
-        }
+    public void execute(MessageReceivedEvent event) {
+        String name = event.getMessage().getAuthor().getName();
+        replyInChannel(event, "Hello "+name+", how U doin?");
+        LOG.info("Saying hello to "+name+", with id="+getAuthor(event));
     }
 }

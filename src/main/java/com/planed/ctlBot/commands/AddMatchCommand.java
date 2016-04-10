@@ -1,9 +1,14 @@
 package com.planed.ctlBot.commands;
 
-import com.planed.ctlBot.CtlDataStore;
+import com.planed.ctlBot.common.AccessLevel;
+import com.planed.ctlBot.data.CtlMatch;
+import com.planed.ctlBot.data.repositories.CtlMatchRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 import sx.blah.discord.handle.impl.events.MessageReceivedEvent;
-import sx.blah.discord.handle.obj.IUser;
 
 import java.util.List;
 
@@ -12,19 +17,30 @@ import java.util.List;
  *
  * @author julian.peters@westernacher.com
  */
+@Component
 public class AddMatchCommand extends AbstractBotCommand {
-    public static final String COMMAND_STRING = "addMatch";
-    public CtlDataStore ctlDataStore;
+    private Logger LOG = LoggerFactory.getLogger(AddMatchCommand.class);
 
-    AddMatchCommand(CtlDataStore ctlDataStore, MessageReceivedEvent event){
-        super(event);
-        this.ctlDataStore = ctlDataStore;
+    public static final String COMMAND_STRING = "addMatch";
+    private final CtlMatchRepository ctlMatchRepository;
+
+    @Autowired
+    AddMatchCommand(BotCommandParser parser, CtlMatchRepository ctlMatchRepository){
+        parser.register(COMMAND_STRING, this);
+        this.ctlMatchRepository = ctlMatchRepository;
     }
 
     @Override
-    public void execute() {
-        List<IUser> mentions = getMessage().getMentions();
-        Assert.isTrue(mentions.size()==2);
-        ctlDataStore.addMatch(mentions.get(0), mentions.get(1));
+    public void execute(MessageReceivedEvent event) {
+        List<String> userNames = getParams(event);
+        LOG.info("Call to addMatchCommand.execute(). The params are "+userNames);
+        Assert.isTrue(userNames.size() == 2);
+        ctlMatchRepository.save(new CtlMatch(userNames.get(0),userNames.get(1)));
+        replyInChannel(event, "Match added between '"+userNames.get(0)+"' and '"+userNames.get(1)+"'");
+    }
+
+    @Override
+    public AccessLevel getAccessLevel() {
+        return AccessLevel.Admin;
     }
 }
