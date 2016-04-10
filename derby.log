@@ -1,7 +1,7 @@
 ----------------------------------------------------------------
-Sun Apr 10 17:42:57 CEST 2016:
-Booting Derby version The Apache Software Foundation - Apache Derby - 10.12.1.1 - (1704137): instance a816c00e-0154-00d7-1835-00000b417b20 
-on database directory /Users/jps/code/CtlBattleBot/database.db with class loader sun.misc.Launcher$AppClassLoader@1d81eb93 
+Sun Apr 10 18:29:29 CEST 2016:
+Booting Derby version The Apache Software Foundation - Apache Derby - 10.12.1.1 - (1704137): instance a816c00e-0154-0101-afda-00000b49c620 
+on database directory /Users/jps/code/CtlBattleBot/database.db with class loader sun.misc.Launcher$AppClassLoader@18b4aac2 
 Loaded from file:/Users/jps/.m2/repository/org/apache/derby/derby/10.12.1.1/derby-10.12.1.1.jar
 java.vendor=Oracle Corporation
 java.runtime.version=1.8.0_72-b15

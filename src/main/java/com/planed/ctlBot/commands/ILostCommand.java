@@ -42,4 +42,9 @@ public class ILostCommand extends AbstractMatchCommand {
         LOG.info("Setting winner on match "+match+" to "+winner);
         replyInChannel(event, "You lost your match against "+winner+". Tough luck!");
     }
+
+    @Override
+    public String getHelpText() {
+        return "This command signals that despite your best effort your match this week went awry";
+    }
 }

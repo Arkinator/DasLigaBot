@@ -46,4 +46,9 @@ public class StandingsCommand extends AbstractBotCommand {
             replyInChannel(event, builder.toString());
         }
     }
+
+    @Override
+    public String getHelpText() {
+        return "Outputs the current CTL standings";
+    }
 }

@@ -40,4 +40,9 @@ public class ScoreCommand extends AbstractBotCommand {
         }
         replyInChannel(event, "The score is " + scoreTeamA + " - " + scoreTeamB);
     }
+
+    @Override
+    public String getHelpText() {
+        return "Outputs the current CTL score";
+    }
 }

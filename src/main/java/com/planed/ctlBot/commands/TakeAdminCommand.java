@@ -43,4 +43,9 @@ public class TakeAdminCommand extends AbstractBotCommand {
     public AccessLevel getAccessLevel() {
         return AccessLevel.Author;
     }
+
+    @Override
+    public String getHelpText() {
+        return "Demotes the target user from admin to user";
+    }
 }

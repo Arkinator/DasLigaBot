@@ -36,4 +36,9 @@ public class NewWeekCommand extends AbstractBotCommand {
     public AccessLevel getAccessLevel() {
         return AccessLevel.Admin;
     }
+
+    @Override
+    public String getHelpText() {
+        return "Only Admins can start a new week with this command. Deletes all matches, can not be undone!";
+    }
 }

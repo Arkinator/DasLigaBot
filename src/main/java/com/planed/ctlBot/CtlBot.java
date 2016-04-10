@@ -22,25 +22,27 @@ public class CtlBot {
     private String discordUsername;
     private String discordPassword;
     private BotCommandParser botCommandParser;
+    private Object commandListener;
 
     @Autowired
     public CtlBot(BotCommandParser botCommandParser,
                   @Value("${discord.username}")String discordUsername,
                   @Value("${discord.password}")String discordPassword,
-                  UserService userService) {
+                  UserService userService,
+                  CommandListener commandListener) {
         this.botCommandParser = botCommandParser;
         this.discordPassword = discordPassword;
         this.discordUsername = discordUsername;
         this.client = getClient();
         this.userService = userService;
+        this.commandListener = commandListener;
         registerClient();
     }
 
     private void registerClient() {
         // promote fustup :)
         userService.giveUserAccessLevel("<@116296552204599298>", AccessLevel.Author);
-        client.getDispatcher().registerListener(new HelloWorldCommandListener(botCommandParser));
-        client.getDispatcher().registerListener(new LogOnListener());
+        client.getDispatcher().registerListener(commandListener);
     }
 
     private IDiscordClient getClient() {

@@ -47,4 +47,9 @@ public class GiveAdminCommand extends AbstractBotCommand {
     public AccessLevel getAccessLevel() {
         return AccessLevel.Author;
     }
+
+    @Override
+    public String getHelpText() {
+        return "Promotes the target user to the ranks of admin";
+    }
 }

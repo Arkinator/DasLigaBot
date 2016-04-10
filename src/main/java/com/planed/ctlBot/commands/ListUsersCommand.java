@@ -50,4 +50,9 @@ public class ListUsersCommand extends AbstractBotCommand {
     public AccessLevel getAccessLevel() {
         return AccessLevel.Author;
     }
+
+    @Override
+    public String getHelpText() {
+        return "Lists all known Users";
+    }
 }

@@ -12,12 +12,12 @@ import sx.blah.discord.handle.impl.events.MessageReceivedEvent;
  * @author julian.peters@westernacher.com
  */
 @Component
-public class HelloWorldCommand extends AbstractBotCommand {
-    private Logger LOG = LoggerFactory.getLogger(HelloWorldCommand.class);
+public class HelloCommand extends AbstractBotCommand {
+    private Logger LOG = LoggerFactory.getLogger(HelloCommand.class);
     public static final String COMMAND_STRING = "hello";
 
     @Autowired
-    HelloWorldCommand(BotCommandParser parser) {
+    HelloCommand(BotCommandParser parser) {
         parser.register(COMMAND_STRING, this);
     }
 
@@ -26,5 +26,10 @@ public class HelloWorldCommand extends AbstractBotCommand {
         String name = event.getMessage().getAuthor().getName();
         replyInChannel(event, "Hello "+name+", how U doin?");
         LOG.info("Saying hello to "+name+", with id="+getAuthor(event));
+    }
+
+    @Override
+    public String getHelpText() {
+        return "Say hello to me! YAY!";
     }
 }

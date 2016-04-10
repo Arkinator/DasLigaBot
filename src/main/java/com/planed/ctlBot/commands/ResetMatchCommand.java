@@ -32,4 +32,9 @@ public class ResetMatchCommand extends AbstractMatchCommand {
         LOG.info("Resetting winner on match " + match);
         replyInChannel(event, "Reset the winner in your match.");
     }
+
+    @Override
+    public String getHelpText() {
+        return "Lets you reset your match-result in case you messed up.";
+    }
 }

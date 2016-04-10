@@ -40,4 +40,9 @@ public class IWonCommand extends AbstractMatchCommand {
         LOG.info("Setting winner on match "+match+" to "+getAuthor(event));
         replyInChannel(event, "You won your match against "+looser+". Way to go!");
     }
+
+    @Override
+    public String getHelpText() {
+        return "This signals that you schooled your opponent hard this week! YEAH!";
+    }
 }

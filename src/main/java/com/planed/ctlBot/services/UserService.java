@@ -53,4 +53,8 @@ public class UserService {
             return "";
         return discordId.substring(2,discordId.length()-1);
     }
+
+    public User getCurrentUser(MessageReceivedEvent event) {
+        return userRepository.findByDiscordId("<@"+event.getMessage().getAuthor().getID()+">");
+    }
 }

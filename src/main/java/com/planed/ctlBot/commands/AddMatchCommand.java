@@ -43,4 +43,9 @@ public class AddMatchCommand extends AbstractBotCommand {
     public AccessLevel getAccessLevel() {
         return AccessLevel.Admin;
     }
+
+    @Override
+    public String getHelpText() {
+        return "Admins: you can add a new match with this. Just link the UR-Player (with @), space, and enter the name of the opponent (no spaces in the name)";
+    }
 }

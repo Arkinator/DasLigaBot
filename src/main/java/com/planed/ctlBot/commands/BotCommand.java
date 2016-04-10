@@ -14,4 +14,6 @@ public interface BotCommand {
     AccessLevel getAccessLevel();
 
     boolean doesUserHaveNecessaryLevel(MessageReceivedEvent event);
+
+    String getHelpText();
 }
