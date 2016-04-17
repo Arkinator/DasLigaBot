@@ -2,8 +2,8 @@ package com.planed.ctlBot.data;
 
 
 import com.planed.ctlBot.common.AccessLevel;
-import com.sun.istack.internal.NotNull;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -23,9 +23,9 @@ public class User {
     private long id;
 
     private String discordId;
-    @NotNull
+    @Column(nullable = false)
     private int numberOfInteractions = 0;
-    @NotNull
+    @Column(nullable = false)
     private AccessLevel accessLevel = AccessLevel.User;
 
     public String getDiscordId() {

@@ -1,6 +1,6 @@
 package com.planed.ctlBot;
 
-import com.planed.ctlBot.commands.BotCommandParser;
+import com.planed.ctlBot.commands.InfoCommand;
 import com.planed.ctlBot.common.AccessLevel;
 import com.planed.ctlBot.services.UserService;
 import org.slf4j.Logger;
@@ -18,31 +18,24 @@ public class CtlBot {
     Logger LOG = LoggerFactory.getLogger(CtlBot.class);
 
     private final IDiscordClient client;
-
+    @Value("${discord.username}")
     private String discordUsername;
+    @Value("${discord.password}")
     private String discordPassword;
-    private BotCommandParser botCommandParser;
-    private Object commandListener;
+    @Autowired
+    private InfoCommand infoCommand;
 
     @Autowired
-    public CtlBot(BotCommandParser botCommandParser,
-                  @Value("${discord.username}")String discordUsername,
-                  @Value("${discord.password}")String discordPassword,
-                  UserService userService,
-                  CommandListener commandListener) {
-        this.botCommandParser = botCommandParser;
-        this.discordPassword = discordPassword;
-        this.discordUsername = discordUsername;
+    public CtlBot(UserService userService) {
         this.client = getClient();
         this.userService = userService;
-        this.commandListener = commandListener;
         registerClient();
     }
 
     private void registerClient() {
         // promote fustup :)
-        userService.giveUserAccessLevel("<@116296552204599298>", AccessLevel.Author);
-        client.getDispatcher().registerListener(commandListener);
+        userService.giveUserAccessLevel("116296552204599298", AccessLevel.Author);
+        client.getDispatcher().registerListener(infoCommand);
     }
 
     private IDiscordClient getClient() {

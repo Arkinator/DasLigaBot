@@ -1,19 +1,12 @@
 package com.planed.ctlBot.commands;
 
-import com.planed.ctlBot.common.AccessLevel;
-import sx.blah.discord.handle.impl.events.MessageReceivedEvent;
+import com.planed.ctlBot.commands.data.CommandCall;
 
 /**
- * Created by Julian Peters on 09.04.16.
+ * Created by Julian Peters on 17.04.16.
  *
  * @author julian.peters@westernacher.com
  */
 public interface BotCommand {
-    void execute(MessageReceivedEvent event);
-
-    AccessLevel getAccessLevel();
-
-    boolean doesUserHaveNecessaryLevel(MessageReceivedEvent event);
-
-    String getHelpText();
+    void messageReceiver(CommandCall command);
 }
