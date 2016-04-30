@@ -7,4 +7,5 @@ package com.planed.ctlBot.common;
  */
 public class LigaConstants {
     public static final Double INITIAL_ELO = 1200.;
+    public static final double K_FACTOR = 40;
 }

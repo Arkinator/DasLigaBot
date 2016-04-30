@@ -8,8 +8,6 @@ import com.planed.ctlBot.common.Race;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
@@ -24,8 +22,6 @@ import javax.persistence.Table;
 @Table(name="USER_TABLE")
 public class UserEntity {
     @Id
-    @GeneratedValue(strategy= GenerationType.AUTO)
-    private long userId;
     @Column(nullable = false)
     private String discordId;
     @Column(nullable = false)
@@ -46,14 +42,6 @@ public class UserEntity {
 
     public void setDiscordId(final String discordId) {
         this.discordId = discordId;
-    }
-
-    public long getUserId() {
-        return userId;
-    }
-
-    public void setUserId(final long userId) {
-        this.userId = userId;
     }
 
     public AccessLevel getAccessLevel() {
@@ -92,7 +80,7 @@ public class UserEntity {
         this.match = match;
     }
 
-    public void setElo(Double elo) {
+    public void setElo(final Double elo) {
         this.elo = elo;
     }
 }

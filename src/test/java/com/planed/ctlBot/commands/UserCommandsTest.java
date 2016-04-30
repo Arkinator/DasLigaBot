@@ -28,6 +28,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.greaterThan;
 
 @SpringApplicationConfiguration(classes = {
         BotBoot.class
@@ -169,6 +170,55 @@ public class UserCommandsTest {
         commandRegistry.fireEvent(aSimpleCommand(user2, "report", "win"));
 
         assertThat(user1.getMatch().getGameStatus(), is(GameStatus.conflictState));
+    }
+
+    @Test
+    public void userCanChangeResultsForConflictingGames() {
+        commandRegistry.fireEvent(anIssueChallengeCommand(user1, user2));
+        commandRegistry.fireEvent(aSimpleCommand(user2, "accept"));
+        commandRegistry.fireEvent(aSimpleCommand(user1, "report", "win"));
+        commandRegistry.fireEvent(aSimpleCommand(user2, "report", "win"));
+        commandRegistry.fireEvent(aSimpleCommand(user2, "report", "loss"));
+
+        assertThat(userRepository.findByDiscordId(user1.getDiscordId()).getMatch(), is(nullValue()));
+    }
+
+    @Test
+    public void userCanChangeResultsForPartialReportedGame() {
+        commandRegistry.fireEvent(anIssueChallengeCommand(user1, user2));
+        commandRegistry.fireEvent(aSimpleCommand(user2, "accept"));
+        commandRegistry.fireEvent(aSimpleCommand(user1, "report", "win"));
+        commandRegistry.fireEvent(aSimpleCommand(user1, "report", "loss"));
+        final Match match = user1.getMatch();
+        commandRegistry.fireEvent(aSimpleCommand(user2, "report", "win"));
+
+        assertThat(match.getGameStatus(), is(GameStatus.gamePlayed));
+        assertThat(userRepository.findByDiscordId(user1.getDiscordId()).getMatch(), is(nullValue()));
+    }
+
+    @Test
+    public void eloIncreasesForWinner() {
+        final double eloBefore = user1.getElo();
+        commandRegistry.fireEvent(anIssueChallengeCommand(user1, user2));
+        commandRegistry.fireEvent(aSimpleCommand(user2, "accept"));
+        commandRegistry.fireEvent(aSimpleCommand(user1, "report", "win"));
+        commandRegistry.fireEvent(aSimpleCommand(user2, "report", "loss"));
+
+        assertThat(userRepository.findByDiscordId(user1.getDiscordId()).getElo(), is(greaterThan(eloBefore)));
+    }
+
+    @Test
+    public void eloWinsAndLossesAreEqual() {
+        final double elo1Before = user1.getElo();
+        final double elo2Before = user2.getElo();
+        commandRegistry.fireEvent(anIssueChallengeCommand(user1, user2));
+        commandRegistry.fireEvent(aSimpleCommand(user2, "accept"));
+        commandRegistry.fireEvent(aSimpleCommand(user1, "report", "win"));
+        commandRegistry.fireEvent(aSimpleCommand(user2, "report", "loss"));
+
+        final double change1 = elo1Before - userRepository.findByDiscordId(user1.getDiscordId()).getElo();
+        final double change2 = - (elo2Before - userRepository.findByDiscordId(user2.getDiscordId()).getElo());
+        assertThat(change1, is(change2));
     }
 
     @Test

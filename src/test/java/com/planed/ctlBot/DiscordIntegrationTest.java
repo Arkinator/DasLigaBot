@@ -58,12 +58,12 @@ public class DiscordIntegrationTest {
 
     @Test
     public void shouldCreateUserWhenCommandIsInvoked() {
-        assertThat(userEntityRepository.findByDiscordId(AUTHOR_ID), is(nullValue()));
+        assertThat(userEntityRepository.findOne(AUTHOR_ID), is(nullValue()));
 
         final CommandCall call = aCommandCallFromAuthor().createCommandCall();
         commandRegistry.fireEvent(call);
 
-        assertThat(userEntityRepository.findByDiscordId(AUTHOR_ID), is(not(nullValue())));
+        assertThat(userEntityRepository.findOne(AUTHOR_ID), is(not(nullValue())));
     }
 
     @Test(expected = CommandRegistry.InsufficientAccessRightsException.class)

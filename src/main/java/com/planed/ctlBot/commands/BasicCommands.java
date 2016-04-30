@@ -1,13 +1,17 @@
 package com.planed.ctlBot.commands;
 
 import com.planed.ctlBot.commands.data.CommandCall;
+import com.planed.ctlBot.common.AccessLevel;
 import com.planed.ctlBot.discord.DiscordCommand;
 import com.planed.ctlBot.discord.DiscordController;
 import com.planed.ctlBot.discord.DiscordService;
-import com.planed.ctlBot.domain.User;
+import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import java.io.File;
+import java.io.IOException;
 
 /**
  * Created by Julian Peters on 23.04.16.
@@ -16,37 +20,43 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 @DiscordController
 public class BasicCommands {
+    private static final String CODE_ESCAPE = "```";
     Logger LOG = LoggerFactory.getLogger(BasicCommands.class);
 
     private final DiscordService discordService;
+    private String infoString = "error booting the server";
 
     @Autowired
     public BasicCommands(final DiscordService discordService) {
         this.discordService = discordService;
+        try {
+            this.infoString = FileUtils.readFileToString(new File("src/main/resources/logo.txt"));
+        } catch (final IOException e) {
+            LOG.error("error while reading file '"+new File("logo.txt")+"' :",e);
+        }
     }
 
     @DiscordCommand(name = "hello", help = "Hello World command")
     public void helloCommand(final CommandCall call) {
-        LOG.info("received hello command from " + call.getAuthor());
-        discordService.replyInChannel(call.getChannel(), "he yourself");
+        discordService.whisperToUser(call.getAuthor().getDiscordId(), "he yourself");
     }
 
     @DiscordCommand(name = {"list", "help"}, help = "Lists all available commands")
     public void listAllCommands(final CommandCall call) {
-        LOG.info("received list command");
-        discordService.replyInChannel(call.getChannel(), discordService.getCommandList());
+        discordService.whisperToUser(call.getAuthor().getDiscordId(), discordService.getCommandList());
     }
 
-    @DiscordCommand(name = {"info", "whataboutme"}, help = "Displays some information about yourself")
+    @DiscordCommand(name = {"info"}, help = "Displays some information about me!")
     public void infoCommand(final CommandCall call) {
-        LOG.info("received info command");
+        discordService.whisperToUser(call.getAuthor().getDiscordId(), buildInfoText(call));
+    }
+
+    @DiscordCommand(name = {"intro"}, help = "Administrator command to introduce the bot to a channel", roleRequired= AccessLevel.Admin)
+    public void introductionCommand(final CommandCall call) {
         discordService.replyInChannel(call.getChannel(), buildInfoText(call));
     }
 
     private String buildInfoText(final CommandCall call) {
-        final User user = call.getAuthor();
-        return "You are " + user.getDiscordId() + " and had " + user.getNumberOfInteractions()
-                + " interactions with me. You clearance-level is "
-                + user.getAccessLevel() + ". Have a nice day!";
+        return CODE_ESCAPE + "\n" + infoString + CODE_ESCAPE;
     }
 }

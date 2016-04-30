@@ -1,39 +1,29 @@
 package com.planed.ctlBot.domain;
 
 import com.planed.ctlBot.common.AccessLevel;
+import com.planed.ctlBot.common.LigaConstants;
 import com.planed.ctlBot.common.Race;
 
 public class User {
-    private long userId;
-
     private String discordId;
 
-    private int numberOfInteractions;
+    private int numberOfInteractions = 0;
 
-    private AccessLevel accessLevel;
+    private AccessLevel accessLevel = AccessLevel.User;
 
     private Race race;
 
     private Match match;
 
-    private Double elo;
+    private Double elo = LigaConstants.INITIAL_ELO;
 
     public User() {
     }
 
-    public User(final long userId, final String discordId, final int numberOfInteractions, final AccessLevel accessLevel) {
-        this.userId = userId;
+    public User(final String discordId, final int numberOfInteractions, final AccessLevel accessLevel) {
         this.discordId = discordId;
         this.numberOfInteractions = numberOfInteractions;
         this.accessLevel = accessLevel;
-    }
-
-    public long getUserId() {
-        return userId;
-    }
-
-    public void setUserId(final long userId) {
-        this.userId = userId;
     }
 
     public String getDiscordId() {
@@ -82,5 +72,9 @@ public class User {
 
     public void setElo(final Double elo) {
         this.elo = elo;
+    }
+
+    public String toString(){
+        return "<@"+getDiscordId()+">";
     }
 }

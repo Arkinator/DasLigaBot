@@ -1,0 +1,21 @@
+----------------------------------------------------------------------
+*  ___  ____   __    ____   ___  ____    __    ____  ____    ___     *
+* / __)(_  _) /__\  (  _ \ / __)(  _ \  /__\  ( ___)(_  _)  (__ \    *
+* \__ \  )(  /(__)\  )   /( (__  )   / /(__)\  )__)   )(     / _/    *
+* (___/ (__)(__)(__)(_)\_) \___)(_)\_)(__)(__)(__)   (__)   (____)   *
+*                                                                    *
+*                                                                    *
+*   D iscord           Starcraft 2 - DAS Liga                        *
+*   A utomated                                                       *
+*   S tarcraft         !hello, I'm a Discord-Bot. I run an automated *
+*                      starcraft tournament. Just type !challenge    *
+*      _     _         to challenge anybody. Or !list to get a list  *
+*     | |   (_)        of all available commands. !match gives your  *
+*     | |    _  __ _  __ _   current match, !league the current      *
+*     | |   | |/ _` |/ _` |  standings of the league. Oh, and don't  *
+*     | |___| | (_| | (_| |  forget to change your !race.            *
+*     \_____/_|\__, |\__,_|                                          *
+*               __/ |           glhf                                 *
+*              |___/                                                 *
+*                                   DAS Liga Bot                     *
+----------------------------------------------------------------------

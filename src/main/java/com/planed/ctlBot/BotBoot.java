@@ -13,11 +13,13 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import sx.blah.discord.api.ClientBuilder;
 import sx.blah.discord.api.EventDispatcher;
 import sx.blah.discord.api.IDiscordClient;
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IPrivateChannel;
+import sx.blah.discord.handle.obj.IUser;
 import sx.blah.discord.util.DiscordException;
 
 import javax.sql.DataSource;
@@ -33,6 +35,7 @@ import static org.mockito.Mockito.mock;
 @ComponentScan(basePackages = "com.planed.ctlBot")
 @PropertySource("/application.properties")
 @EnableAutoConfiguration
+@EnableScheduling
 public class BotBoot {
     @Value("${discord.username}")
     private String discordUsername;
@@ -49,7 +52,7 @@ public class BotBoot {
     public DataSource dbFromFileSystem() {
         final DriverManagerDataSource ds = new DriverManagerDataSource();
         ds.setDriverClassName("org.apache.derby.jdbc.EmbeddedDriver");
-        ds.setUrl("jdbc:derby:/Users/jps/code/CtlBattleBot/database.db;create=true");
+        ds.setUrl("jdbc:derby:/Users/jps/code/CtlBattleBot/database.db");
         ds.setUsername("");
         ds.setPassword("");
         return ds;
@@ -88,6 +91,7 @@ public class BotBoot {
             Mockito.when(result.getDispatcher()).thenReturn(mock(EventDispatcher.class));
             Mockito.when(result.getChannelByID(any())).thenReturn(mock(IChannel.class));
             Mockito.when(result.getOrCreatePMChannel(any())).thenReturn(mock(IPrivateChannel.class));
+            Mockito.when(result.getUserByID(any())).thenReturn(mock(IUser.class));
 
             return result;
         } catch (final Exception e ){

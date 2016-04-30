@@ -1,9 +1,7 @@
 package com.planed.ctlBot.discord;
 
-import com.planed.ctlBot.common.AccessLevel;
-import com.planed.ctlBot.data.UserEntity;
-import com.planed.ctlBot.data.repositories.UserEntityRepository;
 import com.planed.ctlBot.domain.User;
+import com.planed.ctlBot.domain.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,33 +15,26 @@ import sx.blah.discord.util.MessageBuilder;
 import sx.blah.discord.util.MissingPermissionsException;
 import sx.blah.discord.util.RequestBuffer;
 
-
-/**
- * Created by Julian Peters on 17.04.16.
- *
- * @author julian.peters@westernacher.com
- */
 @Component
 public class DiscordService {
     Logger LOG = LoggerFactory.getLogger(DiscordService.class);
 
     private IDiscordClient discordClient;
-    private final UserEntityRepository userEntityRepository;
+    private final UserRepository userRepository;
     private String commandList;
 
     @Autowired
-    public DiscordService(final UserEntityRepository userEntityRepository) {
-        this.userEntityRepository = userEntityRepository;
+    public DiscordService(final UserRepository userRepository) {
+        this.userRepository = userRepository;
     }
 
     public void replyInChannel(final String channelId, final String message) {
         RequestBuffer.request(() -> {
             try {
-                LOG.info("building message " + message);
+                LOG.info("Replying in "+channelId+ ": "+message);
                 new MessageBuilder(discordClient)
                         .withChannel(channelId)
                         .withContent(message).build();
-                LOG.info("\tbuild message " + message);
             } catch (MissingPermissionsException | DiscordException e) {
                 e.printStackTrace();
             }
@@ -53,7 +44,6 @@ public class DiscordService {
 
     public void whisperToUser(final String authorId, final String message) {
         try {
-            LOG.warn(message);
             final IChannel privateChannel = discordClient.getOrCreatePMChannel(discordClient.getUserByID(authorId));
             replyInChannel(privateChannel.getID(), message);
         } catch (HTTP429Exception | DiscordException e) {
@@ -61,19 +51,17 @@ public class DiscordService {
         }
     }
 
-    public UserEntity createNewUserFromId(final String discordId) {
-        final UserEntity entity = fillUserEntityObject(discordId);
-        userEntityRepository.save(entity);
-        return userEntityRepository.findByDiscordId(discordId);
+    public User createNewUserFromId(final String discordId) {
+        final User entity = fillUserObject(discordId);
+        userRepository.save(entity);
+        return userRepository.findByDiscordId(discordId);
     }
 
-    private UserEntity fillUserEntityObject(final String discordId) {
+    private User fillUserObject(final String discordId) {
         Assert.notNull(discordClient);
         discordClient.getUserByID(discordId);
-        final UserEntity result = new UserEntity();
+        final User result = new User();
         result.setDiscordId(discordId);
-        result.setAccessLevel(AccessLevel.User);
-        result.setNumberOfInteractions(0);
         return result;
     }
 

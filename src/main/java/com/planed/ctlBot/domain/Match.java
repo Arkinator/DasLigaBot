@@ -108,11 +108,6 @@ public class Match {
         this.gameStatus = gameStatus;
     }
 
-    @Override
-    public String toString() {
-        return new ToStringBuilder(this).toString();
-    }
-
     public boolean didUserReportResult(final User player) {
         if (isPlayerA(player) && playerAreportedScoreForPlayerA != null) {
             return true;
@@ -136,7 +131,7 @@ public class Match {
     }
 
     private void updateGameStatus() {
-        if (playerBreportedScoreForPlayerA != null) {
+        if ((playerBreportedScoreForPlayerA != null) && (playerAreportedScoreForPlayerA != null)) {
             if (reportsAreMatching()) {
                 setGameStatus(GameStatus.gamePlayed);
                 setFinalScorePlayerA(playerAreportedScoreForPlayerA);
@@ -144,8 +139,10 @@ public class Match {
             } else {
                 setGameStatus(GameStatus.conflictState);
             }
-        } else {
+        } else if  ((playerBreportedScoreForPlayerA != null) || (playerAreportedScoreForPlayerA != null)){
             setGameStatus(GameStatus.partiallyReported);
+        } else {
+            setGameStatus(GameStatus.challengeAccepted);
         }
     }
 
@@ -160,5 +157,37 @@ public class Match {
     public boolean reportsAreMatching() {
         return (playerAreportedScoreForPlayerA == playerBreportedScoreForPlayerA) &&
                 (playerAreportedScoreForPlayerB == playerBreportedScoreForPlayerB);
+    }
+
+    @Override
+    public String toString() {
+        if (gameStatus == GameStatus.challengeExtended) {
+            return players.get(0) + " (vs) " + players.get(1) + " (extended challenge)";
+        }
+        if (gameStatus == GameStatus.challengeAccepted) {
+            return players.get(0) + " vs " + players.get(1) + " (accepted challenge)";
+        }
+        if (gameStatus == GameStatus.partiallyReported) {
+            return players.get(0) + " vs " + players.get(1) + " (partially reported)";
+        }
+        if (gameStatus == GameStatus.conflictState) {
+            return players.get(0) + " vs " + players.get(1) + " (conflict state)";
+        }
+        if (gameStatus == GameStatus.gamePlayed) {
+            return players.get(0) + "(" + finalScorePlayerA + ") vs (" + finalScorePlayerB + ") " + players.get(1);
+        }
+        return ToStringBuilder.reflectionToString(this);
+    }
+
+    public double getEloResult() {
+        return ((finalScorePlayerA - finalScorePlayerB) + 1) / 2;
+    }
+
+    public User getPlayerA() {
+        return players.get(0);
+    }
+
+    public User getPlayerB() {
+        return players.get(1);
     }
 }

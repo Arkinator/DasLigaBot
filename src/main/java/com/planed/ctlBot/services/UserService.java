@@ -3,6 +3,7 @@ package com.planed.ctlBot.services;
 import com.planed.ctlBot.common.AccessLevel;
 import com.planed.ctlBot.common.GameResult;
 import com.planed.ctlBot.common.GameStatus;
+import com.planed.ctlBot.common.LigaConstants;
 import com.planed.ctlBot.common.Race;
 import com.planed.ctlBot.discord.DiscordService;
 import com.planed.ctlBot.domain.Match;
@@ -65,7 +66,7 @@ public class UserService {
     }
 
     public void changeRace(final User author, final String newRace) {
-        author.setRace(Race.valueOf(newRace));
+        author.setRace(Race.valueOf(newRace.toLowerCase()));
         userRepository.save(author);
     }
 
@@ -95,21 +96,29 @@ public class UserService {
         final Match match = author.getMatch();
         match.setGameStatus(GameStatus.challengeAccepted);
         matchRepository.saveMatch(match);
-        updateMatch(match);
     }
 
     public void reportResult(final Match match, final User author, final GameResult result) {
-        if (!match.didUserReportResult(author)) {
-            match.reportResult(author, result);
-            if (match.getGameStatus() == GameStatus.gamePlayed) {
-                finalizeGame(match);
-            }
-            matchRepository.saveMatch(match);
+        match.reportResult(author, result);
+        if (match.getGameStatus() == GameStatus.gamePlayed) {
+            finalizeGame(match);
         }
+        matchRepository.saveMatch(match);
     }
 
     private void finalizeGame(final Match match) {
         if (match.getGameStatus() == GameStatus.gamePlayed) {
+            final User playerA = match.getPlayerA();
+            final User playerB = match.getPlayerB();
+
+            final double expectancy = 1 / (1 + Math.pow(10,
+                    (playerB.getElo() - playerA.getElo()) / 400.));
+            final double result = match.getEloResult();
+
+            playerA.setElo(playerA.getElo() + LigaConstants.K_FACTOR * (result - expectancy));
+            playerB.setElo(playerB.getElo() + LigaConstants.K_FACTOR * ((1 - result) - (1 - expectancy)));
+
+            userRepository.save(playerA, playerB);
             clearMatchOfInvolvedPlayers(match);
         }
     }
@@ -121,10 +130,11 @@ public class UserService {
         });
     }
 
-    private void updateMatch(final Match match) {
-//        match.getPlayers().forEach(p -> {
-//            p.setMatch(match);
-//            userRepository.save(p);
-//        });
+    public String getLeagueString() {
+        final StringBuilder result = new StringBuilder();
+        final List<User> users = userRepository.findAll();
+        users.sort((u1, u2) -> u1.getElo().compareTo(u2.getElo()));
+        users.forEach(user -> result.append(discordService.shortInfo(user) + "\n"));
+        return result.toString();
     }
 }

@@ -6,8 +6,8 @@ package com.planed.ctlBot.common;
  * @author julian.peters@westernacher.com
  */
 public enum Race {
-    Terran,
-    Zerg,
-    Protoss,
-    Random
+    terran,
+    zerg,
+    protoss,
+    random
 }

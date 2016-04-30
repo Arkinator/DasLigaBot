@@ -4,7 +4,6 @@ package com.planed.ctlBot.data;
 import com.planed.ctlBot.common.GameStatus;
 import com.planed.ctlBot.common.Race;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -27,7 +26,7 @@ public class MatchEntity {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long matchId;
 
-    @OneToMany(mappedBy= "match", cascade= CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy= "match", fetch = FetchType.EAGER)
     private List<UserEntity> players;
     @Column(nullable = false)
     private GameStatus gameStatus;

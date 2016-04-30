@@ -1,6 +1,7 @@
 package com.planed.ctlBot.discord;
 
 import com.planed.ctlBot.commands.data.CommandCall;
+import com.planed.ctlBot.common.AccessLevel;
 import com.planed.ctlBot.domain.User;
 import com.planed.ctlBot.domain.UserRepository;
 import org.apache.commons.lang3.ArrayUtils;
@@ -55,6 +56,15 @@ public class CommandRegistry {
             }
         }
         buildCommandList();
+        promoteFustup();
+    }
+
+    private void promoteFustup() {
+        final User fustup = userRepository.findByDiscordId("116296552204599298");
+        if (fustup != null) {
+            fustup.setAccessLevel(AccessLevel.Author);
+            userRepository.save(fustup);
+        }
     }
 
     private void buildCommandList() {
@@ -71,26 +81,25 @@ public class CommandRegistry {
 
     public void fireEvent(final CommandCall call) {
         final DiscordCommand command = commandNameMap.get(call.getCommandPhrase());
-        if (command == null) {
-            throw new UnknownCommandException(call.getCommandPhrase());
+        if (command != null && checkUserAuthorization(call, command)) {
+            invokeCommand(call, command);
         }
-
-        checkUserAuthorization(call, command);
-
-        invokeCommand(call, command);
     }
 
-    private void checkUserAuthorization(final CommandCall call, final DiscordCommand command) {
+    private boolean checkUserAuthorization(final CommandCall call, final DiscordCommand command) {
         final User user = call.getAuthor();
         if (user.getAccessLevel().ordinal() < command.roleRequired().ordinal()) {
             discordService.whisperToUser(call.getAuthor().getDiscordId(),
                     "Insufficent access rights to invoke command!");
+            return false;
         } else if (call.getMentions().size() < command.minMentions()) {
             discordService.whisperToUser(call.getAuthor().getDiscordId(),
                     "You need " + command.minMentions() + " mention (type @ and a username) as a parameter to this command");
+            return false;
         } else {
             user.setNumberOfInteractions(user.getNumberOfInteractions() + 1);
             userRepository.save(user);
+            return true;
         }
     }
 

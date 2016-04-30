@@ -30,7 +30,7 @@ public class UserRepository {
     }
 
     public User findByDiscordId(final String discordId) {
-        final UserEntity userEntity = userEntityRepository.findByDiscordId(discordId);
+        final UserEntity userEntity = userEntityRepository.findOne(discordId);
         if (userEntity == null)
             return null;
         return mapper.map(userEntity, User.class);
@@ -41,5 +41,9 @@ public class UserRepository {
             final UserEntity userEntity = mapper.map(user, UserEntity.class);
             userEntityRepository.save(userEntity);
         }
+    }
+
+    public User refresh(final User author) {
+        return mapper.map(userEntityRepository.findOne(author.getDiscordId()), User.class);
     }
 }
