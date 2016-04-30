@@ -45,7 +45,7 @@ public class DiscordApplication {
     }
 
     @EventSubscriber
-    public void onReadyEvent(final MessageReceivedEvent event) {
+    public void receiveMessage(final MessageReceivedEvent event) {
         LOG.debug("received event: " + event);
 
         final Optional<CommandCall> commandCallOptional = discordMessageParser.deconstructMessage(event);

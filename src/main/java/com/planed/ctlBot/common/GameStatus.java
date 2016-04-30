@@ -10,5 +10,5 @@ public enum GameStatus {
     challengeAccepted,
     partiallyReported,
     conflictState,
-    challengeRejected, gamePlayed
+    challengeRejected, challengeRevoked, gamePlayed
 }

@@ -1,6 +1,5 @@
 package com.planed.ctlBot.commands;
 
-import com.planed.ctlBot.InterfaceListener;
 import com.planed.ctlBot.common.AccessLevel;
 import com.planed.ctlBot.services.UserService;
 import org.slf4j.Logger;
@@ -24,7 +23,7 @@ import sx.blah.discord.util.HTTP429Exception;
 @Component
 public class Backup {
     private final UserService userService;
-    Logger LOG = LoggerFactory.getLogger(InterfaceListener.class);
+    Logger LOG = LoggerFactory.getLogger(Backup.class);
 
     @Autowired
     public Backup(UserService userService) {

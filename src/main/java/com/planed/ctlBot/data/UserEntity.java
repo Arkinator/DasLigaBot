@@ -35,7 +35,7 @@ public class UserEntity {
     @Column
     private Race race;
     @Column(nullable = false)
-    private final Double elo = LigaConstants.INITIAL_ELO;
+    private Double elo = LigaConstants.INITIAL_ELO;
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "matchId")
     private MatchEntity match;
@@ -90,5 +90,9 @@ public class UserEntity {
 
     public void setMatch(final MatchEntity match) {
         this.match = match;
+    }
+
+    public void setElo(Double elo) {
+        this.elo = elo;
     }
 }

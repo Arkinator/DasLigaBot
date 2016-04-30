@@ -3,7 +3,7 @@ package com.planed.ctlBot.discord;
 import com.planed.ctlBot.commands.data.CommandCall;
 import com.planed.ctlBot.domain.User;
 import com.planed.ctlBot.domain.UserRepository;
-import com.planed.ctlBot.services.UserService;
+import org.apache.commons.lang3.ArrayUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
@@ -23,7 +23,7 @@ import java.util.Map;
 @Service
 public class CommandRegistry {
     private final ApplicationContext applicationContext;
-    private final UserService userService;
+    private final DiscordService discordService;
     private final Map<String, DiscordCommand> commandNameMap;
     private final Map<DiscordCommand, Method> commandMap;
     private final Map<DiscordCommand, Object> controllerMap;
@@ -31,10 +31,10 @@ public class CommandRegistry {
 
     @Autowired
     public CommandRegistry(final ApplicationContext applicationContext,
-                           final UserService userService,
+                           final DiscordService discordService,
                            final UserRepository userRepository) {
         this.applicationContext = applicationContext;
-        this.userService = userService;
+        this.discordService = discordService;
         this.userRepository = userRepository;
         commandMap = new HashMap<>();
         commandNameMap = new HashMap<>();
@@ -54,6 +54,19 @@ public class CommandRegistry {
                 }
             }
         }
+        buildCommandList();
+    }
+
+    private void buildCommandList() {
+        final StringBuilder builder = new StringBuilder();
+        for (final DiscordCommand command : getAllCommands()) {
+            builder.append(ArrayUtils.toString(command.name()));
+            builder.append("\t\t");
+            builder.append(command.help());
+            builder.append("\n");
+
+        }
+        discordService.setCommandList(builder.toString());
     }
 
     public void fireEvent(final CommandCall call) {
@@ -70,10 +83,15 @@ public class CommandRegistry {
     private void checkUserAuthorization(final CommandCall call, final DiscordCommand command) {
         final User user = call.getAuthor();
         if (user.getAccessLevel().ordinal() < command.roleRequired().ordinal()) {
-            throw new InsufficientAccessRightsException(command);
+            discordService.whisperToUser(call.getAuthor().getDiscordId(),
+                    "Insufficent access rights to invoke command!");
+        } else if (call.getMentions().size() < command.minMentions()) {
+            discordService.whisperToUser(call.getAuthor().getDiscordId(),
+                    "You need " + command.minMentions() + " mention (type @ and a username) as a parameter to this command");
+        } else {
+            user.setNumberOfInteractions(user.getNumberOfInteractions() + 1);
+            userRepository.save(user);
         }
-        user.setNumberOfInteractions(user.getNumberOfInteractions() + 1);
-        userRepository.save(user);
     }
 
     private void invokeCommand(final CommandCall call, final DiscordCommand command) {

@@ -2,14 +2,15 @@ package com.planed.ctlBot.commands.data;
 
 import com.planed.ctlBot.domain.User;
 
+import java.util.Collections;
 import java.util.List;
 
 public class CommandCallBuilder {
     private String commandPhrase;
     private User author;
     private String channel;
-    private List<String> parameterList;
-    private List<User> mentionsList;
+    private List<String> parameterList = Collections.emptyList();
+    private List<User> mentionsList = Collections.emptyList();
 
     public CommandCallBuilder setCommandPhrase(final String commandPhrase) {
         this.commandPhrase = commandPhrase;

@@ -1,14 +1,16 @@
 package com.planed.ctlBot.domain;
 
+import com.planed.ctlBot.common.GameResult;
 import com.planed.ctlBot.common.GameStatus;
 import com.planed.ctlBot.common.Race;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import java.util.List;
 
 public class Match {
     private long matchId;
     private List<User> players;
-    private GameStatus gameStatus = GameStatus.challengeExtended;
+    private GameStatus gameStatus;
     private Integer finalScorePlayerA;
     private Integer finalScorePlayerB;
     private Race racePlayerA;
@@ -104,5 +106,59 @@ public class Match {
 
     public void setGameStatus(final GameStatus gameStatus) {
         this.gameStatus = gameStatus;
+    }
+
+    @Override
+    public String toString() {
+        return new ToStringBuilder(this).toString();
+    }
+
+    public boolean didUserReportResult(final User player) {
+        if (isPlayerA(player) && playerAreportedScoreForPlayerA != null) {
+            return true;
+        }
+        if (isPlayerB(player) && playerBreportedScoreForPlayerA != null) {
+            return true;
+        }
+        return false;
+    }
+
+    public void reportResult(final User reporter, final GameResult result) {
+        if (isPlayerA(reporter)) {
+            playerAreportedScoreForPlayerA = result.getScoreForHome();
+            playerAreportedScoreForPlayerB = result.getScoreForAway();
+            updateGameStatus();
+        } else if (isPlayerB(reporter)) {
+            playerBreportedScoreForPlayerA = result.getScoreForAway();
+            playerBreportedScoreForPlayerB = result.getScoreForHome();
+            updateGameStatus();
+        }
+    }
+
+    private void updateGameStatus() {
+        if (playerBreportedScoreForPlayerA != null) {
+            if (reportsAreMatching()) {
+                setGameStatus(GameStatus.gamePlayed);
+                setFinalScorePlayerA(playerAreportedScoreForPlayerA);
+                setFinalScorePlayerB(playerAreportedScoreForPlayerB);
+            } else {
+                setGameStatus(GameStatus.conflictState);
+            }
+        } else {
+            setGameStatus(GameStatus.partiallyReported);
+        }
+    }
+
+    private boolean isPlayerA(final User player) {
+        return player.getDiscordId().equals(players.get(0).getDiscordId());
+    }
+
+    private boolean isPlayerB(final User player) {
+        return player.getDiscordId().equals(players.get(1).getDiscordId());
+    }
+
+    public boolean reportsAreMatching() {
+        return (playerAreportedScoreForPlayerA == playerBreportedScoreForPlayerA) &&
+                (playerAreportedScoreForPlayerB == playerBreportedScoreForPlayerB);
     }
 }

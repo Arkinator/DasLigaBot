@@ -3,7 +3,9 @@ package com.planed.ctlBot.commands;
 import com.planed.ctlBot.BotBoot;
 import com.planed.ctlBot.commands.data.CommandCall;
 import com.planed.ctlBot.commands.data.CommandCallBuilder;
+import com.planed.ctlBot.common.GameStatus;
 import com.planed.ctlBot.common.Race;
+import com.planed.ctlBot.data.repositories.UserEntityRepository;
 import com.planed.ctlBot.discord.CommandRegistry;
 import com.planed.ctlBot.domain.Match;
 import com.planed.ctlBot.domain.MatchRepository;
@@ -18,6 +20,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Arrays;
 import java.util.Collections;
 
 import static com.planed.ctlBot.domain.UserFixtures.aDefaultUser;
@@ -37,6 +40,8 @@ public class UserCommandsTest {
     private CommandRegistry commandRegistry;
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private UserEntityRepository userEntityRepository;
     @Autowired
     private MatchRepository matchRepository;
     @Autowired
@@ -78,7 +83,7 @@ public class UserCommandsTest {
     @Test
     public void challengeRejectedShouldFreeBothPlayers() {
         commandRegistry.fireEvent(anIssueChallengeCommand(user1, user2));
-        commandRegistry.fireEvent(aRejectChallengeCommand(user2));
+        commandRegistry.fireEvent(aSimpleCommand(user2, "reject"));
 
         assertThat(matchRepository.findMatchForUser(user1.getDiscordId()), is(nullValue()));
         assertThat(matchRepository.findMatchForUser(user2.getDiscordId()), is(nullValue()));
@@ -87,16 +92,100 @@ public class UserCommandsTest {
     @Test
     public void theAuthorCanNotRejectAChallengeHeMade() {
         commandRegistry.fireEvent(anIssueChallengeCommand(user1, user2));
-        commandRegistry.fireEvent(aRejectChallengeCommand(user1));
+        commandRegistry.fireEvent(aSimpleCommand(user1, "reject"));
 
         assertThat(matchRepository.findMatchForUser(user1.getDiscordId()), is(not(nullValue())));
     }
 
-    private CommandCall aRejectChallengeCommand(final User user) {
+    @Test
+    public void theAuthorCanRevokeAChallengeHeMade() {
+        commandRegistry.fireEvent(anIssueChallengeCommand(user1, user2));
+        commandRegistry.fireEvent(aSimpleCommand(user1, "revoke"));
+
+        assertThat(matchRepository.findMatchForUser(user1.getDiscordId()), is(nullValue()));
+    }
+
+    @Test
+    public void theChallengeCanNotRevokeAChallengeMade() {
+        commandRegistry.fireEvent(anIssueChallengeCommand(user1, user2));
+        commandRegistry.fireEvent(aSimpleCommand(user2, "revoke"));
+
+        assertThat(matchRepository.findMatchForUser(user1.getDiscordId()), is(not(nullValue())));
+    }
+
+    @Test
+    public void anAcceptedChallengeShouldGiveAnActiveMatch() {
+        commandRegistry.fireEvent(anIssueChallengeCommand(user1, user2));
+
+        commandRegistry.fireEvent(aSimpleCommand(user2, "accept"));
+
+        assertThat(user1.getMatch().getGameStatus(), is(GameStatus.challengeAccepted));
+    }
+
+    @Test
+    public void aChallengerCanNotAcceptedHisOwnChallenge() {
+        commandRegistry.fireEvent(anIssueChallengeCommand(user1, user2));
+        commandRegistry.fireEvent(aSimpleCommand(user1, "accept"));
+
+        assertThat(matchRepository.findMatchForUser(user1.getDiscordId()).getGameStatus(),
+                is(GameStatus.challengeExtended));
+    }
+
+    @Test
+    public void acceptedGameWithReportGivesPartialReported() {
+        commandRegistry.fireEvent(anIssueChallengeCommand(user1, user2));
+        commandRegistry.fireEvent(aSimpleCommand(user2, "accept"));
+        commandRegistry.fireEvent(aSimpleCommand(user1, "report", "win"));
+
+        assertThat(user1.getMatch().getGameStatus(), is(GameStatus.partiallyReported));
+    }
+
+    @Test
+    public void bothReportsGiveFinishedGame() {
+        commandRegistry.fireEvent(anIssueChallengeCommand(user1, user2));
+        commandRegistry.fireEvent(aSimpleCommand(user2, "accept"));
+        commandRegistry.fireEvent(aSimpleCommand(user1, "report", "win"));
+        commandRegistry.fireEvent(aSimpleCommand(user2, "report", "loss"));
+
+        assertThat(user1.getMatch().getGameStatus(), is(GameStatus.gamePlayed));
+    }
+
+    @Test
+    public void finishedGameHasCorrectScore() {
+        commandRegistry.fireEvent(anIssueChallengeCommand(user1, user2));
+        commandRegistry.fireEvent(aSimpleCommand(user2, "accept"));
+        commandRegistry.fireEvent(aSimpleCommand(user1, "report", "win"));
+        commandRegistry.fireEvent(aSimpleCommand(user2, "report", "loss"));
+
+        assertThat(user1.getMatch().getFinalScorePlayerA(), is(1));
+        assertThat(user1.getMatch().getFinalScorePlayerB(), is(0));
+    }
+
+    @Test
+    public void differingReportsGiveConflictingGame() {
+        commandRegistry.fireEvent(anIssueChallengeCommand(user1, user2));
+        commandRegistry.fireEvent(aSimpleCommand(user2, "accept"));
+        commandRegistry.fireEvent(aSimpleCommand(user1, "report", "win"));
+        commandRegistry.fireEvent(aSimpleCommand(user2, "report", "win"));
+
+        assertThat(user1.getMatch().getGameStatus(), is(GameStatus.conflictState));
+    }
+
+    @Test
+    public void canNotReportOnAnUnacceptedChallenge() {
+        commandRegistry.fireEvent(anIssueChallengeCommand(user1, user2));
+        commandRegistry.fireEvent(aSimpleCommand(user1, "report", "win"));
+
+        assertThat(matchRepository.findMatchForUser(user1.getDiscordId()).getGameStatus(),
+                is(GameStatus.challengeExtended));
+    }
+
+    private CommandCall aSimpleCommand(final User user, final String command, final String... parameters) {
         return new CommandCallBuilder()
                 .setAuthor(user)
-                .setCommandPhrase("reject")
+                .setCommandPhrase(command)
                 .setChannel("fjkdsl")
+                .setParameterList(Arrays.asList(parameters))
                 .createCommandCall();
     }
 

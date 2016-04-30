@@ -1,5 +1,6 @@
 package com.planed.ctlBot.domain;
 
+import com.planed.ctlBot.common.GameStatus;
 import com.planed.ctlBot.data.MatchEntity;
 import com.planed.ctlBot.data.UserEntity;
 import com.planed.ctlBot.data.repositories.MatchEntityRepository;
@@ -47,6 +48,7 @@ public class MatchRepository {
 
         final Match match = new Match();
         match.setPlayers(playerList);
+        match.setGameStatus(GameStatus.challengeExtended);
         final long matchId = matchEntityRepository.save(mapToEntity(match)).getMatchId();
 
         final Match dbMatch = findMatchById(matchId);

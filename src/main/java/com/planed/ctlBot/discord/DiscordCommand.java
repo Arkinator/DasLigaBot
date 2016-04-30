@@ -27,4 +27,6 @@ public @interface DiscordCommand {
      * The AccessLevel required to invoke this command
      */
     AccessLevel roleRequired() default AccessLevel.User;
+
+    int minMentions() default 0;
 }

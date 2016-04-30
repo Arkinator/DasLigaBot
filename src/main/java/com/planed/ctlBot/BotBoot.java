@@ -17,9 +17,11 @@ import sx.blah.discord.api.ClientBuilder;
 import sx.blah.discord.api.EventDispatcher;
 import sx.blah.discord.api.IDiscordClient;
 import sx.blah.discord.handle.obj.IChannel;
+import sx.blah.discord.handle.obj.IPrivateChannel;
 import sx.blah.discord.util.DiscordException;
 
 import javax.sql.DataSource;
+
 import static org.hibernate.jpa.internal.QueryImpl.LOG;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
@@ -81,10 +83,16 @@ public class BotBoot {
     @Bean(name = "discordClient")
     @Profile("development")
     public IDiscordClient mockClient() {
-        final IDiscordClient result = mock(IDiscordClient.class);
-        Mockito.when(result.getDispatcher()).thenReturn(mock(EventDispatcher.class));
-        Mockito.when(result.getChannelByID(any())).thenReturn(mock(IChannel.class));
-        return result;
+        try {
+            final IDiscordClient result = mock(IDiscordClient.class);
+            Mockito.when(result.getDispatcher()).thenReturn(mock(EventDispatcher.class));
+            Mockito.when(result.getChannelByID(any())).thenReturn(mock(IChannel.class));
+            Mockito.when(result.getOrCreatePMChannel(any())).thenReturn(mock(IPrivateChannel.class));
+
+            return result;
+        } catch (final Exception e ){
+            return null;
+        }
     }
 
     private static class DiscordLoginException extends RuntimeException {

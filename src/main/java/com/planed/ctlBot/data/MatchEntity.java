@@ -7,6 +7,7 @@ import com.planed.ctlBot.common.Race;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -26,10 +27,10 @@ public class MatchEntity {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long matchId;
 
-    @OneToMany(mappedBy= "match", cascade= CascadeType.ALL)
+    @OneToMany(mappedBy= "match", cascade= CascadeType.ALL, fetch = FetchType.EAGER)
     private List<UserEntity> players;
     @Column(nullable = false)
-    private GameStatus gameStatus = GameStatus.challengeExtended;
+    private GameStatus gameStatus;
     @Column
     private Integer finalScorePlayerA;
     @Column
@@ -130,5 +131,9 @@ public class MatchEntity {
 
     public void setRacePlayerB(final Race racePlayerB) {
         this.racePlayerB = racePlayerB;
+    }
+
+    public void setGameStatus(final GameStatus gameStatus) {
+        this.gameStatus = gameStatus;
     }
 }

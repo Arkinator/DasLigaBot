@@ -16,6 +16,8 @@ public class User {
 
     private Match match;
 
+    private Double elo;
+
     public User() {
     }
 
@@ -72,5 +74,13 @@ public class User {
 
     public void setMatch(final Match match) {
         this.match = match;
+    }
+
+    public Double getElo() {
+        return elo;
+    }
+
+    public void setElo(final Double elo) {
+        this.elo = elo;
     }
 }
