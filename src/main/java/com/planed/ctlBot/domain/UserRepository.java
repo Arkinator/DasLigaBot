@@ -14,36 +14,46 @@ import java.util.List;
 @Component
 public class UserRepository {
     private final Mapper mapper = new DozerBeanMapper();
-    private final UserEntityRepository userEntityRepository;
-
     @Autowired
-    public UserRepository(final UserEntityRepository userEntityRepository) {
-        this.userEntityRepository = userEntityRepository;
-    }
+    private UserEntityRepository userEntityRepository;
+    @Autowired
+    private MatchRepository matchRepository;
 
     public List<User> findAll() {
         final List<User> result = new ArrayList<>();
         StreamUtils.createStreamFromIterator(userEntityRepository.findAll().iterator())
-                .map(o->mapper.map(o, User.class))
+                .map(o -> mapFromEntity(o))
                 .forEach(result::add);
         return result;
     }
 
     public User findByDiscordId(final String discordId) {
         final UserEntity userEntity = userEntityRepository.findOne(discordId);
-        if (userEntity == null)
+        if (userEntity == null) {
             return null;
-        return mapper.map(userEntity, User.class);
+        }
+        return mapFromEntity(userEntity);
     }
 
     public void save(final User... users) {
         for (final User user : users) {
-            final UserEntity userEntity = mapper.map(user, UserEntity.class);
+            final UserEntity userEntity = mapToEntity(user);
             userEntityRepository.save(userEntity);
         }
     }
 
+    private UserEntity mapToEntity(final User user) {
+        final UserEntity result = mapper.map(user, UserEntity.class);
+        result.setMatchId(user.getMatchId());
+        return result;
+    }
+
+    private User mapFromEntity(final UserEntity user) {
+        final User result = mapper.map(user, User.class);
+        return result;
+    }
+
     public User refresh(final User author) {
-        return mapper.map(userEntityRepository.findOne(author.getDiscordId()), User.class);
+        return mapFromEntity(userEntityRepository.findOne(author.getDiscordId()));
     }
 }

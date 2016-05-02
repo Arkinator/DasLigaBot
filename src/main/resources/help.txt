@@ -1,0 +1,16 @@
+-------------------------Help Menu------------------------------------
+*
+* !league                 This displays the current league standings
+* !info                   Displays some information about me!
+* !list                   Lists all available commands
+* !hello                  Hello World command
+*
+*           You can challenge people to play
+* !challenge              Challenge a player. Just type @ and his name!
+* !reject or !swipeleft   Reject your current challenge
+* !revoke                 Revoke your current challenge
+* !accept or !swiperight  Accept the challenge extended to you!
+* !report                 Report either a 'win' or a 'loss' in the current game
+* !race                   This command lets you change your race. Do you play Zerg, Terran, Protoss or Random?
+* !status                 This displays your current status (open challenges, league position etc)
+----------------------------------------------------------------------

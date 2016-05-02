@@ -29,9 +29,9 @@ public class DiscordService {
     }
 
     public void replyInChannel(final String channelId, final String message) {
+        LOG.info(channelId + ": " + message);
         RequestBuffer.request(() -> {
             try {
-                LOG.info("Replying in "+channelId+ ": "+message);
                 new MessageBuilder(discordClient)
                         .withChannel(channelId)
                         .withContent(message).build();
@@ -81,5 +81,9 @@ public class DiscordService {
 
     public void setCommandList(final String commandList) {
         this.commandList = commandList;
+    }
+
+    public String getDiscordName(final User user) {
+        return discordClient.getUserByID(user.getDiscordId()).getName();
     }
 }

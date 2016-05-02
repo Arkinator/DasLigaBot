@@ -1,21 +1,22 @@
 ----------------------------------------------------------------------
-*  ___  ____   __    ____   ___  ____    __    ____  ____    ___     *
-* / __)(_  _) /__\  (  _ \ / __)(  _ \  /__\  ( ___)(_  _)  (__ \    *
-* \__ \  )(  /(__)\  )   /( (__  )   / /(__)\  )__)   )(     / _/    *
-* (___/ (__)(__)(__)(_)\_) \___)(_)\_)(__)(__)(__)   (__)   (____)   *
+*    __________________ .___.___                                     *
+*   /   _____/\_   ___ \|   |   |      Starcraft 2 - DAS Liga        *
+*   \_____  \ /    \  \/|   |   |                                    *
+*   /        \\     \___|   |   |   !hello, I'm a Discord-Bot.       *
+*  /_______  / \______  /___|___|   I run an automated starcraft     *
+*          \/         \/            tournament. Just type !challenge *
+*   (D) iscord            to challenge anybody to play. The other    *
+*   (A) utomated          person has to !accept the challenge. Then  *
+*   (S) tarcraft          you battle it out in SCII and !report the  *
+*                         result back to me. Every win or loss will  *
+*      _     _            gain or loose you ELO points, impacting    *
+*     | |   (_)                 your ranking. With !league you can   *
+*     | |    _  __ _  __ _      take a look at the current rankings. *
+*     | |   | |/ _` |/ _` |                                          *
+*     | |___| | (_| | (_| |         If you have any question, ask    *
+*     \_____/_|\__, |\__,_|         !help                            *
+*               __/ |                                                *
+*              |___/                 glhf                            *
 *                                                                    *
-*                                                                    *
-*   D iscord           Starcraft 2 - DAS Liga                        *
-*   A utomated                                                       *
-*   S tarcraft         !hello, I'm a Discord-Bot. I run an automated *
-*                      starcraft tournament. Just type !challenge    *
-*      _     _         to challenge anybody. Or !list to get a list  *
-*     | |   (_)        of all available commands. !match gives your  *
-*     | |    _  __ _  __ _   current match, !league the current      *
-*     | |   | |/ _` |/ _` |  standings of the league. Oh, and don't  *
-*     | |___| | (_| | (_| |  forget to change your !race.            *
-*     \_____/_|\__, |\__,_|                                          *
-*               __/ |           glhf                                 *
-*              |___/                                                 *
 *                                   DAS Liga Bot                     *
 ----------------------------------------------------------------------

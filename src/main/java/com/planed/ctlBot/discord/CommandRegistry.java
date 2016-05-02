@@ -5,6 +5,8 @@ import com.planed.ctlBot.common.AccessLevel;
 import com.planed.ctlBot.domain.User;
 import com.planed.ctlBot.domain.UserRepository;
 import org.apache.commons.lang3.ArrayUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
@@ -23,6 +25,8 @@ import java.util.Map;
  */
 @Service
 public class CommandRegistry {
+    Logger LOG = LoggerFactory.getLogger(CommandRegistry.class);
+
     private final ApplicationContext applicationContext;
     private final DiscordService discordService;
     private final Map<String, DiscordCommand> commandNameMap;
@@ -81,6 +85,10 @@ public class CommandRegistry {
 
     public void fireEvent(final CommandCall call) {
         final DiscordCommand command = commandNameMap.get(call.getCommandPhrase());
+        LOG.info("Command from " + call.getAuthor()
+                + " with command " + call.getCommandPhrase()
+                + " and " + call.getMentions()
+                + "and" + call.getParameters());
         if (command != null && checkUserAuthorization(call, command)) {
             invokeCommand(call, command);
         }

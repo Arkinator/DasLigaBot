@@ -13,7 +13,7 @@ public class User {
 
     private Race race;
 
-    private Match match;
+    private Long matchId;
 
     private Double elo = LigaConstants.INITIAL_ELO;
 
@@ -58,14 +58,6 @@ public class User {
         this.race = race;
     }
 
-    public Match getMatch() {
-        return match;
-    }
-
-    public void setMatch(final Match match) {
-        this.match = match;
-    }
-
     public Double getElo() {
         return elo;
     }
@@ -74,7 +66,19 @@ public class User {
         this.elo = elo;
     }
 
-    public String toString(){
-        return "<@"+getDiscordId()+">";
+    public String toString() {
+        return "<@" + getDiscordId() + ">";
+    }
+
+    public Long getMatchId() {
+        return matchId;
+    }
+
+    public void setMatchId(final Long matchId) {
+        this.matchId = matchId;
+    }
+
+    public String getInfo() {
+        return "<@" + getDiscordId() + "> (" + getElo() + " ELO, " + getNumberOfInteractions() + " interactions)";
     }
 }

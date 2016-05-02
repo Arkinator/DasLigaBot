@@ -1,10 +1,9 @@
 package com.planed.ctlBot.data.repositories;
 
 import com.planed.ctlBot.data.MatchEntity;
-import com.planed.ctlBot.data.UserEntity;
 import org.springframework.data.repository.CrudRepository;
 
-import java.util.List;
+import java.util.Collection;
 
 /**
  * Created by Julian Peters on 09.04.16.
@@ -12,6 +11,7 @@ import java.util.List;
  * @author julian.peters@westernacher.com
  */
 public interface MatchEntityRepository extends CrudRepository<MatchEntity, Long> {
-    List<MatchEntity> findMatchByPlayers(UserEntity player);
+    Collection<? extends MatchEntity> findMatchByPlayerA(String discordId);
+    Collection<? extends MatchEntity> findMatchByPlayerB(String discordId);
 }
 

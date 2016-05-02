@@ -26,14 +26,17 @@ public class UserService {
     private final DiscordService discordService;
     private final UserRepository userRepository;
     private final MatchRepository matchRepository;
+    private final PrService prService;
 
     @Autowired
     public UserService(final UserRepository userRepository,
                        final DiscordService discordService,
-                       final MatchRepository matchRepository) {
+                       final MatchRepository matchRepository,
+                       final PrService prService) {
         this.userRepository = userRepository;
         this.discordService = discordService;
         this.matchRepository = matchRepository;
+        this.prService = prService;
     }
 
     public void giveUserAccessLevel(final String userName, final AccessLevel accessLevel) {
@@ -71,29 +74,38 @@ public class UserService {
     }
 
     public void issueChallenge(final User author, final User challengee) {
-        matchRepository.addMatch(author, challengee);
+        final Match match = matchRepository.addMatch(author, challengee);
+        author.setMatchId(match.getMatchId());
+        challengee.setMatchId(match.getMatchId());
+        userRepository.save(author, challengee);
         discordService.whisperToUser(challengee.getDiscordId(),
                 "You have been challenged by "
                         + discordService.shortInfo(author)
                         + ". You can !reject or !accept the challenge");
+        prService.printChallengeExtendedMessage(match);
     }
 
     public void rejectChallenge(final User author) {
-        final Match match = author.getMatch();
+        final Match match = matchRepository.findMatchById(author.getMatchId());
+        prService.printChallengeRejectedMessage(match);
         match.setGameStatus(GameStatus.challengeRejected);
         matchRepository.saveMatch(match);
         clearMatchOfInvolvedPlayers(match);
     }
 
     public void revokeChallenge(final User author) {
-        final Match match = author.getMatch();
+        final Match match = matchRepository.findMatchById(author.getMatchId());
         match.setGameStatus(GameStatus.challengeRevoked);
         matchRepository.saveMatch(match);
         clearMatchOfInvolvedPlayers(match);
+        discordService.whisperToUser(author.getDiscordId(), "Your challenge has been revoked.");
+        discordService.whisperToUser(match.getPlayerB().getDiscordId(),
+                "The challenge from " + author.toString() + " has just been revoked.");
     }
 
     public void acceptChallenge(final User author) {
-        final Match match = author.getMatch();
+        final Match match = matchRepository.findMatchById(author.getMatchId());
+        prService.printGameIsOnMessage(match);
         match.setGameStatus(GameStatus.challengeAccepted);
         matchRepository.saveMatch(match);
     }
@@ -101,6 +113,7 @@ public class UserService {
     public void reportResult(final Match match, final User author, final GameResult result) {
         match.reportResult(author, result);
         if (match.getGameStatus() == GameStatus.gamePlayed) {
+            prService.printMessageResultMessage(match);
             finalizeGame(match);
         }
         matchRepository.saveMatch(match);
@@ -125,7 +138,7 @@ public class UserService {
 
     private void clearMatchOfInvolvedPlayers(final Match match) {
         match.getPlayers().forEach(p -> {
-            p.setMatch(null);
+            p.setMatchId(null);
             userRepository.save(p);
         });
     }

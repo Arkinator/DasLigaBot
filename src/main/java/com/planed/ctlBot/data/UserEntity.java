@@ -7,10 +7,7 @@ import com.planed.ctlBot.common.Race;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 /**
@@ -32,9 +29,8 @@ public class UserEntity {
     private Race race;
     @Column(nullable = false)
     private Double elo = LigaConstants.INITIAL_ELO;
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "matchId")
-    private MatchEntity match;
+    @Column
+    private Long matchId;
 
     public String getDiscordId() {
         return discordId;
@@ -72,12 +68,12 @@ public class UserEntity {
         return elo;
     }
 
-    public MatchEntity getMatch() {
-        return match;
+    public Long getMatchId() {
+        return matchId;
     }
 
-    public void setMatch(final MatchEntity match) {
-        this.match = match;
+    public void setMatchId(final Long matchId) {
+        this.matchId = matchId;
     }
 
     public void setElo(final Double elo) {

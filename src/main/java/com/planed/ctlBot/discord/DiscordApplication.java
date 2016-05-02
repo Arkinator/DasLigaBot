@@ -11,7 +11,10 @@ import org.springframework.transaction.annotation.Transactional;
 import sx.blah.discord.api.EventSubscriber;
 import sx.blah.discord.api.IDiscordClient;
 import sx.blah.discord.handle.impl.events.MessageReceivedEvent;
+import sx.blah.discord.handle.impl.events.ReadyEvent;
+import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.util.DiscordException;
+import sx.blah.discord.util.HTTP429Exception;
 
 import java.util.Optional;
 
@@ -58,14 +61,34 @@ public class DiscordApplication {
         }
     }
 
+    @EventSubscriber
+    public void signOn(final ReadyEvent readyEvent) {
+        for (final IChannel channel : discordClient.getChannels(false)) {
+            LOG.info(channel.getID() + " => " + channel.getGuild().getName() + "." + channel.getName());
+        }
+    }
+
     @Scheduled(fixedRate = 5000)
     public void checkDiscordConnection() {
         if (!discordClient.isReady()) {
             try {
+                discordClient.logout();
                 discordClient.login();
             } catch (final DiscordException e) {
                 LOG.error("Error while reconnecting: ", e);
+            } catch (final HTTP429Exception e) {
+                LOG.error("Error while reconnecting: ", e);
             }
+        }
+    }
+
+    @Scheduled(fixedRate = 62020)
+    public void updateStatus() {
+        discordClient.updatePresence(false, Optional.of("Type !info for awesomness"));
+        try {
+            discordClient.changeUsername("DAS Liga Bot");
+        } catch (final Exception e) {
+            LOG.warn("Error on changing status");
         }
     }
 

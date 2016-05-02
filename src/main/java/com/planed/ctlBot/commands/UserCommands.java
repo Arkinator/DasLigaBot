@@ -8,6 +8,7 @@ import com.planed.ctlBot.discord.DiscordCommand;
 import com.planed.ctlBot.discord.DiscordController;
 import com.planed.ctlBot.discord.DiscordService;
 import com.planed.ctlBot.domain.Match;
+import com.planed.ctlBot.domain.MatchRepository;
 import com.planed.ctlBot.domain.User;
 import com.planed.ctlBot.services.UserService;
 import org.slf4j.Logger;
@@ -27,6 +28,8 @@ public class UserCommands {
     @Autowired
     private UserService userService;
     @Autowired
+    private MatchRepository matchRepository;
+    @Autowired
     private DiscordService discordService;
 
     @DiscordCommand(name = {"setRace", "changeRace", "race"}, help = "This command lets you change your race. Specify whether you play Zerg, Terran, Protoss or Random")
@@ -39,19 +42,23 @@ public class UserCommands {
     public void issueChallenge(final CommandCall call) {
         final User challenger = call.getAuthor();
         final User challengee = call.getMentions().get(0);
-        if (needNoMatch(call, call.getAuthor(), "You are already in a match: '" + challenger.getMatch())
+        if (needNoMatch(call, call.getAuthor(), "You are already in a match: '" + findMatch(challenger))
                 && needNoMatch(call, call.getMentions().get(0), "The challengee is already in a match: '" + challengee)
                 && needDifferentUsers(call, challenger, challengee, "You can not challenge yourself!")) {
             userService.issueChallenge(challenger, challengee);
         }
     }
 
-    @DiscordCommand(name = {"reject", "rejectchallenge"}, help = "Reject your current challenge")
+    private Match findMatch(final User user) {
+        return matchRepository.findMatchById(user.getMatchId());
+    }
+
+    @DiscordCommand(name = {"reject", "rejectchallenge", "swipeleft"}, help = "Reject your current challenge")
     public void rejectChallenge(final CommandCall call) {
         if (needMatch(call, "No match found. Type !status to see current Matches\"!") &&
-                needToBeChallengee(call, "You can not reject a challenge you did not make! Your current match is " + call.getAuthor().getMatch()) &&
+                needToBeChallengee(call, "You can not reject a challenge you did not make! Your current match is " + findMatch(call.getAuthor())) &&
                 needGameStatus(call, "You can only reject recently extended challenges. Current match is "
-                        + call.getAuthor().getMatch(), GameStatus.challengeExtended)) {
+                        + findMatch(call.getAuthor()), GameStatus.challengeExtended)) {
             userService.rejectChallenge(call.getAuthor());
         }
     }
@@ -59,38 +66,37 @@ public class UserCommands {
     @DiscordCommand(name = {"revoke", "revokechallenge"}, help = "Revoke your current challenge")
     public void revokeChallenge(final CommandCall call) {
         final User author = call.getAuthor();
-        final Match match = author.getMatch();
         if (needMatch(call, "No match currently assigned to you. You need to !challenge somebody first") &&
                 needGameStatus(call, "You can only revoke recently extended challenges. Type !status to learn about your current match", GameStatus.challengeExtended) &&
-                needToBeChallenger(call, "You can not revoke a challenge that has been extended to you! Your current match is " + author.getMatch())) {
+                needToBeChallenger(call, "You can not revoke a challenge that has been extended to you! Your current match is " + findMatch(author))) {
             userService.revokeChallenge(call.getAuthor());
         }
     }
 
-    @DiscordCommand(name = {"accept", "acceptchallenge"}, help = "Accept the challenge extended to you!")
+    @DiscordCommand(name = {"accept", "acceptchallenge", "swiperight"}, help = "Accept the challenge extended to you!")
     public void acceptChallenge(final CommandCall call) {
         if (needMatch(call, "This command is to accept a challenge, that has been extended to you. Currently there is none") &&
-                needToBeChallengee(call, "You can not accept a challenge that has you made! Your current match is "
-                        + call.getAuthor().getMatch()) &&
+                needToBeChallengee(call, "You can not accept a challenge that you have extended! Your current match is "
+                        + findMatch(call.getAuthor())) &&
                 needGameStatus(call, "You can only recently extended challenges. Current match is "
-                        + call.getAuthor().getMatch(), GameStatus.challengeExtended)) {
-            final User challengee = call.getAuthor().getMatch().getPlayers().get(0);
+                        + findMatch(call.getAuthor()), GameStatus.challengeExtended)) {
+            final User challengee = findMatch(call.getAuthor()).getPlayers().get(0);
             final User challenger = call.getAuthor();
             userService.acceptChallenge(call.getAuthor());
             discordService.whisperToUser(challengee.getDiscordId(),"You just accepted a challenge from "
-                    + discordService.shortInfo(challenger) +
+                    + discordService.shortInfo(challengee) +
                             ". Now get in touch with your opponent and battle it out. The format is Best-of-three, " +
                             "maps are loosers-pick, your pick (the challengee) for the first map, the game is on. glhf");
             discordService.whisperToUser(challenger.getDiscordId(),
-                    "Your challenge to " +  discordService.shortInfo(challengee)+ " just got accepted! "+
+                    "Your challenge to " +  discordService.shortInfo(challenger)+ " just got accepted! "+
                             ". Now get in touch with your opponent and battle it out. The format is Best-of-three, " +
-                            "maps are loosers-pick, your opponents pick (the challengee) for the first map, the game is on. glhf");
+                            "maps are loosers-pick, your opponent picks (the challengee) for the first map, the game is on. glhf");
         }
     }
 
     private boolean needGameStatus(final CommandCall call, final String message, final GameStatus... statusses) {
         for (final GameStatus status : statusses) {
-            if (call.getAuthor().getMatch().getGameStatus() == status) {
+            if (findMatch(call.getAuthor()).getGameStatus() == status) {
                 return true;
             }
         }
@@ -107,7 +113,7 @@ public class UserCommands {
     }
 
     private boolean needToBeChallengee(final CommandCall call, final String message) {
-        if (call.getAuthor().getDiscordId() == call.getAuthor().getMatch().getPlayers().get(0).getDiscordId()) {
+        if (call.getAuthor().getDiscordId() == findMatch(call.getAuthor()).getPlayers().get(0).getDiscordId()) {
             discordService.whisperToUser(call.getAuthor().getDiscordId(), message);
             return false;
         }
@@ -115,7 +121,7 @@ public class UserCommands {
     }
 
     private boolean needToBeChallenger(final CommandCall call, final String message) {
-        if (call.getAuthor().getDiscordId() == call.getAuthor().getMatch().getPlayers().get(1).getDiscordId()) {
+        if (call.getAuthor().getDiscordId() == findMatch(call.getAuthor()).getPlayers().get(1).getDiscordId()) {
             discordService.whisperToUser(call.getAuthor().getDiscordId(), message);
             return false;
         }
@@ -123,7 +129,7 @@ public class UserCommands {
     }
 
     private boolean needNoMatch(final CommandCall call, final User user, final String message) {
-        if (user.getMatch() != null) {
+        if (findMatch(user) != null) {
             discordService.whisperToUser(call.getAuthor().getDiscordId(), message);
             return false;
         }
@@ -131,7 +137,7 @@ public class UserCommands {
     }
 
     private boolean needMatch(final CommandCall call, final String message) {
-        if (call.getAuthor().getMatch() == null) {
+        if (findMatch(call.getAuthor()) == null) {
             discordService.whisperToUser(call.getAuthor().getDiscordId(), message);
             return false;
         }
@@ -150,16 +156,16 @@ public class UserCommands {
     public void reportResult(final CommandCall call) {
         if (needMatch(call, "This command is to report a result for game. No game found for you!") &&
                 needGameStatus(call, "You can only report results for a valid challenge. Current match is "
-                        + call.getAuthor().getMatch(), GameStatus.challengeAccepted, GameStatus.partiallyReported, GameStatus.conflictState) &&
+                        + findMatch(call.getAuthor()), GameStatus.challengeAccepted, GameStatus.partiallyReported, GameStatus.conflictState) &&
                 needParameters(call, 1, "Did you win or loose? Type 'win' or 'loss'.") &&
                 needGameResultParameter(call, "Did you win or loose? Type 'win' or 'loss'.")) {
             discordService.whisperToUser(call.getAuthor().getDiscordId(), "Reporting result: "+GameResult.parse(call.getParameters().get(0)));
-            userService.reportResult(call.getAuthor().getMatch(), call.getAuthor(), GameResult.parse(call.getParameters().get(0)));
+            userService.reportResult(findMatch(call.getAuthor()), call.getAuthor(), GameResult.parse(call.getParameters().get(0)));
         }
     }
 
     private boolean needNoReportedResultForUser(final CommandCall call, final String message) {
-        if (call.getAuthor().getMatch().didUserReportResult(call.getAuthor()) && call.getAuthor().getMatch().getGameStatus()!=GameStatus.conflictState) {
+        if (findMatch(call.getAuthor()).didUserReportResult(call.getAuthor()) && findMatch(call.getAuthor()).getGameStatus()!=GameStatus.conflictState) {
             discordService.whisperToUser(call.getAuthor().getDiscordId(), message);
             return false;
         }
@@ -185,7 +191,7 @@ public class UserCommands {
     }
 
     private String buildStatusString(final CommandCall call) {
-        final Match match = call.getAuthor().getMatch();
+        final Match match = findMatch(call.getAuthor());
         final StringBuilder builder = new StringBuilder();
         if (call.getAuthor().getAccessLevel() == AccessLevel.User) {
             builder.append("Hello! You are a registered user.\n");

@@ -6,13 +6,10 @@ import com.planed.ctlBot.common.Race;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
-import java.util.List;
 
 /**
  * Created by Julian Peters on 09.04.16.
@@ -26,8 +23,10 @@ public class MatchEntity {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long matchId;
 
-    @OneToMany(mappedBy= "match", fetch = FetchType.EAGER)
-    private List<UserEntity> players;
+    @Column
+    private String playerA;
+    @Column
+    private String playerB;
     @Column(nullable = false)
     private GameStatus gameStatus;
     @Column
@@ -56,12 +55,20 @@ public class MatchEntity {
         this.matchId = matchId;
     }
 
-    public List<UserEntity> getPlayers() {
-        return players;
+    public String getPlayerA() {
+        return playerA;
     }
 
-    public void setPlayers(final List<UserEntity> players) {
-        this.players = players;
+    public void setPlayerA(String playerA) {
+        this.playerA = playerA;
+    }
+
+    public String getPlayerB() {
+        return playerB;
+    }
+
+    public void setPlayerB(String playerB) {
+        this.playerB = playerB;
     }
 
     public GameStatus getGameStatus() {

@@ -17,23 +17,18 @@ import java.util.List;
 public class MatchRepository {
     private final Mapper mapper = new DozerBeanMapper();
 
-    private final MatchEntityRepository matchEntityRepository;
-    private final UserEntityRepository userEntityRepository;
-    private final UserRepository userRepository;
-
     @Autowired
-    public MatchRepository(final MatchEntityRepository matchEntityRepository,
-                           final UserEntityRepository userEntityRepository,
-                           final UserRepository userRepository) {
-        this.matchEntityRepository = matchEntityRepository;
-        this.userEntityRepository = userEntityRepository;
-        this.userRepository = userRepository;
-    }
+    private MatchEntityRepository matchEntityRepository;
+    @Autowired
+    private UserEntityRepository userEntityRepository;
+    @Autowired
+    private UserRepository userRepository;
 
     public Match findMatchForUser(final String discordId) {
         final UserEntity user = userEntityRepository.findOne(discordId);
         final List<MatchEntity> resultList = new ArrayList<>();
-        resultList.addAll(matchEntityRepository.findMatchByPlayers(user));
+        resultList.addAll(matchEntityRepository.findMatchByPlayerA(user.getDiscordId()));
+        resultList.addAll(matchEntityRepository.findMatchByPlayerB(user.getDiscordId()));
         if (resultList.size() == 1) {
             return mapper.map(resultList.get(0), Match.class);
         } else {
@@ -41,7 +36,7 @@ public class MatchRepository {
         }
     }
 
-    public void addMatch(final User author, final User challengee) {
+    public Match addMatch(final User author, final User challengee) {
         final List<User> playerList = new ArrayList<>();
         playerList.add(author);
         playerList.add(challengee);
@@ -50,36 +45,49 @@ public class MatchRepository {
         match.setPlayers(playerList);
         match.setGameStatus(GameStatus.challengeExtended);
         final long matchId = matchEntityRepository.save(mapToEntity(match)).getMatchId();
+//
+//        final Match dbMatch = ;
+//        playerList.forEach(p -> {
+//            p.setMatch(dbMatch);
+//            userRepository.save(p);
+//        });
 
-        final Match dbMatch = findMatchById(matchId);
-        playerList.forEach(p -> {
-            p.setMatch(dbMatch);
-            userRepository.save(p);
-        });
+        return findMatchById(matchId);
     }
 
     public Match findMatchById(final Long matchId) {
-        return mapper.map(matchEntityRepository.findOne(matchId), Match.class);
+        if (matchId == null) {
+            return null;
+        }
+        return mapperFromEntity(matchEntityRepository.findOne(matchId));
+    }
+
+    private Match mapperFromEntity(final MatchEntity match) {
+        final Match result = mapper.map(match, Match.class);
+        result.setPlayers(new ArrayList<>());
+        result.getPlayers().add(userRepository.findByDiscordId(match.getPlayerA()));
+        result.getPlayers().add(userRepository.findByDiscordId(match.getPlayerB()));
+        return result;
     }
 
     private MatchEntity mapToEntity(final Match match) {
         final MatchEntity result = mapper.map(match, MatchEntity.class);
-        final List<UserEntity> players = new ArrayList<>();
-        match.getPlayers().forEach(p -> players.add(userEntityRepository.findOne(p.getDiscordId())));
-        result.setPlayers(players);
-
-//        players.forEach(p -> p.setMatch(result));
-//        result.setPlayers(players);
+        if (match.getPlayerA() != null) {
+            result.setPlayerA(match.getPlayerA().getDiscordId());
+        }
+        if (match.getPlayerB() != null) {
+            result.setPlayerB(match.getPlayerB().getDiscordId());
+        }
         return result;
     }
 
     public void saveMatch(final Match match) {
-        matchEntityRepository.save(mapper.map(match, MatchEntity.class));
+        matchEntityRepository.save(mapToEntity(match));
     }
 
     public List<Match> findAll() {
         final List<Match> result = new ArrayList<>();
-        matchEntityRepository.findAll().forEach(m->result.add(mapper.map(m, Match.class)));
+        matchEntityRepository.findAll().forEach(m -> result.add(mapperFromEntity(m)));
         return result;
     }
 }

@@ -3,7 +3,6 @@ package com.planed.ctlBot.domain;
 import com.planed.ctlBot.common.GameResult;
 import com.planed.ctlBot.common.GameStatus;
 import com.planed.ctlBot.common.Race;
-import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import java.util.List;
 
@@ -139,7 +138,7 @@ public class Match {
             } else {
                 setGameStatus(GameStatus.conflictState);
             }
-        } else if  ((playerBreportedScoreForPlayerA != null) || (playerAreportedScoreForPlayerA != null)){
+        } else if ((playerBreportedScoreForPlayerA != null) || (playerAreportedScoreForPlayerA != null)) {
             setGameStatus(GameStatus.partiallyReported);
         } else {
             setGameStatus(GameStatus.challengeAccepted);
@@ -161,22 +160,34 @@ public class Match {
 
     @Override
     public String toString() {
+        String scoreA = "";
+        String scoreB = "";
+        String vs = " vs ";
+        String status = "";
         if (gameStatus == GameStatus.challengeExtended) {
-            return players.get(0) + " (vs) " + players.get(1) + " (extended challenge)";
+            vs = " (vs) ";
+            status = " (extended challenge)";
         }
         if (gameStatus == GameStatus.challengeAccepted) {
-            return players.get(0) + " vs " + players.get(1) + " (accepted challenge)";
+            status = " (accepted challenge)";
         }
         if (gameStatus == GameStatus.partiallyReported) {
-            return players.get(0) + " vs " + players.get(1) + " (partially reported)";
+            status = " (partially reported)";
         }
         if (gameStatus == GameStatus.conflictState) {
-            return players.get(0) + " vs " + players.get(1) + " (conflict state)";
+            status = " (conflict state)";
         }
         if (gameStatus == GameStatus.gamePlayed) {
-            return players.get(0) + "(" + finalScorePlayerA + ") vs (" + finalScorePlayerB + ") " + players.get(1);
+            scoreA = "(" + finalScorePlayerA + ")";
+            scoreB = "(" + finalScorePlayerB + ")";
         }
-        return ToStringBuilder.reflectionToString(this);
+        String playerA = "<>";
+        String playerB = "<>";
+        if (players.size() == 2) {
+            playerA = players.get(0).toString();
+            playerB = players.get(1).toString();
+        }
+        return playerA + scoreA + vs + scoreB + playerB + status;
     }
 
     public double getEloResult() {

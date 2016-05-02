@@ -25,14 +25,16 @@ public class BasicCommands {
 
     private final DiscordService discordService;
     private String infoString = "error booting the server";
+    private String helpString = "error booting the server";
 
     @Autowired
     public BasicCommands(final DiscordService discordService) {
         this.discordService = discordService;
         try {
             this.infoString = FileUtils.readFileToString(new File("src/main/resources/logo.txt"));
+            this.helpString = FileUtils.readFileToString(new File("src/main/resources/help.txt"));
         } catch (final IOException e) {
-            LOG.error("error while reading file '"+new File("logo.txt")+"' :",e);
+            LOG.error("Error while reading file:", e);
         }
     }
 
@@ -43,7 +45,7 @@ public class BasicCommands {
 
     @DiscordCommand(name = {"list", "help"}, help = "Lists all available commands")
     public void listAllCommands(final CommandCall call) {
-        discordService.whisperToUser(call.getAuthor().getDiscordId(), discordService.getCommandList());
+        discordService.whisperToUser(call.getAuthor().getDiscordId(), CODE_ESCAPE + "\n" + helpString + CODE_ESCAPE);
     }
 
     @DiscordCommand(name = {"info"}, help = "Displays some information about me!")
@@ -51,7 +53,7 @@ public class BasicCommands {
         discordService.whisperToUser(call.getAuthor().getDiscordId(), buildInfoText(call));
     }
 
-    @DiscordCommand(name = {"intro"}, help = "Administrator command to introduce the bot to a channel", roleRequired= AccessLevel.Admin)
+    @DiscordCommand(name = {"intro"}, help = "Administrator command to introduce the bot to a channel", roleRequired = AccessLevel.Admin)
     public void introductionCommand(final CommandCall call) {
         discordService.replyInChannel(call.getChannel(), buildInfoText(call));
     }
