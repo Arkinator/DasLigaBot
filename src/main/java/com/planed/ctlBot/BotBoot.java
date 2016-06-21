@@ -28,9 +28,6 @@ import static org.hibernate.jpa.internal.QueryImpl.LOG;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 
-/**
- * Created by jules on 09.04.2016.
- */
 @Configuration
 @ComponentScan(basePackages = "com.planed.ctlBot")
 @PropertySource("/application.properties")
@@ -43,7 +40,6 @@ public class BotBoot {
     private String discordPassword;
 
     public static void main(final String[] args) {
-//        System.setProperty("derby.system.homeSystem.setProp", "/Users/jps/code/CtlBattleBot/");
         SpringApplication.run(BotBoot.class, args);
     }
 
@@ -51,10 +47,10 @@ public class BotBoot {
     @Profile("!development")
     public DataSource dbFromFileSystem() {
         final DriverManagerDataSource ds = new DriverManagerDataSource();
-        ds.setDriverClassName("org.apache.derby.jdbc.EmbeddedDriver");
-        ds.setUrl("jdbc:derby:/Users/jps/code/CtlBattleBot/database.db");
-        ds.setUsername("");
-        ds.setPassword("");
+       // ds.setDriverClassName("org.apache.derby.jdbc.EmbeddedDriver");
+        ds.setUrl("jdbc:mysql://inet00.de:3306/k39321h8_DasLiga");
+        ds.setUsername("k39321h8_LigaBot");
+        ds.setPassword("epLC976XM9bemX5YxeKP");
         return ds;
     }
 
@@ -75,7 +71,7 @@ public class BotBoot {
         if (discordUsername == null || discordPassword == null) {
             throw new UnsetUserCredentialsException();
         }
-        clientBuilder.withLogin(discordUsername, discordPassword);
+        clientBuilder.withToken("MTk0NzE1MjU0Nzg0MTMxMDcz.Ckp-Ng.-dtm8JRr1RJTSVuVUdowKJSmsyE");
         try {
             return clientBuilder.login();
         } catch (final DiscordException e) {
