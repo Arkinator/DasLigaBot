@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.util.StreamUtils;
 import org.springframework.stereotype.Repository;
 
+import com.planed.ctlBot.common.GameStatus;
 import com.planed.ctlBot.data.LineupEntity;
 import com.planed.ctlBot.data.repositories.LineupEntityRepository;
 
@@ -31,7 +32,17 @@ public class LineupRepository { //couple of functions and how to save object fro
 	                .forEach(result::add);
 	        return result;
 	    }
-
+	    
+	    public void addLineup(final String lineupId) {
+	    	final Lineup lineup = new Lineup(lineupId);
+	    	lineupEntityRepository.save(mapToEntity(lineup));
+	    }
+	    
+	    public void addLineup(final String lineupId, String mentions, String message) {
+	    	final Lineup lineup = new Lineup(lineupId, mentions, message);
+	    	lineupEntityRepository.save(mapToEntity(lineup));
+	    }
+	    
 	    public Lineup findByLineupId(final String lineupId) {
 	        final LineupEntity lineupEntity = lineupEntityRepository.findOne(lineupId);
 	        if (lineupEntity == null) {
@@ -61,4 +72,8 @@ public class LineupRepository { //couple of functions and how to save object fro
 	    public Lineup refresh(final Lineup lineup) {
 	        return mapFromEntity(lineupEntityRepository.findOne(lineup.getLineupId()));
 	    }
+	    
+	    public void removeLineup(final String lineupId) {
+			lineupEntityRepository.delete(lineupId);
+		}
 }
