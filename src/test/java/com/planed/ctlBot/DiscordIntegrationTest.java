@@ -66,12 +66,14 @@ public class DiscordIntegrationTest {
         assertThat(userEntityRepository.findOne(AUTHOR_ID), is(not(nullValue())));
     }
 
-    @Test(expected = CommandRegistry.InsufficientAccessRightsException.class)
+    @Test
     public void shouldNotCallWhenUserRightsAreInsufficient() {
         final CommandCall call = aCommandCallFromAuthor()
                 .setCommandPhrase(COMMAND_PHRASE_2)
                 .createCommandCall();
         commandRegistry.fireEvent(call);
+
+        assertThat(lastCall, is(not(call)));
     }
 
     @Test
