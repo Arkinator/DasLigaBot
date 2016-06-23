@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-
 import com.planed.ctlBot.commands.data.CommandCall;
 import com.planed.ctlBot.common.AccessLevel;
 import com.planed.ctlBot.discord.DiscordCommand;
@@ -46,18 +45,20 @@ public class LineupCommands {
 	public void listLineupsCommand(final CommandCall call) {
 		List<Lineup> list = lineupService.getAllLineups();
 		if(list!=null)
-			discordService.replyInChannel(call.getChannel(), lineupService.getAllLineups().size() + "" );
-				for(Lineup tmpLineup : list) 
-					discordService.replyInChannel(call.getChannel(), tmpLineup.getLineupId() + " " 
-							+ tmpLineup.getPlayerMentions() + " "
-							+ tmpLineup.getMessage());
+			discordService.replyInChannel(call.getChannel(), lineupService.count() + "" ); //+ list.size() 
+		for(Lineup tmpLineup : list) 
+			discordService.replyInChannel(call.getChannel(), tmpLineup.getLineupId() + " " 
+					+ tmpLineup.getMessage());
 	}
 
 	@DiscordCommand(name = {"setlineupmessage"}, help = "Sets lineup message - {setlineupmessage, lineupUniqueId, message}", roleRequired = AccessLevel.Admin)
 	public void setLineupMessageCommand(final CommandCall call) {
 		Lineup lineup = lineupRepository.findByLineupId(call.getParameters().get(0));
+		StringBuilder message = new StringBuilder();
+		for(int i = 1; i<call.getParameters().size(); i++)
+			message.append(call.getParameters().get(i) + " ");
 		if(lineup!=null) {
-			lineup.setMessage(call.getParameters().get(1));
+			lineup.setMessage(message.toString());
 		}
 	}
 
@@ -76,19 +77,17 @@ public class LineupCommands {
 			lineupRepository.removeLineup(call.getParameters().get(0));
 		}
 	}
-	
+
 	@DiscordCommand(name = {"lineupwmentions"}, help = "lists named lineup with mentions - {lineupwmentions, lineupUniqueId}", roleRequired = AccessLevel.Admin)
 	public void listLineupWithoutMentionCommand(final CommandCall call) {
 		Lineup lineup = lineupRepository.findByLineupId(call.getParameters().get(0));
-		discordService.replyInChannel(call.getChannel(), lineup.getLineupId() + " " 
-				+ lineup.getPlayerMentions() + " "
+		discordService.replyInChannel(call.getChannel(), lineup.getPlayerMentions() + " "
 				+ lineup.getMessage());
 	}
-	
+
 	@DiscordCommand(name = {"lineup"}, help = "lists named lineup - {lineup, lineupUniqueId}")
 	public void listLineupCommand(final CommandCall call) {
 		Lineup lineup = lineupRepository.findByLineupId(call.getParameters().get(0));
-		discordService.replyInChannel(call.getChannel(), lineup.getLineupId() + " " 
-				+ lineup.getMessage());
+		discordService.replyInChannel(call.getChannel(), "" + lineup.getMessage());
 	}
 }
