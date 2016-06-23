@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.planed.ctlBot.commands.data.CommandCall;
+import com.planed.ctlBot.common.AccessLevel;
 import com.planed.ctlBot.discord.DiscordCommand;
 import com.planed.ctlBot.discord.DiscordController;
 import com.planed.ctlBot.discord.DiscordService;
@@ -28,7 +29,7 @@ public class LineupCommands {
 	@Autowired
 	private DiscordService discordService;
 
-	@DiscordCommand(name = {"createlineup"}, help = "Creates lineup - {createlineup, lineupUniqueId, mentions, message}")
+	@DiscordCommand(name = {"createlineup"}, help = "Creates lineup - {createlineup, lineupUniqueId, mentions, message}", roleRequired = AccessLevel.Admin)
 	public void createLineupCommand(final CommandCall call) {
 		if(call.getParameters().size()>=3) {
 			StringBuilder message = new StringBuilder();
@@ -47,7 +48,7 @@ public class LineupCommands {
 					+ list.get(i).getMessage());
 	}
 
-	@DiscordCommand(name = {"setlineupmessage"}, help = "Sets lineup message - {setlineupmessage, lineupUniqueId, message}")
+	@DiscordCommand(name = {"setlineupmessage"}, help = "Sets lineup message - {setlineupmessage, lineupUniqueId, message}", roleRequired = AccessLevel.Admin)
 	public void setLineupMessageCommand(final CommandCall call) {
 		Lineup lineup = lineupRepository.findByLineupId(call.getParameters().get(0));
 		if(lineup!=null) {
@@ -55,7 +56,7 @@ public class LineupCommands {
 		}
 	}
 	
-	@DiscordCommand(name = {"setlineupmentions"}, help = "Sets lineup mentions - {setlineupmentions, lineupUniqueId, new mention tag}")
+	@DiscordCommand(name = {"setlineupmentions"}, help = "Sets lineup mentions - {setlineupmentions, lineupUniqueId, new mention tag}", roleRequired = AccessLevel.Admin)
 	public void setLineupMentionCommand(final CommandCall call) {
 		Lineup lineup = lineupRepository.findByLineupId(call.getParameters().get(0));
 		if(lineup!=null) {
@@ -63,7 +64,7 @@ public class LineupCommands {
 		}
 	}
 	
-	@DiscordCommand(name = {"deletelineup"}, help = "deletes named lineup - {deletelineup, lineupUniqueId}")
+	@DiscordCommand(name = {"deletelineup"}, help = "deletes named lineup - {deletelineup, lineupUniqueId}", roleRequired = AccessLevel.Admin)
 	public void deleteLineupCommand(final CommandCall call) {
 		Lineup lineup = lineupRepository.findByLineupId(call.getParameters().get(0));
 		if(lineup!=null) {
