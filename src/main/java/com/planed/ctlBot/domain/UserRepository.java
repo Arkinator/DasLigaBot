@@ -14,10 +14,12 @@ import java.util.List;
 @Component
 public class UserRepository {
     private final Mapper mapper = new DozerBeanMapper();
-    @Autowired
     private UserEntityRepository userEntityRepository;
+
     @Autowired
-    private MatchRepository matchRepository;
+    public UserRepository(UserEntityRepository userEntityRepository) {
+        this.userEntityRepository = userEntityRepository;
+    }
 
     public List<User> findAll() {
         final List<User> result = new ArrayList<>();

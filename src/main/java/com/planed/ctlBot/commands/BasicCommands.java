@@ -43,7 +43,7 @@ public class BasicCommands {
         discordService.whisperToUser(call.getAuthor().getDiscordId(), "he yourself");
     }
 
-    @DiscordCommand(name = {"list", "help"}, help = "Lists all available commands")
+    @DiscordCommand(name = {"list", "help", "commands"}, help = "Lists all available commands")
     public void listAllCommands(final CommandCall call) {
         discordService.whisperToUser(call.getAuthor().getDiscordId(), CODE_ESCAPE + "\n" + helpString + CODE_ESCAPE);
     }
