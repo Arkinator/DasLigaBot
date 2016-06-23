@@ -46,7 +46,7 @@ public class LineupCommands {
 	public void listLineupsCommand(final CommandCall call) {
 		List<Lineup> list = lineupService.getAllLineups();
 		if(list!=null)
-			discordService.replyInChannel(call.getChannel(), lineupService.count() + "" ); //+ list.size() 
+			discordService.replyInChannel(call.getChannel(), lineupService.getAllLineups().size() + "" );
 				for(Lineup tmpLineup : list) 
 					discordService.replyInChannel(call.getChannel(), tmpLineup.getLineupId() + " " 
 							+ tmpLineup.getPlayerMentions() + " "

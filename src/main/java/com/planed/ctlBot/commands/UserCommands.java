@@ -16,11 +16,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.Assert;
 
-/**
- * Created by Julian Peters on 23.04.16.
- *
- * @author julian.peters@westernacher.com
- */
 @DiscordController
 public class UserCommands {
     Logger LOG = LoggerFactory.getLogger(UserCommands.class);
@@ -83,11 +78,11 @@ public class UserCommands {
             final User challengee = findMatch(call.getAuthor()).getPlayers().get(0);
             final User challenger = call.getAuthor();
             userService.acceptChallenge(call.getAuthor());
-            discordService.whisperToUser(challengee.getDiscordId(),"You just accepted a challenge from "
+            discordService.whisperToUser(challenger.getDiscordId(),"You just accepted a challenge from "
                     + discordService.shortInfo(challengee) +
                             ". Now get in touch with your opponent and battle it out. The format is Best-of-three, " +
                             "maps are loosers-pick, your pick (the challengee) for the first map, the game is on. glhf");
-            discordService.whisperToUser(challenger.getDiscordId(),
+            discordService.whisperToUser(challengee.getDiscordId(),
                     "Your challenge to " +  discordService.shortInfo(challenger)+ " just got accepted! "+
                             ". Now get in touch with your opponent and battle it out. The format is Best-of-three, " +
                             "maps are loosers-pick, your opponent picks (the challengee) for the first map, the game is on. glhf");
