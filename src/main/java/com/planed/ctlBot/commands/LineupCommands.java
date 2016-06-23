@@ -2,11 +2,9 @@ package com.planed.ctlBot.commands;
 
 
 import java.util.List;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-
 import com.planed.ctlBot.commands.data.CommandCall;
 import com.planed.ctlBot.common.AccessLevel;
 import com.planed.ctlBot.discord.DiscordCommand;
@@ -22,7 +20,7 @@ import com.planed.ctlBot.domain.LineupRepository;
  */
 @DiscordController
 public class LineupCommands {
-	Logger LOG = LoggerFactory.getLogger(UserCommands.class);
+	Logger LOG = LoggerFactory.getLogger(LineupCommands.class);
 
 	@Autowired
 	private LineupRepository lineupRepository;
