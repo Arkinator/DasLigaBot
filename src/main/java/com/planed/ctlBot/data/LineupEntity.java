@@ -14,6 +14,7 @@ import javax.persistence.Table;
 @Table(name = "LINEUPS_TABLE")
 public class LineupEntity { //this defines db structure for this table
 	@Id
+	@Column
 	private String lineupId;
 	@Column
 	private String playerMentions;
