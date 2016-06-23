@@ -10,11 +10,15 @@ public class Lineup { //defines object lineup (in memory)
 	private String playerMentions;
 	private String message;
 
-	public Lineup() { //fucking dumb dozer needs parameterless constructors
-	}
-
 	public Lineup(final String lineupId) {
 		this.lineupId = lineupId;
+	}
+
+	/**
+	 * Default-constructor for dozer
+	 */
+	public Lineup() {
+
 	}
 
 	public Lineup(final String lineupId, String playerMentions, String message) {

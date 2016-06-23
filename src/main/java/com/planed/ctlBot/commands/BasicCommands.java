@@ -31,8 +31,8 @@ public class BasicCommands {
     public BasicCommands(final DiscordService discordService) {
         this.discordService = discordService;
         try {
-            this.infoString = FileUtils.readFileToString(new File("src/main/resources/logo.txt"));
-            this.helpString = FileUtils.readFileToString(new File("src/main/resources/help.txt"));
+            this.infoString = FileUtils.readFileToString(new File(this.getClass().getClassLoader().getResource("logo.txt").getFile()));
+            this.helpString = FileUtils.readFileToString(new File(this.getClass().getClassLoader().getResource("help.txt").getFile()));
         } catch (final IOException e) {
             LOG.error("Error while reading file:", e);
         }

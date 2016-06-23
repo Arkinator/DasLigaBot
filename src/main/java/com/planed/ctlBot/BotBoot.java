@@ -1,7 +1,6 @@
 package com.planed.ctlBot;
 
 
-import org.flywaydb.core.Flyway;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
@@ -23,7 +22,6 @@ import sx.blah.discord.handle.obj.IPrivateChannel;
 import sx.blah.discord.handle.obj.IUser;
 import sx.blah.discord.util.DiscordException;
 
-import javax.annotation.PostConstruct;
 import javax.sql.DataSource;
 
 import static org.hibernate.jpa.internal.QueryImpl.LOG;
@@ -53,14 +51,7 @@ public class BotBoot {
         ds.setUrl("jdbc:mysql://inet00.de:3306/k39321h8_DasLiga");
         ds.setUsername("k39321h8_LigaBot");
         ds.setPassword("epLC976XM9bemX5YxeKP");
-        executeFlyway(ds);
         return ds;
-    }
-
-    public void executeFlyway(DataSource dataSource) {
-        Flyway flyway = new Flyway();
-        flyway.setDataSource(dataSource);
-        flyway.migrate();
     }
 
     @Bean
@@ -70,7 +61,6 @@ public class BotBoot {
         DataSource ds = builder
                 .setType(EmbeddedDatabaseType.DERBY)
                 .build();
-        executeFlyway(ds);
         return ds;
     }
 
