@@ -98,6 +98,14 @@ public class UserCommandsTest {
     }
 
     @Test
+    public void theAuthorCanNotAcceptAChallengeHeMade() {
+        commandRegistry.fireEvent(anIssueChallengeCommand(user1, user2));
+        commandRegistry.fireEvent(aSimpleCommand(user1, "accept"));
+
+        assertThat(matchRepository.findMatchForUser(user1.getDiscordId()).getGameStatus(), is(GameStatus.challengeExtended));
+    }
+
+    @Test
     public void theAuthorCanRevokeAChallengeHeMade() {
         commandRegistry.fireEvent(anIssueChallengeCommand(user1, user2));
         commandRegistry.fireEvent(aSimpleCommand(user1, "revoke"));

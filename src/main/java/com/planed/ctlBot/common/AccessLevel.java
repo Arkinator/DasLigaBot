@@ -8,5 +8,5 @@ package com.planed.ctlBot.common;
 public enum AccessLevel {
     User,
     Admin,
-    Author;
+    Author
 }
