@@ -31,7 +31,7 @@ public class LineupCommands {
 	@Autowired
 	private LineupService lineupService;
 
-	@DiscordCommand(name = {"createlineup"}, help = "Creates lineup - {createlineup, lineupUniqueId, mentions, message}", roleRequired = AccessLevel.Admin)
+	@DiscordCommand(name = {"createmessage"}, help = "Creates lineup - {createlineup, lineupUniqueId, mentions, message}", roleRequired = AccessLevel.Admin)
 	public void createLineupCommand(final CommandCall call) {
 		if(call.getParameters().size()>=3) {
 			StringBuilder message = new StringBuilder();
@@ -41,7 +41,7 @@ public class LineupCommands {
 		} //else error handling report back to user?
 	}
 
-	@DiscordCommand(name = {"listlineups"}, help = "Lists available lineups - {listlineups}")
+	@DiscordCommand(name = {"listmessages"}, help = "Lists available lineups - {listlineups}")
 	public void listLineupsCommand(final CommandCall call) {
 		List<Lineup> list = lineupService.getAllLineups();
 		if(list!=null)
@@ -51,7 +51,7 @@ public class LineupCommands {
 					+ tmpLineup.getMessage());
 	}
 
-	@DiscordCommand(name = {"setlineupmessage"}, help = "Sets lineup message - {setlineupmessage, lineupUniqueId, message}", roleRequired = AccessLevel.Admin)
+	@DiscordCommand(name = {"editmessage"}, help = "Sets lineup message - {setlineupmessage, lineupUniqueId, message}", roleRequired = AccessLevel.Admin)
 	public void setLineupMessageCommand(final CommandCall call) {
 		Lineup lineup = lineupRepository.findByLineupId(call.getParameters().get(0));
 		StringBuilder message = new StringBuilder();
@@ -62,7 +62,7 @@ public class LineupCommands {
 		}
 	}
 
-	@DiscordCommand(name = {"setlineupmentions"}, help = "Sets lineup mentions - {setlineupmentions, lineupUniqueId, new mention tag}", roleRequired = AccessLevel.Admin)
+	@DiscordCommand(name = {"editmessagementions"}, help = "Sets lineup mentions - {setlineupmentions, lineupUniqueId, new mention tag}", roleRequired = AccessLevel.Admin)
 	public void setLineupMentionCommand(final CommandCall call) {
 		Lineup lineup = lineupRepository.findByLineupId(call.getParameters().get(0));
 		if(lineup!=null) {
@@ -70,7 +70,7 @@ public class LineupCommands {
 		}
 	}
 
-	@DiscordCommand(name = {"deletelineup"}, help = "deletes named lineup - {deletelineup, lineupUniqueId}", roleRequired = AccessLevel.Admin)
+	@DiscordCommand(name = {"deletemessage"}, help = "deletes named lineup - {deletelineup, lineupUniqueId}", roleRequired = AccessLevel.Admin)
 	public void deleteLineupCommand(final CommandCall call) {
 		Lineup lineup = lineupRepository.findByLineupId(call.getParameters().get(0));
 		if(lineup!=null) {
@@ -78,14 +78,14 @@ public class LineupCommands {
 		}
 	}
 
-	@DiscordCommand(name = {"lineupwmentions"}, help = "lists named lineup with mentions - {lineupwmentions, lineupUniqueId}", roleRequired = AccessLevel.Admin)
+	@DiscordCommand(name = {"messagewmentions"}, help = "lists named lineup with mentions - {lineupwmentions, lineupUniqueId}", roleRequired = AccessLevel.Admin)
 	public void listLineupWithoutMentionCommand(final CommandCall call) {
 		Lineup lineup = lineupRepository.findByLineupId(call.getParameters().get(0));
 		discordService.replyInChannel(call.getChannel(), lineup.getPlayerMentions() + " "
 				+ lineup.getMessage());
 	}
 
-	@DiscordCommand(name = {"lineup"}, help = "lists named lineup - {lineup, lineupUniqueId}")
+	@DiscordCommand(name = {"message"}, help = "lists named lineup - {lineup, lineupUniqueId}")
 	public void listLineupCommand(final CommandCall call) {
 		Lineup lineup = lineupRepository.findByLineupId(call.getParameters().get(0));
 		discordService.replyInChannel(call.getChannel(), "" + lineup.getMessage());
