@@ -19,8 +19,8 @@ public class PrService {
     private static final String CODE_ESCAPE = "```";
     private static final String matchFormatter =
             "\n*******************************************************************************\n" +
-                    "  The showdown is real! A Challenge has been accepted, it's g0-time boisss!\n" +
-                    "   {0} ()==[:::::::::> VS <::::::::::||===) {1}\n" +
+                    "  The showdown is real! A Challenge has been accepted, it is g0-time boisss!   \n" +
+                    "   {0} ()==[:::::::::> VS <::::::::::||===) {1}     \n" +
                     "*******************************************************************************";
     private static final String extendedFormatter =
             "A challenge has been extended from {0}. Will {1} man up or will he wuzz out?";
@@ -28,7 +28,7 @@ public class PrService {
             "The honor of {1} has taken another hit. He rejected the challenge from {0}";
     private static final String resultFormatter =
             "\n*******************************************************************************\n" +
-                    "             @         Thats just in:  \n" +
+                    "             @         That just in:  \n" +
                     "          @:::@                    \n" +
                     "       @.:/\\:/\\:.@         {1}   \n" +
                     "      ':\\@ @ @ @/:'                      \n" +
@@ -49,9 +49,10 @@ public class PrService {
     }
 
     public void printGameIsOnMessage(final Match match) {
-        discordService.replyInChannel(prChannelName, CODE_ESCAPE+MessageFormat.format(matchFormatter,
+        String message = MessageFormat.format(matchFormatter,
                 getPlayerName(match.getPlayerA()),
-                getPlayerName(match.getPlayerB()))+CODE_ESCAPE);
+                getPlayerName(match.getPlayerB()));
+        discordService.replyInChannel(prChannelName, CODE_ESCAPE + message + CODE_ESCAPE);
     }
 
     public void printChallengeRejectedMessage(final Match match) {
@@ -66,14 +67,16 @@ public class PrService {
 
     public void printMessageResultMessage(final Match match) {
         final double outcome = match.getEloResult();
+        String resultMessage = null;
         if (outcome < 0.1) {
-            discordService.replyInChannel(prChannelName, MessageFormat.format(CODE_ESCAPE+resultFormatter,
+            resultMessage = CODE_ESCAPE + MessageFormat.format(resultFormatter,
                     getPlayerName(match.getPlayerB()),
-                    getPlayerName(match.getPlayerA()))+CODE_ESCAPE);
+                    getPlayerName(match.getPlayerA())) + CODE_ESCAPE;
         } else if (outcome > 0.9) {
-            discordService.replyInChannel(prChannelName, MessageFormat.format(CODE_ESCAPE+resultFormatter,
+            resultMessage = CODE_ESCAPE + MessageFormat.format(resultFormatter,
                     getPlayerName(match.getPlayerA()),
-                    getPlayerName(match.getPlayerB()))+CODE_ESCAPE);
+                    getPlayerName(match.getPlayerB())) + CODE_ESCAPE;
         }
+        discordService.replyInChannel(prChannelName, resultMessage);
     }
 }

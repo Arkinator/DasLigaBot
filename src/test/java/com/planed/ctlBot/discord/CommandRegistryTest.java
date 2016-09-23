@@ -9,11 +9,19 @@ package com.planed.ctlBot.discord;
 import com.planed.ctlBot.BotBoot;
 import com.planed.ctlBot.commands.data.CommandCall;
 import com.planed.ctlBot.commands.data.CommandCallBuilder;
+import com.planed.ctlBot.common.AccessLevel;
+import com.planed.ctlBot.domain.User;
+import com.planed.ctlBot.services.UserService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Matchers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.util.ArrayList;
@@ -23,11 +31,16 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.empty;
+import static org.mockito.AdditionalMatchers.eq;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
 
 @SpringApplicationConfiguration(classes = {
-        BotBoot.class,
-        CommandRegistry.class
+        CommandRegistryTest.CommandRegistryTestConfiguration.class,
+        CommandRegistry.class,
+        CommandRegistryTest.TestClass.class
 })
+//@ContextConfiguration(CommandRegistryTest.CommandRegistryTestConfiguration.class)
 @RunWith(SpringJUnit4ClassRunner.class)
 public class CommandRegistryTest {
     private static List<Object> callParameters;
@@ -35,14 +48,35 @@ public class CommandRegistryTest {
     @Autowired
     private CommandRegistry commandRegistry;
 
+    private static UserService mockUserService = mock(UserService.class);
+    private String discordId = "discord-id";
+
     @Before
     public void setUp() {
+        doReturn(aStandardUser()).when(mockUserService).findUserAndCreateIfNotFound(Matchers.eq(discordId));
         callParameters = new ArrayList<>();
+    }
+
+    private User aStandardUser() {
+        User result = new User();
+        result.setAccessLevel(AccessLevel.User);
+        result.setDiscordId(discordId);
+        return result;
+    }
+
+    private User anAdminUser() {
+        User result = new User();
+        result.setAccessLevel(AccessLevel.Admin);
+        result.setDiscordId(discordId);
+        return result;
     }
 
     @Test
     public void shouldCallTestCommandIfCallTriggered(){
-        final CommandCall call = new CommandCallBuilder().setCommandPhrase("test").createCommandCall();
+        final CommandCall call = new CommandCallBuilder()
+                .setAuthor(aStandardUser())
+                .setCommandPhrase("test")
+                .createCommandCall();
         assertThat(callParameters, is(empty()));
         commandRegistry.fireEvent(call);
         assertThat(callParameters, is(not(empty())));
@@ -50,14 +84,40 @@ public class CommandRegistryTest {
     }
 
     @Test
+    public void adminShouldBeAllowedToCallAdminMethod(){
+        final CommandCall call = new CommandCallBuilder()
+                .setAuthor(anAdminUser())
+                .setCommandPhrase("admin")
+                .createCommandCall();
+        commandRegistry.fireEvent(call);
+        assertThat(callParameters, is(not(empty())));
+    }
+
+    @Test
+    public void normalUserShouldNotBeAllowedToCallAdminMethod(){
+        final CommandCall call = new CommandCallBuilder()
+                .setAuthor(aStandardUser())
+                .setCommandPhrase("admin")
+                .createCommandCall();
+        commandRegistry.fireEvent(call);
+        assertThat(callParameters, is(empty()));
+    }
+
+    @Test
     public void shouldCallTestCommandForMultiNameMethod(){
-        final CommandCall call1 = new CommandCallBuilder().setCommandPhrase("test1").createCommandCall();
+        final CommandCall call1 = new CommandCallBuilder()
+                .setCommandPhrase("test1")
+                .setAuthor(aStandardUser())
+                .createCommandCall();
         commandRegistry.fireEvent(call1);
         assertThat(callParameters.get(0), is(call1));
 
         callParameters.remove(0);
 
-        final CommandCall call2 = new CommandCallBuilder().setCommandPhrase("test2").createCommandCall();
+        final CommandCall call2 = new CommandCallBuilder()
+                .setCommandPhrase("test2")
+                .setAuthor(aStandardUser())
+                .createCommandCall();
         commandRegistry.fireEvent(call2);
         assertThat(callParameters.get(0), is(call2));
     }
@@ -72,6 +132,24 @@ public class CommandRegistryTest {
         @DiscordCommand(name={"test1", "test2"})
         public void testCommand2(final CommandCall call){
             callParameters.add(call);
+        }
+
+        @DiscordCommand(name="admin", roleRequired = AccessLevel.Admin)
+        public void adminCommand(final CommandCall call){
+            callParameters.add(call);
+        }
+    }
+
+    @Configuration
+    static class CommandRegistryTestConfiguration {
+        @Bean
+        UserService userService() {
+            return mockUserService;
+        }
+
+        @Bean
+        DiscordService discordService() {
+            return mock(DiscordService.class);
         }
     }
 }

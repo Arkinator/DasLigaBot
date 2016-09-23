@@ -4,6 +4,7 @@ import com.planed.ctlBot.commands.data.CommandCall;
 import com.planed.ctlBot.common.AccessLevel;
 import com.planed.ctlBot.domain.User;
 import com.planed.ctlBot.domain.UserRepository;
+import com.planed.ctlBot.services.UserService;
 import org.apache.commons.lang3.ArrayUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,20 +28,18 @@ import java.util.Map;
 public class CommandRegistry {
     Logger LOG = LoggerFactory.getLogger(CommandRegistry.class);
 
-    private final ApplicationContext applicationContext;
-    private final DiscordService discordService;
+    @Autowired
+    private ApplicationContext applicationContext;
+    @Autowired
+    private DiscordService discordService;
+    @Autowired
+    private UserService userService;
+
     private final Map<String, DiscordCommand> commandNameMap;
     private final Map<DiscordCommand, Method> commandMap;
     private final Map<DiscordCommand, Object> controllerMap;
-    private final UserRepository userRepository;
 
-    @Autowired
-    public CommandRegistry(final ApplicationContext applicationContext,
-                           final DiscordService discordService,
-                           final UserRepository userRepository) {
-        this.applicationContext = applicationContext;
-        this.discordService = discordService;
-        this.userRepository = userRepository;
+    public CommandRegistry() {
         commandMap = new HashMap<>();
         commandNameMap = new HashMap<>();
         controllerMap = new HashMap<>();
@@ -64,11 +63,7 @@ public class CommandRegistry {
     }
 
     private void promoteFustup() {
-        final User fustup = userRepository.findByDiscordId("116296552204599298");
-        if (fustup != null) {
-            fustup.setAccessLevel(AccessLevel.Author);
-            userRepository.save(fustup);
-        }
+        userService.giveUserAccessLevel("116296552204599298", AccessLevel.Author);
     }
 
     private void buildCommandList() {
@@ -87,8 +82,8 @@ public class CommandRegistry {
         final DiscordCommand command = commandNameMap.get(call.getCommandPhrase());
         LOG.info("Command from " + call.getAuthor()
                 + " with command " + call.getCommandPhrase()
-                + " and " + call.getMentions()
-                + "and" + call.getParameters());
+                + " and Mentions " + call.getMentions()
+                + " and Parameters " + call.getParameters());
         if (command != null && checkUserAuthorization(call, command)) {
             invokeCommand(call, command);
         }
@@ -105,8 +100,7 @@ public class CommandRegistry {
                     "You need " + command.minMentions() + " mention (type @ and a username) as a parameter to this command");
             return false;
         } else {
-            user.setNumberOfInteractions(user.getNumberOfInteractions() + 1);
-            userRepository.save(user);
+            userService.incrementCallsForUserByDiscordId(user.getDiscordId());
             return true;
         }
     }

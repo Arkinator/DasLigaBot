@@ -2,6 +2,7 @@ package com.planed.ctlBot.discord;
 
 import com.planed.ctlBot.domain.User;
 import com.planed.ctlBot.domain.UserRepository;
+import com.planed.ctlBot.services.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,14 +20,10 @@ import sx.blah.discord.util.RequestBuffer;
 public class DiscordService {
     Logger LOG = LoggerFactory.getLogger(DiscordService.class);
 
-    private IDiscordClient discordClient;
-    private final UserRepository userRepository;
     private String commandList;
-
+    private IDiscordClient discordClient;
     @Autowired
-    public DiscordService(final UserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
+    private UserService userService;
 
     public void replyInChannel(final String channelId, final String message) {
         LOG.info(channelId + ": " + message);
@@ -49,20 +46,6 @@ public class DiscordService {
         } catch (HTTP429Exception | DiscordException e) {
             e.printStackTrace();
         }
-    }
-
-    public User createNewUserFromId(final String discordId) {
-        final User entity = fillUserObject(discordId);
-        userRepository.save(entity);
-        return userRepository.findByDiscordId(discordId);
-    }
-
-    private User fillUserObject(final String discordId) {
-        Assert.notNull(discordClient);
-        discordClient.getUserByID(discordId);
-        final User result = new User();
-        result.setDiscordId(discordId);
-        return result;
     }
 
     public void setDiscordClient(final IDiscordClient discordClient) {

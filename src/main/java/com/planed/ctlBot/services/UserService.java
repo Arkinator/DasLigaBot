@@ -39,12 +39,8 @@ public class UserService {
         this.prService = prService;
     }
 
-    public void giveUserAccessLevel(final String userName, final AccessLevel accessLevel) {
-        User user = userRepository.findByDiscordId(userName);
-        if (user == null) {
-            user = new User();
-            user.setDiscordId(userName);
-        }
+    public void giveUserAccessLevel(final String discordId, final AccessLevel accessLevel) {
+        User user = findUserAndCreateIfNotFound(discordId);
         user.setAccessLevel(accessLevel);
         userRepository.save(user);
     }
@@ -65,7 +61,9 @@ public class UserService {
     }
 
     public void addNewUser(final String discordId) {
-        discordService.createNewUserFromId(discordId);
+        final User entity = new User();
+        entity.setDiscordId(discordId);
+        userRepository.save(entity);
     }
 
     public void changeRace(final User author, final String newRace) {
@@ -149,5 +147,11 @@ public class UserService {
         users.sort((u1, u2) -> u1.getElo().compareTo(u2.getElo()));
         users.forEach(user -> result.append(discordService.shortInfo(user) + "\n"));
         return result.toString();
+    }
+
+    public void incrementCallsForUserByDiscordId(String discordId) {
+        User user = findUserAndCreateIfNotFound(discordId);
+        user.setNumberOfInteractions(user.getNumberOfInteractions() + 1);
+        userRepository.save(user);
     }
 }
