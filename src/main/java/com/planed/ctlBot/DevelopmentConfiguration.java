@@ -4,15 +4,11 @@ import org.mockito.Mockito;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
-import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
-import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 import sx.blah.discord.api.IDiscordClient;
 import sx.blah.discord.api.events.EventDispatcher;
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IPrivateChannel;
 import sx.blah.discord.handle.obj.IUser;
-
-import javax.sql.DataSource;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
@@ -21,15 +17,6 @@ import static org.mockito.Mockito.mock;
 @Configuration
 @Profile("development")
 public class DevelopmentConfiguration {
-    @Bean
-    public DataSource inMemoryDb() {
-        final EmbeddedDatabaseBuilder builder = new EmbeddedDatabaseBuilder();
-        DataSource ds = builder
-                .setType(EmbeddedDatabaseType.DERBY)
-                .build();
-        return ds;
-    }
-
 /*    @Bean(name = "discordClient")
     public IDiscordClient realClient() {
         final ClientBuilder clientBuilder = new ClientBuilder();

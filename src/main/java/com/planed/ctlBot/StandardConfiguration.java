@@ -3,17 +3,15 @@ package com.planed.ctlBot;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
-import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import sx.blah.discord.api.ClientBuilder;
 import sx.blah.discord.api.IDiscordClient;
 import sx.blah.discord.util.DiscordException;
-
-import javax.sql.DataSource;
 
 
 @Configuration
 @Profile("!development")
 public class StandardConfiguration {
+/*
     @Bean
     public DataSource connectToMySql() {
         final DriverManagerDataSource ds = new DriverManagerDataSource();
@@ -24,6 +22,7 @@ public class StandardConfiguration {
         return ds;
     }
 
+*/
     @Bean(name = "discordClient")
     public IDiscordClient realClient() {
         final ClientBuilder clientBuilder = new ClientBuilder();
