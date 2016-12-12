@@ -2,19 +2,15 @@ package com.planed.ctlBot;
 
 import org.mockito.Mockito;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
-import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
-import sx.blah.discord.api.ClientBuilder;
-import sx.blah.discord.api.EventDispatcher;
 import sx.blah.discord.api.IDiscordClient;
+import sx.blah.discord.api.events.EventDispatcher;
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IPrivateChannel;
 import sx.blah.discord.handle.obj.IUser;
-import sx.blah.discord.util.DiscordException;
 
 import javax.sql.DataSource;
 
@@ -33,6 +29,17 @@ public class DevelopmentConfiguration {
                 .build();
         return ds;
     }
+
+/*    @Bean(name = "discordClient")
+    public IDiscordClient realClient() {
+        final ClientBuilder clientBuilder = new ClientBuilder();
+        clientBuilder.withToken("MTk0NzE1MjU0Nzg0MTMxMDcz.Ckp-Ng.-dtm8JRr1RJTSVuVUdowKJSmsyE");
+        try {
+            return clientBuilder.login();
+        } catch (final DiscordException e) {
+            throw new RuntimeException("Error while logging in to Discord", e);
+        }
+    }*/
 
     @Bean(name = "discordClient")
     public IDiscordClient mockClient() {

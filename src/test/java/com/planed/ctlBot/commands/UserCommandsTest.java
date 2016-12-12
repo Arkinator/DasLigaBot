@@ -1,6 +1,5 @@
 package com.planed.ctlBot.commands;
 
-import com.planed.ctlBot.BotBoot;
 import com.planed.ctlBot.commands.data.CommandCall;
 import com.planed.ctlBot.commands.data.CommandCallBuilder;
 import com.planed.ctlBot.common.GameStatus;
@@ -14,27 +13,21 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.SpringApplicationConfiguration;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.Arrays;
 import java.util.Collections;
 
 import static com.planed.ctlBot.domain.UserFixtures.aDefaultUser;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.not;
-import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.CoreMatchers.*;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.greaterThan;
 
-@SpringApplicationConfiguration(classes = {
-        BotBoot.class
-})
-@RunWith(SpringJUnit4ClassRunner.class)
+@RunWith(SpringRunner.class)
+@SpringBootTest(webEnvironment= SpringBootTest.WebEnvironment.NONE)
 @ActiveProfiles("development")
-@Transactional
 public class UserCommandsTest {
     @Autowired
     private CommandRegistry commandRegistry;

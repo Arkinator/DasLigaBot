@@ -6,7 +6,6 @@ package com.planed.ctlBot.discord;
  * @author julian.peters@westernacher.com
  */
 
-import com.planed.ctlBot.BotBoot;
 import com.planed.ctlBot.commands.data.CommandCall;
 import com.planed.ctlBot.commands.data.CommandCallBuilder;
 import com.planed.ctlBot.common.AccessLevel;
@@ -18,10 +17,8 @@ import org.junit.runner.RunWith;
 import org.mockito.Matchers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.util.ArrayList;
@@ -31,7 +28,6 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.empty;
-import static org.mockito.AdditionalMatchers.eq;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 

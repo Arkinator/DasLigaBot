@@ -4,3 +4,4 @@ target/
 .project
 .classpath
 ctlBot.iml
+derby.log

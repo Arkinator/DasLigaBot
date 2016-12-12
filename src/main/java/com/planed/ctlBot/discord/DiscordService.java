@@ -1,20 +1,14 @@
 package com.planed.ctlBot.discord;
 
 import com.planed.ctlBot.domain.User;
-import com.planed.ctlBot.domain.UserRepository;
 import com.planed.ctlBot.services.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.util.Assert;
 import sx.blah.discord.api.IDiscordClient;
 import sx.blah.discord.handle.obj.IChannel;
-import sx.blah.discord.util.DiscordException;
-import sx.blah.discord.util.HTTP429Exception;
-import sx.blah.discord.util.MessageBuilder;
-import sx.blah.discord.util.MissingPermissionsException;
-import sx.blah.discord.util.RequestBuffer;
+import sx.blah.discord.util.*;
 
 @Component
 public class DiscordService {
@@ -43,7 +37,9 @@ public class DiscordService {
         try {
             final IChannel privateChannel = discordClient.getOrCreatePMChannel(discordClient.getUserByID(authorId));
             replyInChannel(privateChannel.getID(), message);
-        } catch (HTTP429Exception | DiscordException e) {
+        } catch (DiscordException e) {
+            e.printStackTrace();
+        } catch (RateLimitException e) {
             e.printStackTrace();
         }
     }

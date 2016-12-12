@@ -15,7 +15,7 @@ import javax.sql.DataSource;
 @Profile("!development")
 public class StandardConfiguration {
     @Bean
-    public DataSource dbFromFileSystem() {
+    public DataSource connectToMySql() {
         final DriverManagerDataSource ds = new DriverManagerDataSource();
         ds.setDriverClassName("com.mysql.jdbc.Driver");
         ds.setUrl("jdbc:mysql://inet00.de:3306/k39321h8_DasLiga");

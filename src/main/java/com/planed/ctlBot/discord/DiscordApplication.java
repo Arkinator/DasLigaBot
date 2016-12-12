@@ -8,13 +8,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-import sx.blah.discord.api.EventSubscriber;
 import sx.blah.discord.api.IDiscordClient;
+import sx.blah.discord.api.events.EventSubscriber;
 import sx.blah.discord.handle.impl.events.MessageReceivedEvent;
 import sx.blah.discord.handle.impl.events.ReadyEvent;
 import sx.blah.discord.handle.obj.IChannel;
-import sx.blah.discord.util.DiscordException;
-import sx.blah.discord.util.HTTP429Exception;
+import sx.blah.discord.handle.obj.Status;
 
 import java.util.Optional;
 
@@ -71,20 +70,20 @@ public class DiscordApplication {
     @Scheduled(fixedRate = 5000)
     public void checkDiscordConnection() {
         if (!discordClient.isReady()) {
-            try {
+/*            try {
                 discordClient.logout();
                 discordClient.login();
             } catch (final DiscordException e) {
                 LOG.error("Error while reconnecting: ", e);
             } catch (final HTTP429Exception e) {
                 LOG.error("Error while reconnecting: ", e);
-            }
+            }*/
         }
     }
 
     @Scheduled(fixedRate = 62020)
     public void updateStatus() {
-        discordClient.updatePresence(false, Optional.of("Type !info for awesomness"));
+        discordClient.changeStatus(Status.game("Type !info for awesomness"));
         try {
             discordClient.changeUsername("DAS Liga Bot");
         } catch (final Exception e) {

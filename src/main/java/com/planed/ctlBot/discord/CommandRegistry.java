@@ -3,7 +3,6 @@ package com.planed.ctlBot.discord;
 import com.planed.ctlBot.commands.data.CommandCall;
 import com.planed.ctlBot.common.AccessLevel;
 import com.planed.ctlBot.domain.User;
-import com.planed.ctlBot.domain.UserRepository;
 import com.planed.ctlBot.services.UserService;
 import org.apache.commons.lang3.ArrayUtils;
 import org.slf4j.Logger;
@@ -19,11 +18,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * Created by Julian Peters on 23.04.16.
- *
- * @author julian.peters@westernacher.com
- */
 @Service
 public class CommandRegistry {
     Logger LOG = LoggerFactory.getLogger(CommandRegistry.class);
@@ -59,7 +53,7 @@ public class CommandRegistry {
             }
         }
         buildCommandList();
-        promoteFustup();
+//j        promoteFustup();
     }
 
     private void promoteFustup() {

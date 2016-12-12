@@ -12,27 +12,17 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.SpringApplicationConfiguration;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit4.SpringRunner;
 
 import static com.planed.ctlBot.domain.UserFixtures.aDefaultUser;
 import static com.planed.ctlBot.domain.UserFixtures.anAdmin;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.not;
-import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.CoreMatchers.*;
 import static org.hamcrest.MatcherAssert.assertThat;
 
-/**
- * Created by Julian Peters on 24.04.16.
- *
- * @author julian.peters@westernacher.com
- */
-@SpringApplicationConfiguration(classes = {
-        BotBoot.class,
-        DiscordIntegrationTest.TestClass.class
-})
-@RunWith(SpringJUnit4ClassRunner.class)
+@RunWith(SpringRunner.class)
+@SpringBootTest(webEnvironment= SpringBootTest.WebEnvironment.NONE)
 @ActiveProfiles("development")
 public class DiscordIntegrationTest {
     private static final String AUTHOR_ID = "author";
