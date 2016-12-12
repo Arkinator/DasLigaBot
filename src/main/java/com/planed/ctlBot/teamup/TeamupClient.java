@@ -6,6 +6,7 @@ import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
@@ -16,6 +17,7 @@ public class TeamupClient {
     Logger LOG = LoggerFactory.getLogger(TeamupClient.class);
 
     private final static String BASE_URL = "https://api.teamup.com/";
+    @Value("${teamup.apiKey}")
     private String apiKey;
 
     private TeamupClient() {
