@@ -53,7 +53,7 @@ public class CommandRegistry {
             }
         }
         buildCommandList();
-//j        promoteFustup();
+        promoteFustup();
     }
 
     private void promoteFustup() {

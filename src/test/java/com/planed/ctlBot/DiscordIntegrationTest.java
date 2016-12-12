@@ -13,6 +13,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import static com.planed.ctlBot.domain.UserFixtures.aDefaultUser;
@@ -21,7 +22,11 @@ import static org.hamcrest.CoreMatchers.*;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest(webEnvironment= SpringBootTest.WebEnvironment.NONE)
+@SpringBootTest(webEnvironment= SpringBootTest.WebEnvironment.NONE, classes = {
+        BotBoot.class,
+        DiscordIntegrationTest.TestClass.class
+})
+@ActiveProfiles("development")
 public class DiscordIntegrationTest {
     private static final String AUTHOR_ID = "author";
     private static final String ADMIN_ID = "admin";
@@ -45,13 +50,13 @@ public class DiscordIntegrationTest {
     }
 
     @Test
-    public void shouldCreateUserWhenCommandIsInvoked() {
-        assertThat(userEntityRepository.findOne(AUTHOR_ID), is(nullValue()));
-
+    public void shouldCreateUserWhenAnyCommandIsInvoked() {
         final CommandCall call = aCommandCallFromAuthor().createCommandCall();
+
+        assertThat(userEntityRepository.findOne(call.getAuthor().getDiscordId()), is(nullValue()));
         commandRegistry.fireEvent(call);
 
-        assertThat(userEntityRepository.findOne(AUTHOR_ID), is(not(nullValue())));
+        assertThat(userEntityRepository.findOne(call.getAuthor().getDiscordId()), is(not(nullValue())));
     }
 
     @Test
@@ -77,11 +82,11 @@ public class DiscordIntegrationTest {
 
     @Test
     public void shouldIncrementNumberOfUserInteractionsWhenInvoked() {
-        final int numBefore = userService.findUserAndCreateIfNotFound(AUTHOR_ID).getNumberOfInteractions();
         final CommandCall call = aCommandCallFromAuthor().createCommandCall();
+        final int numBefore = userService.findUserAndCreateIfNotFound(call.getAuthor().getDiscordId()).getNumberOfInteractions();
         commandRegistry.fireEvent(call);
 
-        final int numAfter = userService.findUserAndCreateIfNotFound(AUTHOR_ID).getNumberOfInteractions();
+        final int numAfter = userService.findUserAndCreateIfNotFound(call.getAuthor().getDiscordId()).getNumberOfInteractions();
         assertThat(numAfter - numBefore, is(1));
     }
 
