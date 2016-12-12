@@ -6,6 +6,7 @@ import com.planed.ctlBot.teamup.data.TeamupEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -22,6 +23,7 @@ public class TeamupService {
 
     @Autowired
     private TeamupClient teamupClient;
+    @Value("${teamup.calendarId }")
     private String calendarId;
 
     public List<TeamupEvent> getEventsBetweenDates(LocalDate from, LocalDate to) {
