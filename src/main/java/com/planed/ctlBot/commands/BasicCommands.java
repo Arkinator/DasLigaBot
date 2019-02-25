@@ -13,11 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.io.File;
 import java.io.IOException;
 
-/**
- * Created by Julian Peters on 23.04.16.
- *
- * @author julian.peters@westernacher.com
- */
 @DiscordController
 public class BasicCommands {
     private static final String CODE_ESCAPE = "```";

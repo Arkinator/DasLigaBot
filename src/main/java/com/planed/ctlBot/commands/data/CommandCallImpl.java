@@ -4,11 +4,6 @@ import com.planed.ctlBot.domain.User;
 
 import java.util.List;
 
-/**
- * Created by Julian Peters on 17.04.16.
- *
- * @author julian.peters@westernacher.com
- */
 public class CommandCallImpl implements CommandCall {
     private final String commandPhrase;
     private final User author;

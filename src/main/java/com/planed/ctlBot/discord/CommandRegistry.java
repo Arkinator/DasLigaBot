@@ -4,7 +4,11 @@ import com.planed.ctlBot.commands.data.CommandCall;
 import com.planed.ctlBot.common.AccessLevel;
 import com.planed.ctlBot.domain.User;
 import com.planed.ctlBot.services.UserService;
+import com.planed.ctlBot.utils.DiscordMessageParser;
 import org.apache.commons.lang3.ArrayUtils;
+import org.javacord.api.DiscordApi;
+import org.javacord.api.event.message.MessageCreateEvent;
+import org.javacord.api.listener.message.MessageCreateListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,28 +23,34 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Service
-public class CommandRegistry {
+public class CommandRegistry implements MessageCreateListener {
+    private final Map<String, DiscordCommand> commandNameMap = new HashMap<>();
+    private final Map<DiscordCommand, Method> commandMap = new HashMap<>();
+    private final Map<DiscordCommand, Object> controllerMap = new HashMap<>();
     Logger LOG = LoggerFactory.getLogger(CommandRegistry.class);
-
     @Autowired
     private ApplicationContext applicationContext;
     @Autowired
     private DiscordService discordService;
     @Autowired
     private UserService userService;
-
-    private final Map<String, DiscordCommand> commandNameMap;
-    private final Map<DiscordCommand, Method> commandMap;
-    private final Map<DiscordCommand, Object> controllerMap;
-
-    public CommandRegistry() {
-        commandMap = new HashMap<>();
-        commandNameMap = new HashMap<>();
-        controllerMap = new HashMap<>();
-    }
+    @Autowired
+    private DiscordApi discordApi;
+    @Autowired
+    private DiscordMessageParser discordMessageParser;
 
     @PostConstruct
     public void registerDiscordControllers() {
+        discordApi.addMessageCreateListener(this);
+
+        findAndCollectDiscordCommandBeans();
+
+        buildCommandList();
+
+        promoteFustup();
+    }
+
+    private void findAndCollectDiscordCommandBeans() {
         final Map<String, Object> beans = applicationContext.getBeansWithAnnotation(DiscordController.class);
         for (final Object bean : beans.values()) {
             for (final Method method : bean.getClass().getDeclaredMethods()) {
@@ -52,15 +62,13 @@ public class CommandRegistry {
                 }
             }
         }
-        buildCommandList();
-        promoteFustup();
     }
 
     private void promoteFustup() {
         userService.giveUserAccessLevel("116296552204599298", AccessLevel.Author);
     }
 
-    private void buildCommandList() {
+    public String buildCommandList() {
         final StringBuilder builder = new StringBuilder();
         for (final DiscordCommand command : getAllCommands()) {
             builder.append(ArrayUtils.toString(command.name()));
@@ -69,7 +77,13 @@ public class CommandRegistry {
             builder.append("\n");
 
         }
-        discordService.setCommandList(builder.toString());
+        return builder.toString();
+    }
+
+    @Override
+    public void onMessageCreate(MessageCreateEvent event) {
+        discordMessageParser.deconstructMessage(event.getMessage())
+                .ifPresent(call -> fireEvent(call));
     }
 
     public void fireEvent(final CommandCall call) {
@@ -120,6 +134,12 @@ public class CommandRegistry {
         return commandMap.keySet();
     }
 
+    public static class InsufficientAccessRightsException extends RuntimeException {
+        public InsufficientAccessRightsException(final DiscordCommand command) {
+            super("Insufficient access rights to invoke command " + command.name()[0] + ".");
+        }
+    }
+
     private class UnknownCommandException extends RuntimeException {
         public UnknownCommandException(final String commandName) {
             super("Unknown command encountered: " + commandName);
@@ -129,12 +149,6 @@ public class CommandRegistry {
     private class InternalServerException extends RuntimeException {
         public InternalServerException(final Exception e) {
             super(e);
-        }
-    }
-
-    public static class InsufficientAccessRightsException extends RuntimeException {
-        public InsufficientAccessRightsException(final DiscordCommand command) {
-            super("Insufficient access rights to invoke command " + command.name()[0] + ".");
         }
     }
 }

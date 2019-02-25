@@ -9,11 +9,6 @@ import org.springframework.stereotype.Component;
 
 import java.text.MessageFormat;
 
-/**
- * Created by Julian Peters on 01.05.16.
- *
- * @author julian.peters@westernacher.com
- */
 @Component
 public class PrService {
     private static final String CODE_ESCAPE = "```";

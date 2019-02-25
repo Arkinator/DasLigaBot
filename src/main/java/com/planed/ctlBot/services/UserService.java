@@ -16,11 +16,6 @@ import org.springframework.stereotype.Component;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Created by Julian Peters on 10.04.16.
- *
- * @author julian.peters@westernacher.com
- */
 @Component
 public class UserService {
     private final DiscordService discordService;
