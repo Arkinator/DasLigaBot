@@ -10,11 +10,6 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
-/**
- * Created by Julian Peters on 09.04.16.
- *
- * @author julian.peters@westernacher.com
- */
 @Entity
 @Table(name="USER_TABLE")
 public class UserEntity {

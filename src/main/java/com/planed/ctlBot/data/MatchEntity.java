@@ -11,11 +11,6 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
-/**
- * Created by Julian Peters on 09.04.16.
- *
- * @author julian.peters@westernacher.com
- */
 @Entity
 @Table(name = "MATCHES")
 public class MatchEntity {

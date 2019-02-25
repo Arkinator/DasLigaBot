@@ -1,0 +1,11 @@
+################################################################
+# Spring-Data properties
+################################################################
+# Always force db migration
+spring:
+  jpa:
+    database-platform: org.hibernate.dialect.MySQLDialect
+
+# FLYWAY (FlywayProperties)
+#flyway.enabled=true
+#flyway.locations=classpath:db/migration
