@@ -38,9 +38,9 @@
         </dependency>
         <!-- Discord API -->
         <dependency>
-            <groupId>com.github.austinv11</groupId>
-            <artifactId>Discord4j</artifactId>
-            <version>2.6.1</version>
+            <groupId>com.discord4j</groupId>
+            <artifactId>Discord4J</artifactId>
+            <version>2.10.1</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
