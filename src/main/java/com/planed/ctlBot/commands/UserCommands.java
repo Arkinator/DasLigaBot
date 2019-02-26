@@ -188,9 +188,9 @@ public class UserCommands {
     private String buildStatusString(final CommandCall call) {
         final Match match = findMatch(call.getAuthor());
         final StringBuilder builder = new StringBuilder();
-        if (call.getAuthor().getAccessLevel() == AccessLevel.User) {
+        if (call.getAuthor().getAccessLevel() == AccessLevel.USER) {
             builder.append("Hello! You are a registered user.\n");
-        } else if (call.getAuthor().getAccessLevel() == AccessLevel.User) {
+        } else if (call.getAuthor().getAccessLevel() == AccessLevel.USER) {
             builder.append("Hello! You are an administrator\n");
         } else {
             builder.append("Hello! You are MY AUTHOR! YEAH!\n");

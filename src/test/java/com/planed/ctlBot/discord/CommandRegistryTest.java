@@ -54,14 +54,14 @@ public class CommandRegistryTest {
 
     private User aStandardUser() {
         User result = new User();
-        result.setAccessLevel(AccessLevel.User);
+        result.setAccessLevel(AccessLevel.USER);
         result.setDiscordId(discordId);
         return result;
     }
 
     private User anAdminUser() {
         User result = new User();
-        result.setAccessLevel(AccessLevel.Admin);
+        result.setAccessLevel(AccessLevel.ADMIN);
         result.setDiscordId(discordId);
         return result;
     }
@@ -129,7 +129,7 @@ public class CommandRegistryTest {
             callParameters.add(call);
         }
 
-        @DiscordCommand(name="admin", roleRequired = AccessLevel.Admin)
+        @DiscordCommand(name="admin", roleRequired = AccessLevel.ADMIN)
         public void adminCommand(final CommandCall call){
             callParameters.add(call);
         }

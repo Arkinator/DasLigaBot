@@ -3,11 +3,6 @@ package com.planed.ctlBot.common;
 import java.util.Arrays;
 import java.util.List;
 
-/**
- * Created by Julian Peters on 30.04.16.
- *
- * @author julian.peters@westernacher.com
- */
 public enum GameResult {
     win(1, 0, "win", "won"),
     draw(1, 1, "drawn", "equal"),

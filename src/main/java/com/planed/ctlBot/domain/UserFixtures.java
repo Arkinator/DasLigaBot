@@ -13,16 +13,16 @@ public class UserFixtures {
     public static User aDefaultUser() {
         final User user = new User();
         user.setDiscordId(RandomStringUtils.randomAlphabetic(20));
-        user.setRace(Race.zerg);
-        user.setAccessLevel(AccessLevel.User);
+        user.setRace(Race.ZERG);
+        user.setAccessLevel(AccessLevel.USER);
         return user;
     }
 
     public static User anAdmin() {
         final User user = new User();
         user.setDiscordId(RandomStringUtils.randomAlphabetic(20));
-        user.setRace(Race.zerg);
-        user.setAccessLevel(AccessLevel.Admin);
+        user.setRace(Race.ZERG);
+        user.setAccessLevel(AccessLevel.ADMIN);
         return user;
     }
 }

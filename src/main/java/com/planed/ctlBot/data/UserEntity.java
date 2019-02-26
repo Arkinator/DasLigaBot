@@ -23,7 +23,7 @@ public class UserEntity {
     @Column(nullable = false)
     private int numberOfInteractions = 0;
     @Column(nullable = false)
-    private AccessLevel accessLevel = AccessLevel.User;
+    private AccessLevel accessLevel = AccessLevel.USER;
     @Column
     private Race race;
     @Column(nullable = false)

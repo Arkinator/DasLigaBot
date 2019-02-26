@@ -45,7 +45,7 @@ public class DiscordIntegrationTest {
         lastCall = null;
 
         userService.findUserAndCreateIfNotFound(ADMIN_ID);
-        userService.giveUserAccessLevel(ADMIN_ID, AccessLevel.Admin);
+        userService.giveUserAccessLevel(ADMIN_ID, AccessLevel.ADMIN);
     }
 
     @Test
@@ -102,7 +102,7 @@ public class DiscordIntegrationTest {
             lastCall = call;
         }
 
-        @DiscordCommand(name = COMMAND_PHRASE_2, roleRequired = AccessLevel.Admin)
+        @DiscordCommand(name = COMMAND_PHRASE_2, roleRequired = AccessLevel.ADMIN)
         public void testCommand2(final CommandCall call) {
             lastCall = call;
         }

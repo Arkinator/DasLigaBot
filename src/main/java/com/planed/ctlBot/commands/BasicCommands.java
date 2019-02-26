@@ -11,10 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 
-import java.io.File;
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
 
 @DiscordController
 public class BasicCommands {
@@ -84,7 +81,7 @@ public class BasicCommands {
         discordService.whisperToUser(call.getAuthor().getDiscordId(), buildInfoText(call));
     }
 
-    @DiscordCommand(name = {"intro"}, help = "Administrator command to introduce the bot to a channel", roleRequired = AccessLevel.Admin)
+    @DiscordCommand(name = {"intro"}, help = "Administrator command to introduce the bot to a channel", roleRequired = AccessLevel.ADMIN)
     public void introductionCommand(final CommandCall call) {
         discordService.replyInChannel(call.getServerId(), call.getChannel(), buildInfoText(call));
     }

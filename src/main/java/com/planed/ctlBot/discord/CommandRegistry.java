@@ -65,7 +65,7 @@ public class CommandRegistry implements MessageCreateListener {
     }
 
     private void promoteFustup() {
-        userService.giveUserAccessLevel("116296552204599298", AccessLevel.Author);
+        userService.giveUserAccessLevel("116296552204599298", AccessLevel.AUTHOR);
     }
 
     public String buildCommandList() {

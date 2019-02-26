@@ -9,7 +9,7 @@ public class User {
 
     private int numberOfInteractions = 0;
 
-    private AccessLevel accessLevel = AccessLevel.User;
+    private AccessLevel accessLevel = AccessLevel.USER;
 
     private Race race;
 
