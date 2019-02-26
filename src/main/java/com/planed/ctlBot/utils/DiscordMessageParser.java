@@ -35,6 +35,9 @@ public class DiscordMessageParser {
                 .channel(message.getChannel().getIdAsString())
                 .commandPhrase(commandParts.remove(0))
                 .parameters(commandParts)
+                .serverId(message.getServer()
+                        .map(server -> server.getIdAsString())
+                        .orElse(null))
                 .mentions(mentions)
                 .build();
         return Optional.of(result);
