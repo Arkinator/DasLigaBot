@@ -3,7 +3,10 @@ package com.planed.ctlBot.data;
 
 import com.planed.ctlBot.common.GameStatus;
 import com.planed.ctlBot.common.Race;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
+import javax.annotation.sql.DataSourceDefinitions;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -12,6 +15,8 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 @Entity
+@Data
+@NoArgsConstructor
 @Table(name = "MATCHES")
 public class MatchEntity {
     @Id
@@ -42,99 +47,8 @@ public class MatchEntity {
     @Column
     private Integer playerBreportedScoreForPlayerB;
 
-    public long getMatchId() {
-        return matchId;
-    }
-
-    public void setMatchId(final long matchId) {
-        this.matchId = matchId;
-    }
-
-    public String getPlayerA() {
-        return playerA;
-    }
-
-    public void setPlayerA(String playerA) {
-        this.playerA = playerA;
-    }
-
-    public String getPlayerB() {
-        return playerB;
-    }
-
-    public void setPlayerB(String playerB) {
-        this.playerB = playerB;
-    }
-
-    public GameStatus getGameStatus() {
-        return gameStatus;
-    }
-
-    public Integer getFinalScorePlayerA() {
-        return finalScorePlayerA;
-    }
-
-    public void setFinalScorePlayerA(final Integer finalScorePlayerA) {
-        this.finalScorePlayerA = finalScorePlayerA;
-    }
-
-    public Integer getFinalScorePlayerB() {
-        return finalScorePlayerB;
-    }
-
-    public void setFinalScorePlayerB(final Integer finalScorePlayerB) {
-        this.finalScorePlayerB = finalScorePlayerB;
-    }
-
-    public Integer getPlayerAreportedScoreForPlayerA() {
-        return playerAreportedScoreForPlayerA;
-    }
-
-    public void setPlayerAreportedScoreForPlayerA(final Integer playerAreportedScoreForPlayerA) {
-        this.playerAreportedScoreForPlayerA = playerAreportedScoreForPlayerA;
-    }
-
-    public Integer getPlayerAreportedScoreForPlayerB() {
-        return playerAreportedScoreForPlayerB;
-    }
-
-    public void setPlayerAreportedScoreForPlayerB(final Integer playerAreportedScoreForPlayerB) {
-        this.playerAreportedScoreForPlayerB = playerAreportedScoreForPlayerB;
-    }
-
-    public Integer getPlayerBreportedScoreForPlayerA() {
-        return playerBreportedScoreForPlayerA;
-    }
-
-    public void setPlayerBreportedScoreForPlayerA(final Integer playerBreportedScoreForPlayerA) {
-        this.playerBreportedScoreForPlayerA = playerBreportedScoreForPlayerA;
-    }
-
-    public Integer getPlayerBreportedScoreForPlayerB() {
-        return playerBreportedScoreForPlayerB;
-    }
-
-    public void setPlayerBreportedScoreForPlayerB(final Integer playerBreportedScoreForPlayerB) {
-        this.playerBreportedScoreForPlayerB = playerBreportedScoreForPlayerB;
-    }
-
-    public Race getRacePlayerA() {
-        return racePlayerA;
-    }
-
-    public void setRacePlayerA(final Race racePlayerA) {
-        this.racePlayerA = racePlayerA;
-    }
-
-    public Race getRacePlayerB() {
-        return racePlayerB;
-    }
-
-    public void setRacePlayerB(final Race racePlayerB) {
-        this.racePlayerB = racePlayerB;
-    }
-
-    public void setGameStatus(final GameStatus gameStatus) {
-        this.gameStatus = gameStatus;
-    }
+    @Column
+    private String originatingServerId;
+    @Column
+    private String originatingChannelId;
 }

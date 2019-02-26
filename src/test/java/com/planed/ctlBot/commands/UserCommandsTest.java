@@ -1,7 +1,6 @@
 package com.planed.ctlBot.commands;
 
 import com.planed.ctlBot.commands.data.CommandCall;
-import com.planed.ctlBot.commands.data.CommandCallBuilder;
 import com.planed.ctlBot.common.GameStatus;
 import com.planed.ctlBot.common.Race;
 import com.planed.ctlBot.data.repositories.UserEntityRepository;
@@ -234,12 +233,12 @@ public class UserCommandsTest {
     }
 
     private CommandCall aSimpleCommand(final User user, final String command, final String... parameters) {
-        return new CommandCallBuilder()
-                .setAuthor(user)
-                .setCommandPhrase(command)
-                .setChannel("fjkdsl")
-                .setParameterList(Arrays.asList(parameters))
-                .createCommandCall();
+        return CommandCall.builder()
+                .author(user)
+                .commandPhrase(command)
+                .channel("fjkdsl")
+                .parameters(Arrays.asList(parameters))
+                .build();
     }
 
     private User newUser(final User user) {
@@ -248,20 +247,20 @@ public class UserCommandsTest {
     }
 
     private CommandCall anIssueChallengeCommand(final User user1, final User user2) {
-        return new CommandCallBuilder()
-                .setAuthor(user1)
-                .setCommandPhrase("challenge")
-                .setMentionsList(Collections.singletonList(user2))
-                .setChannel("fjkdsl")
-                .createCommandCall();
+        return CommandCall.builder()
+                .author(user1)
+                .commandPhrase("challenge")
+                .mentions(Collections.singletonList(user2))
+                .channel("fjkdsl")
+                .build();
     }
 
     private CommandCall aChangeRaceEvent(final User user) {
-        return new CommandCallBuilder()
-                .setAuthor(user)
-                .setCommandPhrase("changeRace")
-                .setParameterList(Collections.singletonList("Protoss"))
-                .setChannel("fjkdsl")
-                .createCommandCall();
+        return CommandCall.builder()
+                .author(user)
+                .commandPhrase("changeRace")
+                .parameters(Collections.singletonList("Protoss"))
+                .channel("fjkdsl")
+                .build();
     }
 }

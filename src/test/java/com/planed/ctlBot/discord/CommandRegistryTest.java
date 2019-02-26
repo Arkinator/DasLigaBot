@@ -7,7 +7,6 @@ package com.planed.ctlBot.discord;
  */
 
 import com.planed.ctlBot.commands.data.CommandCall;
-import com.planed.ctlBot.commands.data.CommandCallBuilder;
 import com.planed.ctlBot.common.AccessLevel;
 import com.planed.ctlBot.domain.User;
 import com.planed.ctlBot.services.UserService;
@@ -69,10 +68,10 @@ public class CommandRegistryTest {
 
     @Test
     public void shouldCallTestCommandIfCallTriggered(){
-        final CommandCall call = new CommandCallBuilder()
-                .setAuthor(aStandardUser())
-                .setCommandPhrase("test")
-                .createCommandCall();
+        final CommandCall call = CommandCall.builder()
+                .author(aStandardUser())
+                .commandPhrase("test")
+                .build();
         assertThat(callParameters, is(empty()));
         commandRegistry.fireEvent(call);
         assertThat(callParameters, is(not(empty())));
@@ -81,39 +80,39 @@ public class CommandRegistryTest {
 
     @Test
     public void adminShouldBeAllowedToCallAdminMethod(){
-        final CommandCall call = new CommandCallBuilder()
-                .setAuthor(anAdminUser())
-                .setCommandPhrase("admin")
-                .createCommandCall();
+        final CommandCall call = CommandCall.builder()
+                .author(anAdminUser())
+                .commandPhrase("admin")
+                .build();
         commandRegistry.fireEvent(call);
         assertThat(callParameters, is(not(empty())));
     }
 
     @Test
     public void normalUserShouldNotBeAllowedToCallAdminMethod(){
-        final CommandCall call = new CommandCallBuilder()
-                .setAuthor(aStandardUser())
-                .setCommandPhrase("admin")
-                .createCommandCall();
+        final CommandCall call = CommandCall.builder()
+                .author(aStandardUser())
+                .commandPhrase("admin")
+                .build();
         commandRegistry.fireEvent(call);
         assertThat(callParameters, is(empty()));
     }
 
     @Test
     public void shouldCallTestCommandForMultiNameMethod(){
-        final CommandCall call1 = new CommandCallBuilder()
-                .setCommandPhrase("test1")
-                .setAuthor(aStandardUser())
-                .createCommandCall();
+        final CommandCall call1 = CommandCall.builder()
+                .commandPhrase("test1")
+                .author(aStandardUser())
+                .build();
         commandRegistry.fireEvent(call1);
         assertThat(callParameters.get(0), is(call1));
 
         callParameters.remove(0);
 
-        final CommandCall call2 = new CommandCallBuilder()
-                .setCommandPhrase("test2")
-                .setAuthor(aStandardUser())
-                .createCommandCall();
+        final CommandCall call2 = CommandCall.builder()
+                .commandPhrase("test2")
+                .author(aStandardUser())
+                .build();
         commandRegistry.fireEvent(call2);
         assertThat(callParameters.get(0), is(call2));
     }

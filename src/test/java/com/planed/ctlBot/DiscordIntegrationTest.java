@@ -1,7 +1,6 @@
 package com.planed.ctlBot;
 
 import com.planed.ctlBot.commands.data.CommandCall;
-import com.planed.ctlBot.commands.data.CommandCallBuilder;
 import com.planed.ctlBot.common.AccessLevel;
 import com.planed.ctlBot.data.repositories.UserEntityRepository;
 import com.planed.ctlBot.discord.CommandRegistry;
@@ -51,7 +50,7 @@ public class DiscordIntegrationTest {
 
     @Test
     public void shouldCreateUserWhenAnyCommandIsInvoked() {
-        final CommandCall call = aCommandCallFromAuthor().createCommandCall();
+        final CommandCall call = aCommandCallFromAuthor().build();
 
         assertThat(userEntityRepository.findOne(call.getAuthor().getDiscordId()), is(nullValue()));
         commandRegistry.fireEvent(call);
@@ -62,8 +61,8 @@ public class DiscordIntegrationTest {
     @Test
     public void shouldNotCallWhenUserRightsAreInsufficient() {
         final CommandCall call = aCommandCallFromAuthor()
-                .setCommandPhrase(COMMAND_PHRASE_2)
-                .createCommandCall();
+                .commandPhrase(COMMAND_PHRASE_2)
+                .build();
         commandRegistry.fireEvent(call);
 
         assertThat(lastCall, is(not(call)));
@@ -72,9 +71,9 @@ public class DiscordIntegrationTest {
     @Test
     public void shouldCallWhenUserRightsAreSufficient() {
         final CommandCall call = aCommandCallFromAuthor()
-                .setAuthor(anAdmin())
-                .setCommandPhrase(COMMAND_PHRASE_2)
-                .createCommandCall();
+                .author(anAdmin())
+                .commandPhrase(COMMAND_PHRASE_2)
+                .build();
         commandRegistry.fireEvent(call);
 
         assertThat(lastCall, is(call));
@@ -82,7 +81,7 @@ public class DiscordIntegrationTest {
 
     @Test
     public void shouldIncrementNumberOfUserInteractionsWhenInvoked() {
-        final CommandCall call = aCommandCallFromAuthor().createCommandCall();
+        final CommandCall call = aCommandCallFromAuthor().build();
         final int numBefore = userService.findUserAndCreateIfNotFound(call.getAuthor().getDiscordId()).getNumberOfInteractions();
         commandRegistry.fireEvent(call);
 
@@ -90,10 +89,10 @@ public class DiscordIntegrationTest {
         assertThat(numAfter - numBefore, is(1));
     }
 
-    private CommandCallBuilder aCommandCallFromAuthor() {
-        return new CommandCallBuilder()
-                .setAuthor(aDefaultUser())
-                .setCommandPhrase(COMMAND_PHRASE);
+    private CommandCall.CommandCallBuilder aCommandCallFromAuthor() {
+        return CommandCall.builder()
+                .author(aDefaultUser())
+                .commandPhrase(COMMAND_PHRASE);
     }
 
     @DiscordController

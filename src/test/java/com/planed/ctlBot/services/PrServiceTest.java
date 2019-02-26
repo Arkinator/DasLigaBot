@@ -59,7 +59,7 @@ public class PrServiceTest {
 
     private String getLastDiscordCall() {
         ArgumentCaptor<String> argument = ArgumentCaptor.forClass(String.class);
-        verify(discordService).replyInChannel(any(), argument.capture());
+        verify(discordService).replyInChannel(any(), any(), argument.capture());
         return argument.getValue();
     }
 

@@ -40,7 +40,7 @@ public class UserCommands {
         if (needNoMatch(call, call.getAuthor(), "You are already in a match: '" + findMatch(challenger))
                 && needNoMatch(call, call.getMentions().get(0), "The challengee is already in a match: '" + challengee)
                 && needDifferentUsers(call, challenger, challengee, "You can not challenge yourself!")) {
-            userService.issueChallenge(challenger, challengee);
+            userService.issueChallenge(challenger, challengee, call.getServerId(), call.getChannel());
         }
     }
 

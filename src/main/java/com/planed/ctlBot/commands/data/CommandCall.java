@@ -1,21 +1,18 @@
 package com.planed.ctlBot.commands.data;
 
 import com.planed.ctlBot.domain.User;
+import lombok.Builder;
+import lombok.Data;
 
 import java.util.List;
 
-public interface CommandCall {
-    /**
-     * Returns the Discord-ID of the Author of the command
-     * @return The Id in plain form, without braces and add-sign
-     */
-    User getAuthor();
-
-    String getCommandPhrase();
-
-    List<String> getParameters();
-
-    List<User> getMentions();
-
-    String getChannel();
+@Data
+@Builder
+public class CommandCall {
+    private final String commandPhrase;
+    private final User author;
+    private final String channel;
+    private final List<String> parameters;
+    private final List<User> mentions;
+    private final String serverId;
 }

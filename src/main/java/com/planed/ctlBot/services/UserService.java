@@ -66,8 +66,8 @@ public class UserService {
         userRepository.save(author);
     }
 
-    public void issueChallenge(final User author, final User challengee) {
-        final Match match = matchRepository.addMatch(author, challengee);
+    public void issueChallenge(final User author, final User challengee, String serverId, String channelId) {
+        final Match match = matchRepository.addMatch(author, challengee, serverId, channelId);
         author.setMatchId(match.getMatchId());
         challengee.setMatchId(match.getMatchId());
         userRepository.save(author, challengee);

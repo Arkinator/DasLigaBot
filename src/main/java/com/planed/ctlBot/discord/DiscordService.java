@@ -18,9 +18,10 @@ public class DiscordService {
     @Autowired
     private UserService userService;
 
-    public void replyInChannel(final String channelId, final String message) {
+    public void replyInChannel(final String serverId, final String channelId, final String message) {
         LOG.info(channelId + ": " + message);
-        discordApi.getChannelById(channelId)
+        discordApi.getServerById(serverId)
+                .flatMap(server -> server.getChannelById(channelId))
                 .flatMap(channel -> channel.asTextChannel())
                 .ifPresent(channel -> channel.sendMessage(message));
     }

@@ -36,7 +36,7 @@ public class MatchRepository {
         }
     }
 
-    public Match addMatch(final User author, final User challengee) {
+    public Match addMatch(final User author, final User challengee, String serverId, String channelId) {
         final List<User> playerList = new ArrayList<>();
         playerList.add(author);
         playerList.add(challengee);
@@ -44,13 +44,9 @@ public class MatchRepository {
         final Match match = new Match();
         match.setPlayers(playerList);
         match.setGameStatus(GameStatus.challengeExtended);
+        match.setOriginatingServerId(serverId);
+        match.setOriginatingChannelId(channelId);
         final long matchId = matchEntityRepository.save(mapToEntity(match)).getMatchId();
-//
-//        final Match dbMatch = ;
-//        playerList.forEach(p -> {
-//            p.setMatch(dbMatch);
-//            userRepository.save(p);
-//        });
 
         return findMatchById(matchId);
     }

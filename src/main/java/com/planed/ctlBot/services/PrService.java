@@ -38,7 +38,7 @@ public class PrService {
     public DiscordService discordService;
 
     public void printChallengeExtendedMessage(final Match match) {
-        discordService.replyInChannel(prChannelName, MessageFormat.format(extendedFormatter,
+        discordService.replyInChannel(match.getOriginatingServerId(), match.getOriginatingChannelId(), MessageFormat.format(extendedFormatter,
                 match.getPlayerA().toString(),
                 match.getPlayerB().toString()));
     }
@@ -47,11 +47,12 @@ public class PrService {
         String message = MessageFormat.format(matchFormatter,
                 getPlayerName(match.getPlayerA()),
                 getPlayerName(match.getPlayerB()));
-        discordService.replyInChannel(prChannelName, CODE_ESCAPE + message + CODE_ESCAPE);
+        discordService.replyInChannel(match.getOriginatingServerId(), match.getOriginatingChannelId(), CODE_ESCAPE + message + CODE_ESCAPE);
     }
 
     public void printChallengeRejectedMessage(final Match match) {
-        discordService.replyInChannel(prChannelName, MessageFormat.format(rejectedFormatter,
+        discordService.replyInChannel(match.getOriginatingServerId(), match.getOriginatingChannelId(),
+                MessageFormat.format(rejectedFormatter,
                 match.getPlayerA().toString(),
                 match.getPlayerB().toString()));
     }
@@ -72,6 +73,6 @@ public class PrService {
                     getPlayerName(match.getPlayerA()),
                     getPlayerName(match.getPlayerB())) + CODE_ESCAPE;
         }
-        discordService.replyInChannel(prChannelName, resultMessage);
+        discordService.replyInChannel(match.getOriginatingServerId(), match.getOriginatingChannelId(), resultMessage);
     }
 }

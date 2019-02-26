@@ -1,7 +1,6 @@
 package com.planed.ctlBot.utils;
 
 import com.planed.ctlBot.commands.data.CommandCall;
-import com.planed.ctlBot.commands.data.CommandCallBuilder;
 import com.planed.ctlBot.domain.User;
 import com.planed.ctlBot.services.UserService;
 import org.javacord.api.entity.message.Message;
@@ -31,13 +30,13 @@ public class DiscordMessageParser {
         final List<User> mentions = new ArrayList<>();
         message.getMentionedUsers().forEach(user -> mentions.add(
                 userService.findUserAndCreateIfNotFound(user.getIdAsString())));
-        final CommandCall result = new CommandCallBuilder()
-                .setAuthor(userService.findUserAndCreateIfNotFound(message.getAuthor().getIdAsString()))
-                .setChannel(message.getChannel().getIdAsString())
-                .setCommandPhrase(commandParts.remove(0))
-                .setParameterList(commandParts)
-                .setMentionsList(mentions)
-                .createCommandCall();
+        final CommandCall result = CommandCall.builder()
+                .author(userService.findUserAndCreateIfNotFound(message.getAuthor().getIdAsString()))
+                .channel(message.getChannel().getIdAsString())
+                .commandPhrase(commandParts.remove(0))
+                .parameters(commandParts)
+                .mentions(mentions)
+                .build();
         return Optional.of(result);
     }
 }
