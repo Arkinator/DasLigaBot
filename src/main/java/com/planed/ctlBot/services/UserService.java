@@ -81,14 +81,14 @@ public class UserService {
     public void rejectChallenge(final User author) {
         final Match match = matchRepository.findMatchById(author.getMatchId());
         prService.printChallengeRejectedMessage(match);
-        match.setGameStatus(GameStatus.challengeRejected);
+        match.setGameStatus(GameStatus.CHALLENGE_REJECTED);
         matchRepository.saveMatch(match);
         clearMatchOfInvolvedPlayers(match);
     }
 
     public void revokeChallenge(final User author) {
         final Match match = matchRepository.findMatchById(author.getMatchId());
-        match.setGameStatus(GameStatus.challengeRevoked);
+        match.setGameStatus(GameStatus.CHALLENGE_REVOKED);
         matchRepository.saveMatch(match);
         clearMatchOfInvolvedPlayers(match);
         discordService.whisperToUser(author.getDiscordId(), "Your challenge has been revoked.");
@@ -99,13 +99,13 @@ public class UserService {
     public void acceptChallenge(final User author) {
         final Match match = matchRepository.findMatchById(author.getMatchId());
         prService.printGameIsOnMessage(match);
-        match.setGameStatus(GameStatus.challengeAccepted);
+        match.setGameStatus(GameStatus.CHALLENGE_ACCEPTED);
         matchRepository.saveMatch(match);
     }
 
     public void reportResult(final Match match, final User author, final GameResult result) {
         match.reportResult(author, result);
-        if (match.getGameStatus() == GameStatus.gamePlayed) {
+        if (match.getGameStatus() == GameStatus.GAME_PLAYED) {
             prService.printMessageResultMessage(match);
             finalizeGame(match);
         }
@@ -113,7 +113,7 @@ public class UserService {
     }
 
     private void finalizeGame(final Match match) {
-        if (match.getGameStatus() == GameStatus.gamePlayed) {
+        if (match.getGameStatus() == GameStatus.GAME_PLAYED) {
             final User playerA = match.getPlayerA();
             final User playerB = match.getPlayerB();
 

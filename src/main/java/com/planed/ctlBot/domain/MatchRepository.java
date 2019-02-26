@@ -43,7 +43,7 @@ public class MatchRepository {
 
         final Match match = new Match();
         match.setPlayers(playerList);
-        match.setGameStatus(GameStatus.challengeExtended);
+        match.setGameStatus(GameStatus.CHALLENGE_EXTENDED);
         match.setOriginatingServerId(serverId);
         match.setOriginatingChannelId(channelId);
         final long matchId = matchEntityRepository.save(mapToEntity(match)).getMatchId();

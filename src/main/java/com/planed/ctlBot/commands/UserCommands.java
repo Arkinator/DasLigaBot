@@ -53,7 +53,7 @@ public class UserCommands {
         if (needMatch(call, "No match found. Type !status to see current Matches\"!") &&
                 needToBeChallengee(call, "You can not reject a challenge you did not make! Your current match is " + findMatch(call.getAuthor())) &&
                 needGameStatus(call, "You can only reject recently extended challenges. Current match is "
-                        + findMatch(call.getAuthor()), GameStatus.challengeExtended)) {
+                        + findMatch(call.getAuthor()), GameStatus.CHALLENGE_EXTENDED)) {
             userService.rejectChallenge(call.getAuthor());
         }
     }
@@ -62,7 +62,7 @@ public class UserCommands {
     public void revokeChallenge(final CommandCall call) {
         final User author = call.getAuthor();
         if (needMatch(call, "No match currently assigned to you. You need to !challenge somebody first") &&
-                needGameStatus(call, "You can only revoke recently extended challenges. Type !status to learn about your current match", GameStatus.challengeExtended) &&
+                needGameStatus(call, "You can only revoke recently extended challenges. Type !status to learn about your current match", GameStatus.CHALLENGE_EXTENDED) &&
                 needToBeChallenger(call, "You can not revoke a challenge that has been extended to you! Your current match is " + findMatch(author))) {
             userService.revokeChallenge(call.getAuthor());
         }
@@ -74,7 +74,7 @@ public class UserCommands {
                 needToBeChallengee(call, "You can not accept a challenge that you have extended! Your current match is "
                         + findMatch(call.getAuthor())) &&
                 needGameStatus(call, "You can only recently extended challenges. Current match is "
-                        + findMatch(call.getAuthor()), GameStatus.challengeExtended)) {
+                        + findMatch(call.getAuthor()), GameStatus.CHALLENGE_EXTENDED)) {
             final User challengee = findMatch(call.getAuthor()).getPlayers().get(0);
             final User challenger = call.getAuthor();
             userService.acceptChallenge(call.getAuthor());
@@ -151,7 +151,7 @@ public class UserCommands {
     public void reportResult(final CommandCall call) {
         if (needMatch(call, "This command is to report a result for game. No game found for you!") &&
                 needGameStatus(call, "You can only report results for a valid challenge. Current match is "
-                        + findMatch(call.getAuthor()), GameStatus.challengeAccepted, GameStatus.partiallyReported, GameStatus.conflictState) &&
+                        + findMatch(call.getAuthor()), GameStatus.CHALLENGE_ACCEPTED, GameStatus.PARTIALLY_REPORTED, GameStatus.CONFLICT_STATE) &&
                 needParameters(call, 1, "Did you win or loose? Type 'win' or 'loss'.") &&
                 needGameResultParameter(call, "Did you win or loose? Type 'win' or 'loss'.")) {
             discordService.whisperToUser(call.getAuthor().getDiscordId(), "Reporting result: "+GameResult.parse(call.getParameters().get(0)));
@@ -160,7 +160,7 @@ public class UserCommands {
     }
 
     private boolean needNoReportedResultForUser(final CommandCall call, final String message) {
-        if (findMatch(call.getAuthor()).didUserReportResult(call.getAuthor()) && findMatch(call.getAuthor()).getGameStatus()!=GameStatus.conflictState) {
+        if (findMatch(call.getAuthor()).didUserReportResult(call.getAuthor()) && findMatch(call.getAuthor()).getGameStatus()!=GameStatus.CONFLICT_STATE) {
             discordService.whisperToUser(call.getAuthor().getDiscordId(), message);
             return false;
         }

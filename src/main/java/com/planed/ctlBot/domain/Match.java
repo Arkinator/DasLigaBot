@@ -48,16 +48,16 @@ public class Match {
     private void updateGameStatus() {
         if ((playerBreportedScoreForPlayerA != null) && (playerAreportedScoreForPlayerA != null)) {
             if (reportsAreMatching()) {
-                setGameStatus(GameStatus.gamePlayed);
+                setGameStatus(GameStatus.GAME_PLAYED);
                 setFinalScorePlayerA(playerAreportedScoreForPlayerA);
                 setFinalScorePlayerB(playerAreportedScoreForPlayerB);
             } else {
-                setGameStatus(GameStatus.conflictState);
+                setGameStatus(GameStatus.CONFLICT_STATE);
             }
         } else if ((playerBreportedScoreForPlayerA != null) || (playerAreportedScoreForPlayerA != null)) {
-            setGameStatus(GameStatus.partiallyReported);
+            setGameStatus(GameStatus.PARTIALLY_REPORTED);
         } else {
-            setGameStatus(GameStatus.challengeAccepted);
+            setGameStatus(GameStatus.CHALLENGE_ACCEPTED);
         }
     }
 
@@ -80,20 +80,20 @@ public class Match {
         String scoreB = "";
         String vs = " vs ";
         String status = "";
-        if (gameStatus == GameStatus.challengeExtended) {
+        if (gameStatus == GameStatus.CHALLENGE_EXTENDED) {
             vs = " (vs) ";
             status = " (extended challenge)";
         }
-        if (gameStatus == GameStatus.challengeAccepted) {
+        if (gameStatus == GameStatus.CHALLENGE_ACCEPTED) {
             status = " (accepted challenge)";
         }
-        if (gameStatus == GameStatus.partiallyReported) {
+        if (gameStatus == GameStatus.PARTIALLY_REPORTED) {
             status = " (partially reported)";
         }
-        if (gameStatus == GameStatus.conflictState) {
+        if (gameStatus == GameStatus.CONFLICT_STATE) {
             status = " (conflict state)";
         }
-        if (gameStatus == GameStatus.gamePlayed) {
+        if (gameStatus == GameStatus.GAME_PLAYED) {
             scoreA = "(" + finalScorePlayerA + ")";
             scoreB = "(" + finalScorePlayerB + ")";
         }

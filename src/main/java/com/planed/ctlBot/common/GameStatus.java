@@ -1,14 +1,11 @@
 package com.planed.ctlBot.common;
 
-/**
- * Created by Julian Peters on 24.04.16.
- *
- * @author julian.peters@westernacher.com
- */
 public enum GameStatus {
-    challengeExtended,
-    challengeAccepted,
-    partiallyReported,
-    conflictState,
-    challengeRejected, challengeRevoked, gamePlayed
+    CHALLENGE_EXTENDED,
+    CHALLENGE_ACCEPTED,
+    PARTIALLY_REPORTED,
+    CONFLICT_STATE,
+    CHALLENGE_REJECTED,
+    CHALLENGE_REVOKED,
+    GAME_PLAYED
 }
