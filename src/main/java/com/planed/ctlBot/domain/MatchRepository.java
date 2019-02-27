@@ -12,6 +12,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public class MatchRepository {
@@ -25,10 +26,9 @@ public class MatchRepository {
     private UserRepository userRepository;
 
     public Match findMatchForUser(final String discordId) {
-        final UserEntity user = userEntityRepository.findOne(discordId);
         final List<MatchEntity> resultList = new ArrayList<>();
-        resultList.addAll(matchEntityRepository.findMatchByPlayerA(user.getDiscordId()));
-        resultList.addAll(matchEntityRepository.findMatchByPlayerB(user.getDiscordId()));
+        resultList.addAll(matchEntityRepository.findMatchByPlayerA(discordId));
+        resultList.addAll(matchEntityRepository.findMatchByPlayerB(discordId));
         if (resultList.size() == 1) {
             return mapper.map(resultList.get(0), Match.class);
         } else {
@@ -52,10 +52,10 @@ public class MatchRepository {
     }
 
     public Match findMatchById(final Long matchId) {
-        if (matchId == null) {
-            return null;
-        }
-        return mapperFromEntity(matchEntityRepository.findOne(matchId));
+        return Optional.ofNullable(matchId)
+                .flatMap(id -> matchEntityRepository.findById(id))
+                .map(match -> mapperFromEntity(match))
+                .orElse(null);
     }
 
     private Match mapperFromEntity(final MatchEntity match) {

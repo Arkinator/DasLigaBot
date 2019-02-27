@@ -30,11 +30,10 @@ public class UserRepository {
     }
 
     public User findByDiscordId(final String discordId) {
-        final UserEntity userEntity = userEntityRepository.findOne(discordId);
-        if (userEntity == null) {
-            return null;
-        }
-        return mapFromEntity(userEntity);
+        return userEntityRepository
+                .findById(discordId)
+                .map(userEntity -> mapFromEntity(userEntity))
+                .orElse(null);
     }
 
     public void save(final User... users) {
@@ -55,7 +54,9 @@ public class UserRepository {
         return result;
     }
 
-    public User refresh(final User author) {
-        return mapFromEntity(userEntityRepository.findOne(author.getDiscordId()));
+    public User refresh(final User user) {
+        return userEntityRepository.findById(user.getDiscordId())
+                .map(userEntity -> mapFromEntity(userEntity))
+                .orElseThrow(() -> new RuntimeException("Error while refreshing user: " + user.toString()));
     }
 }

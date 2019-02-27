@@ -8,11 +8,11 @@ import com.planed.ctlBot.discord.DiscordCommand;
 import com.planed.ctlBot.discord.DiscordController;
 import com.planed.ctlBot.services.UserService;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import static com.planed.ctlBot.domain.UserFixtures.aDefaultUser;
@@ -21,23 +21,23 @@ import static org.hamcrest.CoreMatchers.*;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest(webEnvironment= SpringBootTest.WebEnvironment.NONE, classes = {
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE, classes = {
         BotBoot.class,
-        DiscordIntegrationTest.TestClass.class
-})
-@ActiveProfiles("development")
+        DiscordIntegrationTest.TestClass.class},
+        properties = {"spring.flyway.enabled: false", "flyway.enabled: false", "spring.jpa.hibernate.ddl-auto: create-drop"})
+@Ignore("Client-Test")
 public class DiscordIntegrationTest {
     private static final String AUTHOR_ID = "author";
     private static final String ADMIN_ID = "admin";
     private static final String COMMAND_PHRASE = "command1";
     private static final String COMMAND_PHRASE_2 = "command2";
+    private static CommandCall lastCall;
     @Autowired
     private CommandRegistry commandRegistry;
     @Autowired
     private UserService userService;
     @Autowired
     private UserEntityRepository userEntityRepository;
-    private static CommandCall lastCall;
 
     @Before
     public void setUp() {
@@ -52,10 +52,10 @@ public class DiscordIntegrationTest {
     public void shouldCreateUserWhenAnyCommandIsInvoked() {
         final CommandCall call = aCommandCallFromAuthor().build();
 
-        assertThat(userEntityRepository.findOne(call.getAuthor().getDiscordId()), is(nullValue()));
+        assertThat(userEntityRepository.findById(call.getAuthor().getDiscordId()).isPresent(), is(false));
         commandRegistry.fireEvent(call);
 
-        assertThat(userEntityRepository.findOne(call.getAuthor().getDiscordId()), is(not(nullValue())));
+        assertThat(userEntityRepository.findById(call.getAuthor().getDiscordId()).get(), is(not(nullValue())));
     }
 
     @Test

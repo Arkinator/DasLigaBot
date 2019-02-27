@@ -11,7 +11,9 @@ import com.planed.ctlBot.domain.UserRepository;
 import com.planed.ctlBot.testUtils.AbstractDiscordCommandTest;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -21,6 +23,7 @@ import static org.hamcrest.CoreMatchers.*;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.greaterThan;
 
+@RunWith(SpringRunner.class)
 public class UserCommandsTest extends AbstractDiscordCommandTest {
     @Autowired
     private CommandRegistry commandRegistry;
@@ -37,6 +40,10 @@ public class UserCommandsTest extends AbstractDiscordCommandTest {
 
     @Before
     public void setUp() {
+        if (user1 != null) {
+            return;
+        }
+
         user1 = newUser(aDefaultUser());
         user2 = newUser(aDefaultUser());
 

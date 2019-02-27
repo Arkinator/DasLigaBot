@@ -4,6 +4,7 @@ import com.planed.ctlBot.domain.User;
 import lombok.Builder;
 import lombok.Data;
 
+import java.util.Collections;
 import java.util.List;
 
 @Data
@@ -12,7 +13,9 @@ public class CommandCall {
     private final String commandPhrase;
     private final User author;
     private final String channel;
-    private final List<String> parameters;
-    private final List<User> mentions;
+    @Builder.Default
+    private final List<String> parameters = Collections.emptyList();
+    @Builder.Default
+    private final List<User> mentions = Collections.emptyList();
     private final String serverId;
 }

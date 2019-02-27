@@ -53,7 +53,7 @@ public class CommandRegistry implements MessageCreateListener {
     private void findAndCollectDiscordCommandBeans() {
         final Map<String, Object> beans = applicationContext.getBeansWithAnnotation(DiscordController.class);
         for (final Object bean : beans.values()) {
-            for (final Method method : bean.getClass().getDeclaredMethods()) {
+            for (final Method method : bean.getClass().getMethods()) {
                 final DiscordCommand command = method.getAnnotation(DiscordCommand.class);
                 if (command == null) {
                     continue;
