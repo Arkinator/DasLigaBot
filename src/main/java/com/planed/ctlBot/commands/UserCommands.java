@@ -71,10 +71,8 @@ public class UserCommands {
     @DiscordCommand(name = {"accept", "acceptchallenge", "swiperight"}, help = "Accept the challenge extended to you!")
     public void acceptChallenge(final CommandCall call) {
         if (needMatch(call, "This command is to accept a challenge, that has been extended to you. Currently there is none") &&
-                needToBeChallengee(call, "You can not accept a challenge that you have extended! Your current match is "
-                        + findMatch(call.getAuthor())) &&
-                needGameStatus(call, "You can only recently extended challenges. Current match is "
-                        + findMatch(call.getAuthor()), GameStatus.CHALLENGE_EXTENDED)) {
+                needToBeChallengee(call, "You can not accept a challenge that you have extended! Your current match is " + findMatch(call.getAuthor())) &&
+                needGameStatus(call, "You can only recently extended challenges. Current match is " + findMatch(call.getAuthor()), GameStatus.CHALLENGE_EXTENDED)) {
             final User challengee = findMatch(call.getAuthor()).getPlayers().get(0);
             final User challenger = call.getAuthor();
             userService.acceptChallenge(call.getAuthor());
@@ -108,11 +106,15 @@ public class UserCommands {
     }
 
     private boolean needToBeChallengee(final CommandCall call, final String message) {
-        if (call.getAuthor().getDiscordId() == findMatch(call.getAuthor()).getPlayers().get(0).getDiscordId()) {
-            discordService.whisperToUser(call.getAuthor().getDiscordId(), message);
+        final String callAuthorId = call.getAuthor().getDiscordId();
+        final String matchChallengeeId = findMatch(call.getAuthor()).getPlayers().get(0).getDiscordId();
+
+        if (callAuthorId.equals(matchChallengeeId)) {
+            discordService.whisperToUser(callAuthorId, message);
             return false;
+        } else {
+            return true;
         }
-        return true;
     }
 
     private boolean needToBeChallenger(final CommandCall call, final String message) {

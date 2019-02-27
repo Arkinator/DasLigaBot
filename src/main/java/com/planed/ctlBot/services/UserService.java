@@ -62,7 +62,7 @@ public class UserService {
     }
 
     public void changeRace(final User author, final String newRace) {
-        author.setRace(Race.valueOf(newRace.toLowerCase()));
+        author.setRace(Race.valueOf(newRace.toUpperCase()));
         userRepository.save(author);
     }
 
