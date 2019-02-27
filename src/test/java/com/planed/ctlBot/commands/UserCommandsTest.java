@@ -235,6 +235,7 @@ public class UserCommandsTest extends AbstractDiscordCommandTest {
                 .commandPhrase(command)
                 .channel("fjkdsl")
                 .parameters(Arrays.asList(parameters))
+                .mentions(Collections.emptyList())
                 .build();
     }
 
@@ -258,6 +259,7 @@ public class UserCommandsTest extends AbstractDiscordCommandTest {
                 .commandPhrase("changeRace")
                 .parameters(Collections.singletonList("Protoss"))
                 .channel("fjkdsl")
+                .mentions(Collections.emptyList())
                 .build();
     }
 }
