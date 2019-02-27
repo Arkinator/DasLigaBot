@@ -8,13 +8,10 @@ import com.planed.ctlBot.discord.CommandRegistry;
 import com.planed.ctlBot.domain.MatchRepository;
 import com.planed.ctlBot.domain.User;
 import com.planed.ctlBot.domain.UserRepository;
+import com.planed.ctlBot.testUtils.AbstractDiscordCommandTest;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -24,10 +21,7 @@ import static org.hamcrest.CoreMatchers.*;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.greaterThan;
 
-@RunWith(SpringRunner.class)
-@SpringBootTest(webEnvironment= SpringBootTest.WebEnvironment.NONE)
-@ActiveProfiles("development")
-public class UserCommandsTest {
+public class UserCommandsTest extends AbstractDiscordCommandTest {
     @Autowired
     private CommandRegistry commandRegistry;
     @Autowired
@@ -45,6 +39,9 @@ public class UserCommandsTest {
     public void setUp() {
         user1 = newUser(aDefaultUser());
         user2 = newUser(aDefaultUser());
+
+        registerUser(user1);
+        registerUser(user2);
     }
 
     @Test
