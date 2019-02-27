@@ -4,7 +4,6 @@ import com.planed.ctlBot.discord.DiscordService;
 import com.planed.ctlBot.domain.User;
 import org.javacord.api.DiscordApi;
 import org.junit.Before;
-import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 

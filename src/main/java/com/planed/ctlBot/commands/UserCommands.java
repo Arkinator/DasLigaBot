@@ -11,15 +11,10 @@ import com.planed.ctlBot.domain.Match;
 import com.planed.ctlBot.domain.MatchRepository;
 import com.planed.ctlBot.domain.User;
 import com.planed.ctlBot.services.UserService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.util.Assert;
 
 @DiscordController
 public class UserCommands {
-    Logger LOG = LoggerFactory.getLogger(UserCommands.class);
-
     @Autowired
     private UserService userService;
     @Autowired
@@ -27,9 +22,8 @@ public class UserCommands {
     @Autowired
     private DiscordService discordService;
 
-    @DiscordCommand(name = {"setRace", "changeRace", "race"}, help = "This command lets you change your race. Specify whether you play Zerg, Terran, Protoss or Random")
+    @DiscordCommand(name = {"setRace", "changeRace", "race"}, help = "This command lets you change your race. Specify whether you play Zerg, Terran, Protoss or Random", minParameters = 1)
     public void changeRaceCommand(final CommandCall call) {
-        Assert.isTrue(call.getParameters().size() >= 1);
         userService.changeRace(call.getAuthor(), call.getParameters().get(0));
     }
 
@@ -76,12 +70,12 @@ public class UserCommands {
             final User challengee = findMatch(call.getAuthor()).getPlayers().get(0);
             final User challenger = call.getAuthor();
             userService.acceptChallenge(call.getAuthor());
-            discordService.whisperToUser(challenger.getDiscordId(),"You just accepted a challenge from "
+            discordService.whisperToUser(challenger.getDiscordId(), "You just accepted a challenge from "
                     + discordService.shortInfo(challengee) +
-                            ". Now get in touch with your opponent and battle it out. The format is Best-of-three, " +
-                            "maps are loosers-pick, your pick (the challengee) for the first map, the game is on. glhf");
+                    ". Now get in touch with your opponent and battle it out. The format is Best-of-three, " +
+                    "maps are loosers-pick, your pick (the challengee) for the first map, the game is on. glhf");
             discordService.whisperToUser(challengee.getDiscordId(),
-                    "Your challenge to " +  discordService.shortInfo(challenger)+ " just got accepted! "+
+                    "Your challenge to " + discordService.shortInfo(challenger) + " just got accepted! " +
                             ". Now get in touch with your opponent and battle it out. The format is Best-of-three, " +
                             "maps are loosers-pick, your opponent picks (the challengee) for the first map, the game is on. glhf");
         }
@@ -98,7 +92,7 @@ public class UserCommands {
     }
 
     private boolean needDifferentUsers(final CommandCall call, final User challenger, final User challengee, final String message) {
-        if (challenger.getDiscordId() == challengee.getDiscordId()) {
+        if (challenger.getDiscordId().equals(challengee.getDiscordId())) {
             discordService.whisperToUser(call.getAuthor().getDiscordId(), message);
             return false;
         }
@@ -118,7 +112,7 @@ public class UserCommands {
     }
 
     private boolean needToBeChallenger(final CommandCall call, final String message) {
-        if (call.getAuthor().getDiscordId() == findMatch(call.getAuthor()).getPlayers().get(1).getDiscordId()) {
+        if (call.getAuthor().getDiscordId().equals(findMatch(call.getAuthor()).getPlayers().get(1).getDiscordId())) {
             discordService.whisperToUser(call.getAuthor().getDiscordId(), message);
             return false;
         }
@@ -156,13 +150,13 @@ public class UserCommands {
                         + findMatch(call.getAuthor()), GameStatus.CHALLENGE_ACCEPTED, GameStatus.PARTIALLY_REPORTED, GameStatus.CONFLICT_STATE) &&
                 needParameters(call, 1, "Did you win or loose? Type 'win' or 'loss'.") &&
                 needGameResultParameter(call, "Did you win or loose? Type 'win' or 'loss'.")) {
-            discordService.whisperToUser(call.getAuthor().getDiscordId(), "Reporting result: "+GameResult.parse(call.getParameters().get(0)));
+            discordService.whisperToUser(call.getAuthor().getDiscordId(), "Reporting result: " + GameResult.parse(call.getParameters().get(0)));
             userService.reportResult(findMatch(call.getAuthor()), call.getAuthor(), GameResult.parse(call.getParameters().get(0)));
         }
     }
 
     private boolean needNoReportedResultForUser(final CommandCall call, final String message) {
-        if (findMatch(call.getAuthor()).didUserReportResult(call.getAuthor()) && findMatch(call.getAuthor()).getGameStatus()!=GameStatus.CONFLICT_STATE) {
+        if (findMatch(call.getAuthor()).didUserReportResult(call.getAuthor()) && findMatch(call.getAuthor()).getGameStatus() != GameStatus.CONFLICT_STATE) {
             discordService.whisperToUser(call.getAuthor().getDiscordId(), message);
             return false;
         }
@@ -192,7 +186,7 @@ public class UserCommands {
         final StringBuilder builder = new StringBuilder();
         if (call.getAuthor().getAccessLevel() == AccessLevel.USER) {
             builder.append("Hello! You are a registered user.\n");
-        } else if (call.getAuthor().getAccessLevel() == AccessLevel.USER) {
+        } else if (call.getAuthor().getAccessLevel() == AccessLevel.ADMIN) {
             builder.append("Hello! You are an administrator\n");
         } else {
             builder.append("Hello! You are MY AUTHOR! YEAH!\n");

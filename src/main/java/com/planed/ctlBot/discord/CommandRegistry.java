@@ -24,10 +24,12 @@ import java.util.Map;
 
 @Service
 public class CommandRegistry implements MessageCreateListener {
+    private static final Logger logger = LoggerFactory.getLogger(CommandRegistry.class);
+
     private final Map<String, DiscordCommand> commandNameMap = new HashMap<>();
     private final Map<DiscordCommand, Method> commandMap = new HashMap<>();
     private final Map<DiscordCommand, Object> controllerMap = new HashMap<>();
-    Logger LOG = LoggerFactory.getLogger(CommandRegistry.class);
+
     @Autowired
     private ApplicationContext applicationContext;
     @Autowired
@@ -55,9 +57,7 @@ public class CommandRegistry implements MessageCreateListener {
         for (final Object bean : beans.values()) {
             for (final Method method : bean.getClass().getMethods()) {
                 final DiscordCommand command = method.getAnnotation(DiscordCommand.class);
-                if (command == null) {
-                    continue;
-                } else {
+                if (command != null) {
                     registerDiscordCommand(command, method, bean);
                 }
             }
@@ -68,7 +68,7 @@ public class CommandRegistry implements MessageCreateListener {
         userService.giveUserAccessLevel("116296552204599298", AccessLevel.AUTHOR);
     }
 
-    public String buildCommandList() {
+    private String buildCommandList() {
         final StringBuilder builder = new StringBuilder();
         for (final DiscordCommand command : getAllCommands()) {
             builder.append(ArrayUtils.toString(command.name()));
@@ -83,32 +83,52 @@ public class CommandRegistry implements MessageCreateListener {
     @Override
     public void onMessageCreate(MessageCreateEvent event) {
         discordMessageParser.deconstructMessage(event.getMessage())
-                .ifPresent(call -> fireEvent(call));
+                .ifPresent(this::fireEvent);
     }
 
     public void fireEvent(final CommandCall call) {
         final DiscordCommand command = commandNameMap.get(call.getCommandPhrase());
-        LOG.info("Command from " + call.getAuthor()
+        logger.info("Command from " + call.getAuthor()
                 + " with command " + call.getCommandPhrase()
                 + " and Mentions " + call.getMentions()
                 + " and Parameters " + call.getParameters());
-        if (command != null && checkUserAuthorization(call, command)) {
+        final User user = call.getAuthor();
+
+        if (command != null
+                && checkUserAuthorization(call, command, user)
+                && checkMinimumMentions(call, command)
+                && checkMinimumParameters(call, command)) {
+            userService.incrementCallsForUserByDiscordId(user.getDiscordId());
             invokeCommand(call, command);
         }
     }
 
-    private boolean checkUserAuthorization(final CommandCall call, final DiscordCommand command) {
-        final User user = call.getAuthor();
-        if (user.getAccessLevel().ordinal() < command.roleRequired().ordinal()) {
+    private boolean checkMinimumParameters(CommandCall call, DiscordCommand command) {
+        if (call.getParameters().size() < command.minParameters()) {
             discordService.whisperToUser(call.getAuthor().getDiscordId(),
-                    "Insufficent access rights to invoke command!");
+                    "You need " + command.minParameters() + " parameters for this command");
             return false;
-        } else if (call.getMentions().size() < command.minMentions()) {
+        } else {
+            return true;
+        }
+    }
+
+    private boolean checkMinimumMentions(CommandCall call, DiscordCommand command) {
+        if (call.getMentions().size() < command.minMentions()) {
             discordService.whisperToUser(call.getAuthor().getDiscordId(),
                     "You need " + command.minMentions() + " mention (type @ and a username) as a parameter to this command");
             return false;
         } else {
-            userService.incrementCallsForUserByDiscordId(user.getDiscordId());
+            return true;
+        }
+    }
+
+    private boolean checkUserAuthorization(final CommandCall call, final DiscordCommand command, User user) {
+        if (user.getAccessLevel().ordinal() < command.roleRequired().ordinal()) {
+            discordService.whisperToUser(call.getAuthor().getDiscordId(),
+                    "Insufficent access rights to invoke command!");
+            return false;
+        } else {
             return true;
         }
     }
@@ -122,7 +142,7 @@ public class CommandRegistry implements MessageCreateListener {
         }
     }
 
-    public void registerDiscordCommand(final DiscordCommand command, final Method method, final Object bean) {
+    private void registerDiscordCommand(final DiscordCommand command, final Method method, final Object bean) {
         commandMap.put(command, method);
         for (final String commandName : command.name()) {
             commandNameMap.put(commandName, command);
@@ -134,20 +154,8 @@ public class CommandRegistry implements MessageCreateListener {
         return commandMap.keySet();
     }
 
-    public static class InsufficientAccessRightsException extends RuntimeException {
-        public InsufficientAccessRightsException(final DiscordCommand command) {
-            super("Insufficient access rights to invoke command " + command.name()[0] + ".");
-        }
-    }
-
-    private class UnknownCommandException extends RuntimeException {
-        public UnknownCommandException(final String commandName) {
-            super("Unknown command encountered: " + commandName);
-        }
-    }
-
     private class InternalServerException extends RuntimeException {
-        public InternalServerException(final Exception e) {
+        InternalServerException(final Exception e) {
             super(e);
         }
     }

@@ -12,16 +12,9 @@ import org.mockito.Mock;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.initMocks;
 
-/**
- * Created by Julian Peters on 17.04.16.
- *
- * @author julian.peters@westernacher.com
- */
 public class UserServiceTest {
     @Mock
     DiscordService discordService;

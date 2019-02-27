@@ -29,4 +29,6 @@ public @interface DiscordCommand {
     AccessLevel roleRequired() default AccessLevel.USER;
 
     int minMentions() default 0;
+
+    int minParameters() default 0;
 }
