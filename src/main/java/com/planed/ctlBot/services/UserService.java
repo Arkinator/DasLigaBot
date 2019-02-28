@@ -1,5 +1,6 @@
 package com.planed.ctlBot.services;
 
+import com.planed.ctlBot.commands.BasicCommands;
 import com.planed.ctlBot.commands.data.DiscordMessage;
 import com.planed.ctlBot.common.*;
 import com.planed.ctlBot.discord.DiscordService;
@@ -16,7 +17,7 @@ import java.util.stream.Collectors;
 
 @Component
 public class UserService {
-    private static final String WELCOME_MESSAGE = "Hello you! I'm the DAS Liga Bot. I would like to know which race you are playing in your Starcraft 2 endeavours? " +
+    private static final String WELCOME_MESSAGE = "I would like to know which race you are playing in your Starcraft 2 endeavours? " +
             "(Click on one of the symbols. They signify Terran, Zerg and Protoss)";
     private static final String RACE_CHANGE_MESSAGE = "Want to change your race? Just let me know which race you are playing in your Starcraft 2 endeavours! " +
             "(Click on one of the symbols. They signify Terran, Zerg and Protoss)";
@@ -54,6 +55,11 @@ public class UserService {
         entity.setDiscordId(discordId);
         userRepository.save(entity);
 
+        if (discordService.isUserYourself(discordId)) {
+            return;
+        }
+
+        discordService.whisperToUser(discordId, BasicCommands.infoString);
         final DiscordMessage message = discordService.whisperToUser(discordId, WELCOME_MESSAGE);
         discordService.addReactionWithMapper(message, Arrays.asList(TERRAN_EMOJI, ZERG_EMOJI, PROTOSS_EMOJI, RANDOM_EMOJI), str -> updateUserRaceByEmoji(str, discordId));
     }

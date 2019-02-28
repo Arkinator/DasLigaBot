@@ -5,18 +5,15 @@ import com.planed.ctlBot.common.AccessLevel;
 import com.planed.ctlBot.discord.DiscordCommand;
 import com.planed.ctlBot.discord.DiscordController;
 import com.planed.ctlBot.discord.DiscordService;
-import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ClassPathResource;
-
-import java.io.IOException;
 
 @DiscordController
 public class BasicCommands {
     private static final String CODE_ESCAPE = "```";
     private final DiscordService discordService;
 
-    private String infoString = "----------------------------------------------------------------------\n" +
+    public static final String infoString = "```\n" +
+            "----------------------------------------------------------------------\n" +
             "*    __________________ .___.___                                       *\n" +
             "*   /   _____/\\_   ___ \\|   |   |      Starcraft 2 - DAS Liga          *\n" +
             "*   \\_____  \\ /    \\  \\/|   |   |                                      *\n" +
@@ -37,9 +34,9 @@ public class BasicCommands {
             "*              |___/                 glhf                              *\n" +
             "*                                                                      *\n" +
             "*                                   DAS Liga Bot                       *\n" +
-            "----------------------------------------------------------------------\n";
+            "----------------------------------------------------------------------\n```";
 
-    private String helpString = "-------------------------Help Menu------------------------------------\n" +
+    private String helpString = "```-------------------------Help Menu------------------------------------\n" +
             "*\n" +
             "* !league                 This displays the current league standings\n" +
             "* !info                   Displays some information about me!\n" +
@@ -54,15 +51,11 @@ public class BasicCommands {
             "* !report                 Report either a 'win' or a 'loss' in the current game\n" +
             "* !race                   This command lets you change your race. Do you play Zerg, Terran, Protoss or Random?\n" +
             "* !status                 This displays your current status (open challenges, league position etc)\n" +
-            "----------------------------------------------------------------------\n";
+            "----------------------------------------------------------------------\n```";
 
     @Autowired
     public BasicCommands(final DiscordService discordService) {
         this.discordService = discordService;
-    }
-
-    private String readTextFileFromClasspath(String fileName) throws IOException {
-        return FileUtils.readFileToString(new ClassPathResource(fileName, BasicCommands.class).getFile());
     }
 
     @DiscordCommand(name = "hello", help = "Hello World command")
@@ -77,21 +70,17 @@ public class BasicCommands {
 
     @DiscordCommand(name = {"info"}, help = "Displays some information about me!")
     public void infoCommand(final DiscordMessage call) {
-        discordService.whisperToUser(call.getAuthor().getDiscordId(), buildInfoText(call));
+        discordService.whisperToUser(call.getAuthor().getDiscordId(), infoString);
     }
 
     @DiscordCommand(name = {"intro"}, help = "Administrator command to introduce the bot to a channel", roleRequired = AccessLevel.ADMIN)
     public void introductionCommand(final DiscordMessage call) {
-        discordService.replyInChannel(call.getServerId(), call.getChannel(), buildInfoText(call));
+        discordService.replyInChannel(call.getServerId(), call.getChannel(), infoString);
     }
 
     @DiscordCommand(name = {"invite"}, help = "Retrieve the bot invite-link", roleRequired = AccessLevel.AUTHOR)
     public void displayInviteLink(final DiscordMessage call) {
-        discordService.replyInChannel(call.getServerId(), call.getChannel(),
+        discordService.whisperToUser(call.getAuthor().getDiscordId(),
                 "Invite link for the bot: " + discordService.getInviteLink());
-    }
-
-    private String buildInfoText(final DiscordMessage call) {
-        return CODE_ESCAPE + "\n" + infoString + CODE_ESCAPE;
     }
 }

@@ -24,6 +24,10 @@ public class DiscordService {
     @Autowired
     private DiscordMessageParser discordMessageParser;
 
+    public boolean isUserYourself(String userId) {
+        return discordApi.getUserById(userId).join().isYourself();
+    }
+
     public DiscordMessage replyInChannel(final String serverId, final String channelId, final String message) {
         logger.info(channelId + ": " + message);
         return discordApi.getServerById(serverId)
