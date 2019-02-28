@@ -32,8 +32,8 @@ public class PrServiceTest {
 
     @Before
     public void setUp() {
-        when(discordService.getDiscordName(PLAYER_A)).thenReturn(PLAYER_A.getDiscordId());
-        when(discordService.getDiscordName(PLAYER_B)).thenReturn(PLAYER_B.getDiscordId());
+        when(discordService.getDiscordName(PLAYER_A, any())).thenReturn(PLAYER_A.getDiscordId());
+        when(discordService.getDiscordName(PLAYER_B, any())).thenReturn(PLAYER_B.getDiscordId());
     }
 
     @Test

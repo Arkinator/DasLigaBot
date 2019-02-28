@@ -45,8 +45,8 @@ public class PrService {
 
     public void printGameIsOnMessage(final Match match) {
         String message = MessageFormat.format(matchFormatter,
-                getPlayerName(match.getPlayerA()),
-                getPlayerName(match.getPlayerB()));
+                getPlayerName(match.getPlayerA(), match.getOriginatingServerId()),
+                getPlayerName(match.getPlayerB(), match.getOriginatingServerId()));
         discordService.replyInChannel(match.getOriginatingServerId(), match.getOriginatingChannelId(), CODE_ESCAPE + message + CODE_ESCAPE);
     }
 
@@ -57,8 +57,8 @@ public class PrService {
                 match.getPlayerB().toString()));
     }
 
-    private String getPlayerName(final User user) {
-        return discordService.getDiscordName(user);
+    private String getPlayerName(final User user, String serverId) {
+        return discordService.getDiscordName(user, serverId);
     }
 
     public void printMessageResultMessage(final Match match) {
@@ -66,12 +66,12 @@ public class PrService {
         String resultMessage = null;
         if (outcome < 0.1) {
             resultMessage = CODE_ESCAPE + MessageFormat.format(resultFormatter,
-                    getPlayerName(match.getPlayerB()),
-                    getPlayerName(match.getPlayerA())) + CODE_ESCAPE;
+                    getPlayerName(match.getPlayerB(), match.getOriginatingServerId()),
+                    getPlayerName(match.getPlayerA(), match.getOriginatingServerId())) + CODE_ESCAPE;
         } else if (outcome > 0.9) {
             resultMessage = CODE_ESCAPE + MessageFormat.format(resultFormatter,
-                    getPlayerName(match.getPlayerA()),
-                    getPlayerName(match.getPlayerB())) + CODE_ESCAPE;
+                    getPlayerName(match.getPlayerA(), match.getOriginatingServerId()),
+                    getPlayerName(match.getPlayerB(), match.getOriginatingServerId())) + CODE_ESCAPE;
         }
         discordService.replyInChannel(match.getOriginatingServerId(), match.getOriginatingChannelId(), resultMessage);
     }

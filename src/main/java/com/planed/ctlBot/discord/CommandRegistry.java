@@ -12,6 +12,7 @@ import org.javacord.api.listener.message.MessageCreateListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 
@@ -40,6 +41,8 @@ public class CommandRegistry implements MessageCreateListener {
     private DiscordApi discordApi;
     @Autowired
     private DiscordMessageParser discordMessageParser;
+    @Value("${discord.authorUserId}")
+    private String authorUserId;
 
     @PostConstruct
     public void registerDiscordControllers() {
@@ -65,7 +68,7 @@ public class CommandRegistry implements MessageCreateListener {
     }
 
     private void promoteFustup() {
-        userService.giveUserAccessLevel("116296552204599298", AccessLevel.AUTHOR);
+        userService.giveUserAccessLevel(authorUserId, AccessLevel.AUTHOR);
     }
 
     private String buildCommandList() {

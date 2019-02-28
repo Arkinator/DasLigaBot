@@ -71,11 +71,11 @@ public class UserCommands {
             final User challenger = call.getAuthor();
             userService.acceptChallenge(call.getAuthor());
             discordService.whisperToUser(challenger.getDiscordId(), "You just accepted a challenge from "
-                    + discordService.shortInfo(challengee) +
+                    + discordService.shortInfo(challengee, call.getServerId()) +
                     ". Now get in touch with your opponent and battle it out. The format is Best-of-three, " +
                     "maps are loosers-pick, your pick (the challengee) for the first map, the game is on. glhf");
             discordService.whisperToUser(challengee.getDiscordId(),
-                    "Your challenge to " + discordService.shortInfo(challenger) + " just got accepted! " +
+                    "Your challenge to " + discordService.shortInfo(challenger, call.getServerId()) + " just got accepted! " +
                             ". Now get in touch with your opponent and battle it out. The format is Best-of-three, " +
                             "maps are loosers-pick, your opponent picks (the challengee) for the first map, the game is on. glhf");
         }

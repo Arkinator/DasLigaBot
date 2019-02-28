@@ -24,7 +24,7 @@ public class AbstractDiscordCommandTest {
 
     @Before
     public void setUpMocks() {
-        when(discordService.getDiscordName(any())).then(call -> ((User)call.getArguments()[0]).getDiscordId());
+        when(discordService.getDiscordName(any(), any())).then(call -> ((User) call.getArguments()[0]).getDiscordId());
     }
 
     public void registerUser(User user) {

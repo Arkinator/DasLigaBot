@@ -6,8 +6,6 @@ import com.planed.ctlBot.discord.DiscordCommand;
 import com.planed.ctlBot.discord.DiscordController;
 import com.planed.ctlBot.discord.DiscordService;
 import org.apache.commons.io.FileUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 
@@ -17,7 +15,7 @@ import java.io.IOException;
 public class BasicCommands {
     private static final String CODE_ESCAPE = "```";
     private final DiscordService discordService;
-    Logger LOG = LoggerFactory.getLogger(BasicCommands.class);
+
     private String infoString = "----------------------------------------------------------------------\n" +
             "*    __________________ .___.___                                       *\n" +
             "*   /   _____/\\_   ___ \\|   |   |      Starcraft 2 - DAS Liga          *\n" +
@@ -40,6 +38,7 @@ public class BasicCommands {
             "*                                                                      *\n" +
             "*                                   DAS Liga Bot                       *\n" +
             "----------------------------------------------------------------------\n";
+
     private String helpString = "-------------------------Help Menu------------------------------------\n" +
             "*\n" +
             "* !league                 This displays the current league standings\n" +
@@ -84,6 +83,12 @@ public class BasicCommands {
     @DiscordCommand(name = {"intro"}, help = "Administrator command to introduce the bot to a channel", roleRequired = AccessLevel.ADMIN)
     public void introductionCommand(final CommandCall call) {
         discordService.replyInChannel(call.getServerId(), call.getChannel(), buildInfoText(call));
+    }
+
+    @DiscordCommand(name = {"invite"}, help = "Retrieve the bot invite-link", roleRequired = AccessLevel.AUTHOR)
+    public void displayInviteLink(final CommandCall call) {
+        discordService.replyInChannel(call.getServerId(), call.getChannel(),
+                "Invite link for the bot: " + discordService.getInviteLink());
     }
 
     private String buildInfoText(final CommandCall call) {

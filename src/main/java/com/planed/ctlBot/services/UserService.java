@@ -1,10 +1,6 @@
 package com.planed.ctlBot.services;
 
-import com.planed.ctlBot.common.AccessLevel;
-import com.planed.ctlBot.common.GameResult;
-import com.planed.ctlBot.common.GameStatus;
-import com.planed.ctlBot.common.LigaConstants;
-import com.planed.ctlBot.common.Race;
+import com.planed.ctlBot.common.*;
 import com.planed.ctlBot.discord.DiscordService;
 import com.planed.ctlBot.domain.Match;
 import com.planed.ctlBot.domain.MatchRepository;
@@ -14,7 +10,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 public class UserService {
@@ -73,7 +71,7 @@ public class UserService {
         userRepository.save(author, challengee);
         discordService.whisperToUser(challengee.getDiscordId(),
                 "You have been challenged by "
-                        + discordService.shortInfo(author)
+                        + discordService.shortInfo(author, serverId)
                         + ". You can !reject or !accept the challenge");
         prService.printChallengeExtendedMessage(match);
     }
@@ -137,11 +135,10 @@ public class UserService {
     }
 
     public String getLeagueString() {
-        final StringBuilder result = new StringBuilder();
-        final List<User> users = userRepository.findAll();
-        users.sort((u1, u2) -> u1.getElo().compareTo(u2.getElo()));
-        users.forEach(user -> result.append(discordService.shortInfo(user) + "\n"));
-        return result.toString();
+        return userRepository.findAll().stream()
+                .sorted(Comparator.comparing(User::getElo))
+                .map(user -> discordService.shortInfo(user))
+                .collect(Collectors.joining("\n"));
     }
 
     public void incrementCallsForUserByDiscordId(String discordId) {
