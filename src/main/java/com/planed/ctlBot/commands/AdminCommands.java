@@ -1,6 +1,6 @@
 package com.planed.ctlBot.commands;
 
-import com.planed.ctlBot.commands.data.CommandCall;
+import com.planed.ctlBot.commands.data.DiscordMessage;
 import com.planed.ctlBot.common.AccessLevel;
 import com.planed.ctlBot.discord.DiscordCommand;
 import com.planed.ctlBot.discord.DiscordController;
@@ -19,14 +19,14 @@ public class AdminCommands {
     private UserRepository userRepository;
 
     @DiscordCommand(name = {"matches"}, help = "Displays all matches", roleRequired = AccessLevel.AUTHOR)
-    public void displayAllMatches(final CommandCall call) {
+    public void displayAllMatches(final DiscordMessage call) {
         final StringBuilder builder = new StringBuilder();
         matchRepository.findAll().forEach(m -> builder.append(m.toString() + "\n"));
         discordService.whisperToUser(call.getAuthor().getDiscordId(), builder.toString());
     }
 
     @DiscordCommand(name = {"users"}, help = "Displays all users", roleRequired = AccessLevel.AUTHOR)
-    public void displayAllUsers(final CommandCall call) {
+    public void displayAllUsers(final DiscordMessage call) {
         final StringBuilder builder = new StringBuilder();
         userRepository.findAll().forEach(p -> builder.append(p.getInfo() + "\n"));
         discordService.whisperToUser(call.getAuthor().getDiscordId(), builder.toString());

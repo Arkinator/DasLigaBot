@@ -1,6 +1,6 @@
 package com.planed.ctlBot;
 
-import com.planed.ctlBot.commands.data.CommandCall;
+import com.planed.ctlBot.commands.data.DiscordMessage;
 import com.planed.ctlBot.common.AccessLevel;
 import com.planed.ctlBot.data.repositories.UserEntityRepository;
 import com.planed.ctlBot.discord.CommandRegistry;
@@ -31,7 +31,7 @@ public class DiscordIntegrationTest {
     private static final String ADMIN_ID = "admin";
     private static final String COMMAND_PHRASE = "command1";
     private static final String COMMAND_PHRASE_2 = "command2";
-    private static CommandCall lastCall;
+    private static DiscordMessage lastCall;
     @Autowired
     private CommandRegistry commandRegistry;
     @Autowired
@@ -50,7 +50,7 @@ public class DiscordIntegrationTest {
 
     @Test
     public void shouldCreateUserWhenAnyCommandIsInvoked() {
-        final CommandCall call = aCommandCallFromAuthor().build();
+        final DiscordMessage call = aDiscordMessageFromAuthor().build();
 
         assertThat(userEntityRepository.findById(call.getAuthor().getDiscordId()).isPresent(), is(false));
         commandRegistry.fireEvent(call);
@@ -60,7 +60,7 @@ public class DiscordIntegrationTest {
 
     @Test
     public void shouldNotCallWhenUserRightsAreInsufficient() {
-        final CommandCall call = aCommandCallFromAuthor()
+        final DiscordMessage call = aDiscordMessageFromAuthor()
                 .commandPhrase(COMMAND_PHRASE_2)
                 .build();
         commandRegistry.fireEvent(call);
@@ -70,7 +70,7 @@ public class DiscordIntegrationTest {
 
     @Test
     public void shouldCallWhenUserRightsAreSufficient() {
-        final CommandCall call = aCommandCallFromAuthor()
+        final DiscordMessage call = aDiscordMessageFromAuthor()
                 .author(anAdmin())
                 .commandPhrase(COMMAND_PHRASE_2)
                 .build();
@@ -81,7 +81,7 @@ public class DiscordIntegrationTest {
 
     @Test
     public void shouldIncrementNumberOfUserInteractionsWhenInvoked() {
-        final CommandCall call = aCommandCallFromAuthor().build();
+        final DiscordMessage call = aDiscordMessageFromAuthor().build();
         final int numBefore = userService.findUserAndCreateIfNotFound(call.getAuthor().getDiscordId()).getNumberOfInteractions();
         commandRegistry.fireEvent(call);
 
@@ -89,8 +89,8 @@ public class DiscordIntegrationTest {
         assertThat(numAfter - numBefore, is(1));
     }
 
-    private CommandCall.CommandCallBuilder aCommandCallFromAuthor() {
-        return CommandCall.builder()
+    private DiscordMessage.DiscordMessageBuilder aDiscordMessageFromAuthor() {
+        return DiscordMessage.builder()
                 .author(aDefaultUser())
                 .commandPhrase(COMMAND_PHRASE);
     }
@@ -98,12 +98,12 @@ public class DiscordIntegrationTest {
     @DiscordController
     public static class TestClass {
         @DiscordCommand(name = COMMAND_PHRASE)
-        public void testCommand1(final CommandCall call) {
+        public void testCommand1(final DiscordMessage call) {
             lastCall = call;
         }
 
         @DiscordCommand(name = COMMAND_PHRASE_2, roleRequired = AccessLevel.ADMIN)
-        public void testCommand2(final CommandCall call) {
+        public void testCommand2(final DiscordMessage call) {
             lastCall = call;
         }
     }

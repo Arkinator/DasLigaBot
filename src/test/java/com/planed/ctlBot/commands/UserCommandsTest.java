@@ -1,6 +1,6 @@
 package com.planed.ctlBot.commands;
 
-import com.planed.ctlBot.commands.data.CommandCall;
+import com.planed.ctlBot.commands.data.DiscordMessage;
 import com.planed.ctlBot.common.GameStatus;
 import com.planed.ctlBot.common.Race;
 import com.planed.ctlBot.data.repositories.UserEntityRepository;
@@ -236,8 +236,8 @@ public class UserCommandsTest extends AbstractDiscordCommandTest {
                 is(GameStatus.CHALLENGE_EXTENDED));
     }
 
-    private CommandCall aSimpleCommand(final User user, final String command, final String... parameters) {
-        return CommandCall.builder()
+    private DiscordMessage aSimpleCommand(final User user, final String command, final String... parameters) {
+        return DiscordMessage.builder()
                 .author(user)
                 .commandPhrase(command)
                 .channel("fjkdsl")
@@ -251,8 +251,8 @@ public class UserCommandsTest extends AbstractDiscordCommandTest {
         return userRepository.findByDiscordId(user.getDiscordId());
     }
 
-    private CommandCall anIssueChallengeCommand(final User user1, final User user2) {
-        return CommandCall.builder()
+    private DiscordMessage anIssueChallengeCommand(final User user1, final User user2) {
+        return DiscordMessage.builder()
                 .author(user1)
                 .commandPhrase("challenge")
                 .mentions(Collections.singletonList(user2))
@@ -260,8 +260,8 @@ public class UserCommandsTest extends AbstractDiscordCommandTest {
                 .build();
     }
 
-    private CommandCall aChangeRaceEvent(final User user) {
-        return CommandCall.builder()
+    private DiscordMessage aChangeRaceEvent(final User user) {
+        return DiscordMessage.builder()
                 .author(user)
                 .commandPhrase("changeRace")
                 .parameters(Collections.singletonList("Protoss"))

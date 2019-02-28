@@ -2,7 +2,7 @@ package com.planed.ctlBot.commands;
 
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
-import com.planed.ctlBot.commands.data.CommandCall;
+import com.planed.ctlBot.commands.data.DiscordMessage;
 import com.planed.ctlBot.common.AccessLevel;
 import com.planed.ctlBot.discord.DiscordCommand;
 import com.planed.ctlBot.discord.DiscordController;
@@ -23,7 +23,7 @@ public class AuthorCommands {
     private MetricsEndpoint metricsEndpoint;
 
     @DiscordCommand(name = {"serverStatus"}, help = "Display server status", roleRequired = AccessLevel.AUTHOR)
-    public void displayServerStatus(final CommandCall call) {
+    public void displayServerStatus(final DiscordMessage call) {
         discordService.whisperToUser(call.getAuthor().getDiscordId(),
                 "IP-Address: " + getIpAddress() + "\n" +
                         "Uptime: " + getUptime());

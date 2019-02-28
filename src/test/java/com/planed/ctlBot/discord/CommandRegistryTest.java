@@ -6,7 +6,7 @@ package com.planed.ctlBot.discord;
  * @author julian.peters@westernacher.com
  */
 
-import com.planed.ctlBot.commands.data.CommandCall;
+import com.planed.ctlBot.commands.data.DiscordMessage;
 import com.planed.ctlBot.common.AccessLevel;
 import com.planed.ctlBot.domain.User;
 import com.planed.ctlBot.services.UserService;
@@ -71,7 +71,7 @@ public class CommandRegistryTest {
 
     @Test
     public void shouldCallTestCommandIfCallTriggered() {
-        final CommandCall call = CommandCall.builder()
+        final DiscordMessage call = DiscordMessage.builder()
                 .author(aStandardUser())
                 .commandPhrase("test")
                 .build();
@@ -83,7 +83,7 @@ public class CommandRegistryTest {
 
     @Test
     public void adminShouldBeAllowedToCallAdminMethod() {
-        final CommandCall call = CommandCall.builder()
+        final DiscordMessage call = DiscordMessage.builder()
                 .author(anAdminUser())
                 .commandPhrase("admin")
                 .build();
@@ -93,7 +93,7 @@ public class CommandRegistryTest {
 
     @Test
     public void normalUserShouldNotBeAllowedToCallAdminMethod() {
-        final CommandCall call = CommandCall.builder()
+        final DiscordMessage call = DiscordMessage.builder()
                 .author(aStandardUser())
                 .commandPhrase("admin")
                 .build();
@@ -103,7 +103,7 @@ public class CommandRegistryTest {
 
     @Test
     public void shouldCallTestCommandForMultiNameMethod() {
-        final CommandCall call1 = CommandCall.builder()
+        final DiscordMessage call1 = DiscordMessage.builder()
                 .commandPhrase("test1")
                 .author(aStandardUser())
                 .build();
@@ -112,7 +112,7 @@ public class CommandRegistryTest {
 
         callParameters.remove(0);
 
-        final CommandCall call2 = CommandCall.builder()
+        final DiscordMessage call2 = DiscordMessage.builder()
                 .commandPhrase("test2")
                 .author(aStandardUser())
                 .build();
@@ -124,17 +124,17 @@ public class CommandRegistryTest {
     @Configuration
     public static class TestClass {
         @DiscordCommand(name = "test")
-        public void testCommand1(final CommandCall call) {
+        public void testCommand1(final DiscordMessage call) {
             callParameters.add(call);
         }
 
         @DiscordCommand(name = {"test1", "test2"})
-        public void testCommand2(final CommandCall call) {
+        public void testCommand2(final DiscordMessage call) {
             callParameters.add(call);
         }
 
         @DiscordCommand(name = "admin", roleRequired = AccessLevel.ADMIN)
-        public void adminCommand(final CommandCall call) {
+        public void adminCommand(final DiscordMessage call) {
             callParameters.add(call);
         }
     }

@@ -1,6 +1,6 @@
 package com.planed.ctlBot.discord;
 
-import com.planed.ctlBot.commands.data.CommandCall;
+import com.planed.ctlBot.commands.data.DiscordMessage;
 import com.planed.ctlBot.common.AccessLevel;
 import com.planed.ctlBot.domain.User;
 import com.planed.ctlBot.services.UserService;
@@ -85,11 +85,14 @@ public class CommandRegistry implements MessageCreateListener {
 
     @Override
     public void onMessageCreate(MessageCreateEvent event) {
+        if (event.getMessageAuthor().isYourself())
+            return;
+
         discordMessageParser.deconstructMessage(event.getMessage())
                 .ifPresent(this::fireEvent);
     }
 
-    public void fireEvent(final CommandCall call) {
+    public void fireEvent(final DiscordMessage call) {
         final DiscordCommand command = commandNameMap.get(call.getCommandPhrase());
         logger.info("Command from " + call.getAuthor()
                 + " with command " + call.getCommandPhrase()
@@ -106,7 +109,7 @@ public class CommandRegistry implements MessageCreateListener {
         }
     }
 
-    private boolean checkMinimumParameters(CommandCall call, DiscordCommand command) {
+    private boolean checkMinimumParameters(DiscordMessage call, DiscordCommand command) {
         if (call.getParameters().size() < command.minParameters()) {
             discordService.whisperToUser(call.getAuthor().getDiscordId(),
                     "You need " + command.minParameters() + " parameters for this command");
@@ -116,7 +119,7 @@ public class CommandRegistry implements MessageCreateListener {
         }
     }
 
-    private boolean checkMinimumMentions(CommandCall call, DiscordCommand command) {
+    private boolean checkMinimumMentions(DiscordMessage call, DiscordCommand command) {
         if (call.getMentions().size() < command.minMentions()) {
             discordService.whisperToUser(call.getAuthor().getDiscordId(),
                     "You need " + command.minMentions() + " mention (type @ and a username) as a parameter to this command");
@@ -126,7 +129,7 @@ public class CommandRegistry implements MessageCreateListener {
         }
     }
 
-    private boolean checkUserAuthorization(final CommandCall call, final DiscordCommand command, User user) {
+    private boolean checkUserAuthorization(final DiscordMessage call, final DiscordCommand command, User user) {
         if (user.getAccessLevel().ordinal() < command.roleRequired().ordinal()) {
             discordService.whisperToUser(call.getAuthor().getDiscordId(),
                     "Insufficent access rights to invoke command!");
@@ -136,7 +139,7 @@ public class CommandRegistry implements MessageCreateListener {
         }
     }
 
-    private void invokeCommand(final CommandCall call, final DiscordCommand command) {
+    private void invokeCommand(final DiscordMessage call, final DiscordCommand command) {
         final Method method = commandMap.get(command);
         try {
             method.invoke(controllerMap.get(command), call);

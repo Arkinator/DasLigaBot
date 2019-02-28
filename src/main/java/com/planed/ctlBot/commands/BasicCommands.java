@@ -1,6 +1,6 @@
 package com.planed.ctlBot.commands;
 
-import com.planed.ctlBot.commands.data.CommandCall;
+import com.planed.ctlBot.commands.data.DiscordMessage;
 import com.planed.ctlBot.common.AccessLevel;
 import com.planed.ctlBot.discord.DiscordCommand;
 import com.planed.ctlBot.discord.DiscordController;
@@ -66,32 +66,32 @@ public class BasicCommands {
     }
 
     @DiscordCommand(name = "hello", help = "Hello World command")
-    public void helloCommand(final CommandCall call) {
+    public void helloCommand(final DiscordMessage call) {
         discordService.whisperToUser(call.getAuthor().getDiscordId(), "he yourself");
     }
 
     @DiscordCommand(name = {"list", "help", "commands"}, help = "Lists all available commands")
-    public void listAllCommands(final CommandCall call) {
+    public void listAllCommands(final DiscordMessage call) {
         discordService.whisperToUser(call.getAuthor().getDiscordId(), CODE_ESCAPE + "\n" + helpString + CODE_ESCAPE);
     }
 
     @DiscordCommand(name = {"info"}, help = "Displays some information about me!")
-    public void infoCommand(final CommandCall call) {
+    public void infoCommand(final DiscordMessage call) {
         discordService.whisperToUser(call.getAuthor().getDiscordId(), buildInfoText(call));
     }
 
     @DiscordCommand(name = {"intro"}, help = "Administrator command to introduce the bot to a channel", roleRequired = AccessLevel.ADMIN)
-    public void introductionCommand(final CommandCall call) {
+    public void introductionCommand(final DiscordMessage call) {
         discordService.replyInChannel(call.getServerId(), call.getChannel(), buildInfoText(call));
     }
 
     @DiscordCommand(name = {"invite"}, help = "Retrieve the bot invite-link", roleRequired = AccessLevel.AUTHOR)
-    public void displayInviteLink(final CommandCall call) {
+    public void displayInviteLink(final DiscordMessage call) {
         discordService.replyInChannel(call.getServerId(), call.getChannel(),
                 "Invite link for the bot: " + discordService.getInviteLink());
     }
 
-    private String buildInfoText(final CommandCall call) {
+    private String buildInfoText(final DiscordMessage call) {
         return CODE_ESCAPE + "\n" + infoString + CODE_ESCAPE;
     }
 }

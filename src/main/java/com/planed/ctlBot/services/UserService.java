@@ -1,5 +1,6 @@
 package com.planed.ctlBot.services;
 
+import com.planed.ctlBot.commands.data.DiscordMessage;
 import com.planed.ctlBot.common.*;
 import com.planed.ctlBot.discord.DiscordService;
 import com.planed.ctlBot.domain.Match;
@@ -9,39 +10,34 @@ import com.planed.ctlBot.domain.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
-import java.util.List;
 import java.util.stream.Collectors;
 
 @Component
 public class UserService {
-    private final DiscordService discordService;
-    private final UserRepository userRepository;
-    private final MatchRepository matchRepository;
-    private final PrService prService;
+    private static final String WELCOME_MESSAGE = "Hello you! I'm the DAS Liga Bot. I would like to know which race you are playing in your Starcraft 2 endeavours? " +
+            "(Click on one of the symbols. They signify Terran, Zerg and Protoss)";
+    private static final String RACE_CHANGE_MESSAGE = "Want to change your race? Just let me know which race you are playing in your Starcraft 2 endeavours! " +
+            "(Click on one of the symbols. They signify Terran, Zerg and Protoss)";
+    private static final String TERRAN_EMOJI = "🏢";
+    private static final String ZERG_EMOJI = "\uD83D\uDC09";
+    private static final String PROTOSS_EMOJI = "\uD83D\uDCA0";
+    private static final String RANDOM_EMOJI = "\uD83C\uDFB2";
 
     @Autowired
-    public UserService(final UserRepository userRepository,
-                       final DiscordService discordService,
-                       final MatchRepository matchRepository,
-                       final PrService prService) {
-        this.userRepository = userRepository;
-        this.discordService = discordService;
-        this.matchRepository = matchRepository;
-        this.prService = prService;
-    }
+    private DiscordService discordService;
+    @Autowired
+    private UserRepository userRepository;
+    @Autowired
+    private MatchRepository matchRepository;
+    @Autowired
+    private PrService prService;
 
     public void giveUserAccessLevel(final String discordId, final AccessLevel accessLevel) {
         User user = findUserAndCreateIfNotFound(discordId);
         user.setAccessLevel(accessLevel);
         userRepository.save(user);
-    }
-
-    public List<User> getAllUsers() {
-        final List<User> result = new ArrayList<>();
-        userRepository.findAll().forEach(result::add);
-        return result;
     }
 
     public User findUserAndCreateIfNotFound(final String discordId) {
@@ -57,6 +53,53 @@ public class UserService {
         final User entity = new User();
         entity.setDiscordId(discordId);
         userRepository.save(entity);
+
+        final DiscordMessage message = discordService.whisperToUser(discordId, WELCOME_MESSAGE);
+        discordService.addReactionWithMapper(message, Arrays.asList(TERRAN_EMOJI, ZERG_EMOJI, PROTOSS_EMOJI, RANDOM_EMOJI), str -> updateUserRaceByEmoji(str, discordId));
+    }
+
+    public void whisperChangeRaceMessageToUser(User author) {
+        final DiscordMessage message = discordService.whisperToUser(author.getDiscordId(), RACE_CHANGE_MESSAGE);
+        discordService.addReactionWithMapper(message, Arrays.asList(TERRAN_EMOJI, ZERG_EMOJI, PROTOSS_EMOJI, RANDOM_EMOJI), str -> updateUserRaceByEmoji(str, author.getDiscordId()));
+    }
+
+    private void updateUserRaceByEmoji(String emoji, String userDiscordId) {
+        User user = findUserAndCreateIfNotFound(userDiscordId);
+        switch (emoji) {
+            case TERRAN_EMOJI:
+                user.setRace(Race.TERRAN);
+                break;
+            case ZERG_EMOJI:
+                user.setRace(Race.ZERG);
+                break;
+            case PROTOSS_EMOJI:
+                user.setRace(Race.PROTOSS);
+                break;
+            case RANDOM_EMOJI:
+                user.setRace(Race.RANDOM);
+                break;
+            default:
+                return;
+        }
+        userRepository.save(user);
+        sendRaceChangeMessage(user);
+    }
+
+    private void sendRaceChangeMessage(User user) {
+        switch (user.getRace()) {
+            case ZERG:
+                discordService.whisperToUser(user.getDiscordId(), "Too old for micro? You now play as Zerg.");
+                break;
+            case TERRAN:
+                discordService.whisperToUser(user.getDiscordId(), "Feeling whiny? You now play as Terran.");
+                break;
+            case PROTOSS:
+                discordService.whisperToUser(user.getDiscordId(), "Did you study the changelog of the next patch? You now play as Protoss");
+                break;
+            case RANDOM:
+                discordService.whisperToUser(user.getDiscordId(), "Somebody wants to show all the 1-base-all ins... You now play as Random");
+                break;
+        }
     }
 
     public void changeRace(final User author, final String newRace) {
