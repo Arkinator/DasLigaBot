@@ -60,27 +60,27 @@ public class BasicCommands {
 
     @DiscordCommand(name = "hello", help = "Hello World command")
     public void helloCommand(final DiscordMessage call) {
-        discordService.whisperToUser(call.getAuthor().getDiscordId(), "he yourself");
+        discordService.whisperToUser(call.getDiscordUser(), "he yourself");
     }
 
     @DiscordCommand(name = {"list", "help", "commands"}, help = "Lists all available commands")
     public void listAllCommands(final DiscordMessage call) {
-        discordService.whisperToUser(call.getAuthor().getDiscordId(), CODE_ESCAPE + "\n" + helpString + CODE_ESCAPE);
+        discordService.whisperToUser(call.getDiscordUser(), CODE_ESCAPE + "\n" + helpString + CODE_ESCAPE);
     }
 
     @DiscordCommand(name = {"info"}, help = "Displays some information about me!")
     public void infoCommand(final DiscordMessage call) {
-        discordService.whisperToUser(call.getAuthor().getDiscordId(), infoString);
+        discordService.whisperToUser(call.getDiscordUser(), infoString);
     }
 
     @DiscordCommand(name = {"intro"}, help = "Administrator command to introduce the bot to a channel", roleRequired = AccessLevel.ADMIN)
     public void introductionCommand(final DiscordMessage call) {
-        discordService.replyInChannel(call.getServerId(), call.getChannel(), infoString);
+        discordService.replyInChannel(call.getTextChannel(), infoString);
     }
 
     @DiscordCommand(name = {"invite"}, help = "Retrieve the bot invite-link", roleRequired = AccessLevel.AUTHOR)
     public void displayInviteLink(final DiscordMessage call) {
-        discordService.whisperToUser(call.getAuthor().getDiscordId(),
+        discordService.whisperToUser(call.getDiscordUser(),
                 "Invite link for the bot: " + discordService.getInviteLink());
     }
 }

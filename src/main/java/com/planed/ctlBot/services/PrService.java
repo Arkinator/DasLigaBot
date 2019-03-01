@@ -58,7 +58,7 @@ public class PrService {
     }
 
     private String getPlayerName(final User user, String serverId) {
-        return discordService.getDiscordName(user, serverId);
+        return discordService.getDiscordName(user.getDiscordId(), serverId);
     }
 
     public void printMessageResultMessage(final Match match) {

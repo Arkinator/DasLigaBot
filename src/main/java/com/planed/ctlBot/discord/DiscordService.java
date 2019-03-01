@@ -1,11 +1,10 @@
 package com.planed.ctlBot.discord;
 
 import com.planed.ctlBot.commands.data.DiscordMessage;
-import com.planed.ctlBot.domain.User;
 import com.planed.ctlBot.utils.DiscordMessageParser;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.channel.TextChannel;
-import org.javacord.api.entity.message.Message;
+import org.javacord.api.entity.user.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +37,14 @@ public class DiscordService {
                 .orElseThrow(() -> new RuntimeException("Error while sending message to server " + serverId + " and channel " + channelId + "!"));
     }
 
+    public DiscordMessage replyInChannel(TextChannel channel, final String message) {
+        logger.info(channel + ": " + message);
+        return Optional.of(channel)
+                .map(ch -> ch.sendMessage(message).join())
+                .flatMap(msg -> discordMessageParser.deconstructMessage(msg))
+                .orElseThrow(() -> new RuntimeException("Error while sending message to channel " + channel + "!"));
+    }
+
     public DiscordMessage whisperToUser(final String userId, final String message) {
         return discordApi.getUserById(userId).join()
                 .openPrivateChannel().join()
@@ -47,39 +54,34 @@ public class DiscordService {
                 .orElseThrow(() -> new RuntimeException("Error while sending whisper message to user " + userId + "!"));
     }
 
+    public DiscordMessage whisperToUser(final User user, final String message) {
+        return user
+                .openPrivateChannel().join()
+                .getCurrentCachedInstance()
+                .map(channel -> channel.sendMessage(message).join())
+                .flatMap(msg -> discordMessageParser.deconstructMessage(msg))
+                .orElseThrow(() -> new RuntimeException("Error while sending whisper message to user " + user.getName() + "!"));
+    }
+
     public DiscordMessage addReactionWithMapper(final DiscordMessage message, List<String> reactions, Consumer<String> reactionAddConsumer) {
-        TextChannel textChannel = discordApi
-                .getChannelById(message.getChannel())
-                .flatMap(channel -> channel.asTextChannel())
-                .orElseThrow(() -> new RuntimeException("Unable to get " + message.getChannel() + " as a text channel!"));
-        final Message internalMessage = discordApi.getMessageById(message.getMessageId(), textChannel).join();
-        reactions.stream()
-                .forEach(reaction -> internalMessage.addReaction(reaction).join());
-        internalMessage.addReactionAddListener(event -> {
+        message.getMessage().addReactionAddListener(event -> {
             if (event.getUser().isYourself()) {
                 return;
             }
             final String emojiAsUnicode = event.getEmoji().asUnicodeEmoji().get();
             reactionAddConsumer.accept(emojiAsUnicode);
         });
+
+        reactions.stream().forEach(reaction -> message.getMessage().addReaction(reaction).join());
+
         return message;
     }
 
-    public String shortInfo(final User user, String serverId) {
-        String result = getDiscordName(user, serverId);
-        result += " (" + user.getElo() + ")";
-        return result;
-    }
-
-    public String shortInfo(final User user) {
-        return shortInfo(user, null);
-    }
-
-    public String getDiscordName(final User user, String serverId) {
+    public String getDiscordName(final String discordId, String serverId) {
         return Optional.ofNullable(serverId)
                 .flatMap(sId -> discordApi.getServerById(sId))
-                .flatMap(server -> discordApi.getUserById(user.getDiscordId()).join().getNickname(server))
-                .orElse(discordApi.getUserById(user.getDiscordId()).join().getName());
+                .flatMap(server -> discordApi.getUserById(discordId).join().getNickname(server))
+                .orElse(discordApi.getUserById(discordId).join().getName());
     }
 
     public String getInviteLink() {

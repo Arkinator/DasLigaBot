@@ -120,7 +120,7 @@ public class UserService {
         userRepository.save(author, challengee);
         discordService.whisperToUser(challengee.getDiscordId(),
                 "You have been challenged by "
-                        + discordService.shortInfo(author, serverId)
+                        + shortInfo(author, serverId)
                         + ". You can !reject or !accept the challenge");
         prService.printChallengeExtendedMessage(match);
     }
@@ -186,7 +186,7 @@ public class UserService {
     public String getLeagueString() {
         return userRepository.findAll().stream()
                 .sorted(Comparator.comparing(User::getElo))
-                .map(user -> discordService.shortInfo(user))
+                .map(user -> shortInfo(user))
                 .collect(Collectors.joining("\n"));
     }
 
@@ -194,5 +194,16 @@ public class UserService {
         User user = findUserAndCreateIfNotFound(discordId);
         user.setNumberOfInteractions(user.getNumberOfInteractions() + 1);
         userRepository.save(user);
+    }
+
+
+    public String shortInfo(final User user, String serverId) {
+        String result = discordService.getDiscordName(user.getDiscordId(), serverId);
+        result += " (" + user.getElo() + ")";
+        return result;
+    }
+
+    public String shortInfo(final User user) {
+        return shortInfo(user, null);
     }
 }
