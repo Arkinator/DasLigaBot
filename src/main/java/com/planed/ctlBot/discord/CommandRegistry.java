@@ -6,15 +6,19 @@ import com.planed.ctlBot.domain.User;
 import com.planed.ctlBot.services.UserService;
 import com.planed.ctlBot.utils.DiscordMessageParser;
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.event.message.MessageCreateEvent;
+import org.javacord.api.event.server.ServerJoinEvent;
 import org.javacord.api.listener.message.MessageCreateListener;
+import org.javacord.api.listener.server.ServerJoinListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ReflectionUtils;
 
 import javax.annotation.PostConstruct;
 import java.lang.reflect.InvocationTargetException;
@@ -22,9 +26,10 @@ import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 @Service
-public class CommandRegistry implements MessageCreateListener {
+public class CommandRegistry implements MessageCreateListener, ServerJoinListener {
     private static final Logger logger = LoggerFactory.getLogger(CommandRegistry.class);
 
     private final Map<String, DiscordCommand> commandNameMap = new HashMap<>();
@@ -43,10 +48,12 @@ public class CommandRegistry implements MessageCreateListener {
     private DiscordMessageParser discordMessageParser;
     @Value("${discord.authorUserId}")
     private String authorUserId;
+    private Pair<Method, Object> serverJoinListener;
 
     @PostConstruct
     public void registerDiscordControllers() {
         discordApi.addMessageCreateListener(this);
+        discordApi.addServerJoinListener(this);
 
         findAndCollectDiscordCommandBeans();
 
@@ -59,10 +66,11 @@ public class CommandRegistry implements MessageCreateListener {
         final Map<String, Object> beans = applicationContext.getBeansWithAnnotation(DiscordController.class);
         for (final Object bean : beans.values()) {
             for (final Method method : bean.getClass().getMethods()) {
-                final DiscordCommand command = method.getAnnotation(DiscordCommand.class);
-                if (command != null) {
-                    registerDiscordCommand(command, method, bean);
-                }
+                Optional.ofNullable(method.getAnnotation(DiscordCommand.class))
+                        .ifPresent(command -> registerDiscordCommand(command, method, bean));
+
+                Optional.ofNullable(method.getAnnotation(DiscordCustomEvent.class))
+                        .ifPresent(customEvent -> registerDiscordEvent(customEvent, method, bean));
             }
         }
     }
@@ -156,8 +164,21 @@ public class CommandRegistry implements MessageCreateListener {
         controllerMap.put(command, bean);
     }
 
+    private void registerDiscordEvent(DiscordCustomEvent customEvent, Method method, Object bean) {
+        if (customEvent.eventType() == DiscordEventType.SERVER_JOIN_EVENT) {
+            serverJoinListener = Pair.of(method, bean);
+        }
+    }
+
     public Collection<DiscordCommand> getAllCommands() {
         return commandMap.keySet();
+    }
+
+    @Override
+    public void onServerJoin(ServerJoinEvent event) {
+        if (serverJoinListener != null) {
+            ReflectionUtils.invokeMethod(serverJoinListener.getKey(), serverJoinListener.getValue(), event);
+        }
     }
 
     private class InternalServerException extends RuntimeException {
