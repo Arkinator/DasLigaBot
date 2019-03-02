@@ -126,28 +126,34 @@ public class UserService {
     }
 
     public void rejectChallenge(final User author) {
-        final Match match = matchRepository.findMatchById(author.getMatchId());
-        prService.printChallengeRejectedMessage(match);
-        match.setGameStatus(GameStatus.CHALLENGE_REJECTED);
-        matchRepository.saveMatch(match);
-        clearMatchOfInvolvedPlayers(match);
+        matchRepository.findMatchById(author.getMatchId())
+                .ifPresent(match -> {
+                    prService.printChallengeRejectedMessage(match);
+                    match.setGameStatus(GameStatus.CHALLENGE_REJECTED);
+                    matchRepository.saveMatch(match);
+                    clearMatchOfInvolvedPlayers(match);
+                });
     }
 
     public void revokeChallenge(final User author) {
-        final Match match = matchRepository.findMatchById(author.getMatchId());
-        match.setGameStatus(GameStatus.CHALLENGE_REVOKED);
-        matchRepository.saveMatch(match);
-        clearMatchOfInvolvedPlayers(match);
-        discordService.whisperToUser(author.getDiscordId(), "Your challenge has been revoked.");
-        discordService.whisperToUser(match.getPlayerB().getDiscordId(),
-                "The challenge from " + author.toString() + " has just been revoked.");
+        matchRepository.findMatchById(author.getMatchId())
+                .ifPresent(match -> {
+                    match.setGameStatus(GameStatus.CHALLENGE_REVOKED);
+                    matchRepository.saveMatch(match);
+                    clearMatchOfInvolvedPlayers(match);
+                    discordService.whisperToUser(author.getDiscordId(), "Your challenge has been revoked.");
+                    discordService.whisperToUser(match.getPlayerB().getDiscordId(),
+                            "The challenge from " + author.toString() + " has just been revoked.");
+                });
     }
 
     public void acceptChallenge(final User author) {
-        final Match match = matchRepository.findMatchById(author.getMatchId());
-        prService.printGameIsOnMessage(match);
-        match.setGameStatus(GameStatus.CHALLENGE_ACCEPTED);
-        matchRepository.saveMatch(match);
+        matchRepository.findMatchById(author.getMatchId())
+                .ifPresent(match -> {
+                    prService.printGameIsOnMessage(match);
+                    match.setGameStatus(GameStatus.CHALLENGE_ACCEPTED);
+                    matchRepository.saveMatch(match);
+                });
     }
 
     public void reportResult(final Match match, final User author, final GameResult result) {

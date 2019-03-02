@@ -2,7 +2,6 @@ package com.planed.ctlBot.domain;
 
 import com.planed.ctlBot.common.GameStatus;
 import com.planed.ctlBot.data.MatchEntity;
-import com.planed.ctlBot.data.UserEntity;
 import com.planed.ctlBot.data.repositories.MatchEntityRepository;
 import com.planed.ctlBot.data.repositories.UserEntityRepository;
 import org.dozer.DozerBeanMapper;
@@ -25,14 +24,15 @@ public class MatchRepository {
     @Autowired
     private UserRepository userRepository;
 
-    public Match findMatchForUser(final String discordId) {
+    public Optional<Match> findMatchForUser(final String discordId) {
+        // TODO change to optional and java9 .or(<other optional>)
         final List<MatchEntity> resultList = new ArrayList<>();
         resultList.addAll(matchEntityRepository.findMatchByPlayerA(discordId));
         resultList.addAll(matchEntityRepository.findMatchByPlayerB(discordId));
         if (resultList.size() == 1) {
-            return mapper.map(resultList.get(0), Match.class);
+            return Optional.of(mapper.map(resultList.get(0), Match.class));
         } else {
-            return null;
+            return Optional.empty();
         }
     }
 
@@ -48,14 +48,14 @@ public class MatchRepository {
         match.setOriginatingChannelId(channelId);
         final long matchId = matchEntityRepository.save(mapToEntity(match)).getMatchId();
 
-        return findMatchById(matchId);
+        return findMatchById(matchId)
+                .orElseThrow(() -> new RuntimeException("Error while adding match: Could not find newly created match in DB!"));
     }
 
-    public Match findMatchById(final Long matchId) {
+    public Optional<Match> findMatchById(final Long matchId) {
         return Optional.ofNullable(matchId)
                 .flatMap(id -> matchEntityRepository.findById(id))
-                .map(match -> mapperFromEntity(match))
-                .orElse(null);
+                .map(match -> mapperFromEntity(match));
     }
 
     private Match mapperFromEntity(final MatchEntity match) {
