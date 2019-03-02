@@ -15,6 +15,7 @@ import java.util.Arrays;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.StringContains.containsString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -32,8 +33,8 @@ public class PrServiceTest {
 
     @Before
     public void setUp() {
-        when(discordService.getDiscordName(PLAYER_A.getDiscordId(), any())).thenReturn(PLAYER_A.getDiscordId());
-        when(discordService.getDiscordName(PLAYER_B.getDiscordId(), any())).thenReturn(PLAYER_B.getDiscordId());
+        when(discordService.getDiscordName(eq(PLAYER_A.getDiscordId()), any())).thenReturn(PLAYER_A.getDiscordId());
+        when(discordService.getDiscordName(eq(PLAYER_B.getDiscordId()), any())).thenReturn(PLAYER_B.getDiscordId());
     }
 
     @Test
