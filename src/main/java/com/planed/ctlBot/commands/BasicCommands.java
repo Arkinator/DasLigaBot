@@ -78,7 +78,7 @@ public class BasicCommands {
         discordService.replyInChannel(call.getTextChannel(), infoString);
     }
 
-    @DiscordCommand(name = {"invite"}, help = "Retrieve the bot invite-link", roleRequired = AccessLevel.AUTHOR)
+    @DiscordCommand(name = {"invite"}, help = "Retrieve the bot invite-link", roleRequired = AccessLevel.USER)
     public void displayInviteLink(final DiscordMessage call) {
         discordService.whisperToUser(call.getDiscordUser(),
                 "Invite link for the bot: " + discordService.getInviteLink());

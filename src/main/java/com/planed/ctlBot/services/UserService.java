@@ -113,7 +113,7 @@ public class UserService {
         userRepository.save(author);
     }
 
-    public void issueChallenge(final User author, final User challengee, String serverId, String channelId) {
+    public void issueChallenge(final User author, final User challengee, Long serverId, Long channelId) {
         final Match match = matchRepository.addMatch(author, challengee, serverId, channelId);
         author.setMatchId(match.getMatchId());
         challengee.setMatchId(match.getMatchId());
@@ -203,7 +203,7 @@ public class UserService {
     }
 
 
-    public String shortInfo(final User user, String serverId) {
+    public String shortInfo(final User user, Long serverId) {
         String result = discordService.getDiscordName(user.getDiscordId(), serverId);
         result += " (" + user.getElo() + ")";
         return result;

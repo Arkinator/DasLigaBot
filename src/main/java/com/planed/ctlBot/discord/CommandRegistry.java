@@ -111,9 +111,20 @@ public class CommandRegistry implements MessageCreateListener, ServerJoinListene
         if (command != null
                 && checkUserAuthorization(call, command, user)
                 && checkMinimumMentions(call, command)
-                && checkMinimumParameters(call, command)) {
+                && checkMinimumParameters(call, command)
+                && checkMinimumChannelLinks(call, command)) {
             userService.incrementCallsForUserByDiscordId(user.getDiscordId());
             invokeCommand(call, command);
+        }
+    }
+
+    private boolean checkMinimumChannelLinks(DiscordMessage call, DiscordCommand command) {
+        if (call.getMentionedChannels().size() < command.minChannelLinks()) {
+            discordService.whisperToUser(call.getAuthor().getDiscordId(),
+                    "You need " + command.minParameters() + " channel links for this command");
+            return false;
+        } else {
+            return true;
         }
     }
 

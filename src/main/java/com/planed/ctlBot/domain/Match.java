@@ -20,17 +20,14 @@ public class Match {
     private Integer playerAreportedScoreForPlayerB;
     private Integer playerBreportedScoreForPlayerA;
     private Integer playerBreportedScoreForPlayerB;
-    private String originatingServerId;
-    private String originatingChannelId;
+    private Long originatingServerId;
+    private Long originatingChannelId;
 
     public boolean didUserReportResult(final User player) {
         if (isPlayerA(player) && playerAreportedScoreForPlayerA != null) {
             return true;
         }
-        if (isPlayerB(player) && playerBreportedScoreForPlayerA != null) {
-            return true;
-        }
-        return false;
+        return isPlayerB(player) && playerBreportedScoreForPlayerA != null;
     }
 
     public void reportResult(final User reporter, final GameResult result) {

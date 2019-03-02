@@ -42,7 +42,7 @@ public class MatchEntity {
     private Integer playerBreportedScoreForPlayerB;
 
     @Column
-    private String originatingServerId;
+    private Long originatingServerId;
     @Column
-    private String originatingChannelId;
+    private Long originatingChannelId;
 }
