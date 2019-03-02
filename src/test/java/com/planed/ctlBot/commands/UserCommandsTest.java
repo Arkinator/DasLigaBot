@@ -98,7 +98,7 @@ public class UserCommandsTest extends AbstractDiscordCommandTest {
         commandRegistry.fireEvent(anIssueChallengeCommand(user1, user2));
         commandRegistry.fireEvent(aSimpleCommand(user1, "accept"));
 
-        assertThat(matchRepository.findMatchForUser(user1.getDiscordId()).getGameStatus(), is(GameStatus.CHALLENGE_EXTENDED));
+        assertThat(matchRepository.findMatchForUser(user1.getDiscordId()).get().getGameStatus(), is(GameStatus.CHALLENGE_EXTENDED));
     }
 
     @Test
@@ -125,7 +125,7 @@ public class UserCommandsTest extends AbstractDiscordCommandTest {
         commandRegistry.fireEvent(aSimpleCommand(user2, "accept"));
         user1 = userRepository.findByDiscordId(user1.getDiscordId());
 
-        assertThat(matchRepository.findMatchById(user1.getMatchId()).getGameStatus(),
+        assertThat(matchRepository.findMatchById(user1.getMatchId()).get().getGameStatus(),
                 is(GameStatus.CHALLENGE_ACCEPTED));
     }
 
@@ -134,7 +134,7 @@ public class UserCommandsTest extends AbstractDiscordCommandTest {
         commandRegistry.fireEvent(anIssueChallengeCommand(user1, user2));
         commandRegistry.fireEvent(aSimpleCommand(user1, "accept"));
 
-        assertThat(matchRepository.findMatchForUser(user1.getDiscordId()).getGameStatus(),
+        assertThat(matchRepository.findMatchForUser(user1.getDiscordId()).get().getGameStatus(),
                 is(GameStatus.CHALLENGE_EXTENDED));
     }
 
@@ -144,7 +144,7 @@ public class UserCommandsTest extends AbstractDiscordCommandTest {
         commandRegistry.fireEvent(aSimpleCommand(user2, "accept"));
         commandRegistry.fireEvent(aSimpleCommand(user1, "report", "win"));
 
-        assertThat(matchRepository.findMatchById(user1.getMatchId()).getGameStatus(), is(GameStatus.PARTIALLY_REPORTED));
+        assertThat(matchRepository.findMatchById(user1.getMatchId()).get().getGameStatus(), is(GameStatus.PARTIALLY_REPORTED));
     }
 
     @Test
@@ -154,7 +154,7 @@ public class UserCommandsTest extends AbstractDiscordCommandTest {
         commandRegistry.fireEvent(aSimpleCommand(user1, "report", "win"));
         commandRegistry.fireEvent(aSimpleCommand(user2, "report", "loss"));
 
-        assertThat(matchRepository.findMatchById(user1.getMatchId()).getGameStatus(), is(GameStatus.GAME_PLAYED));
+        assertThat(matchRepository.findMatchById(user1.getMatchId()).get().getGameStatus(), is(GameStatus.GAME_PLAYED));
     }
 
     @Test
@@ -164,8 +164,8 @@ public class UserCommandsTest extends AbstractDiscordCommandTest {
         commandRegistry.fireEvent(aSimpleCommand(user1, "report", "win"));
         commandRegistry.fireEvent(aSimpleCommand(user2, "report", "loss"));
 
-        assertThat(matchRepository.findMatchById(user1.getMatchId()).getFinalScorePlayerA(), is(1));
-        assertThat(matchRepository.findMatchById(user1.getMatchId()).getFinalScorePlayerB(), is(0));
+        assertThat(matchRepository.findMatchById(user1.getMatchId()).get().getFinalScorePlayerA(), is(1));
+        assertThat(matchRepository.findMatchById(user1.getMatchId()).get().getFinalScorePlayerB(), is(0));
     }
 
     @Test
@@ -175,7 +175,7 @@ public class UserCommandsTest extends AbstractDiscordCommandTest {
         commandRegistry.fireEvent(aSimpleCommand(user1, "report", "win"));
         commandRegistry.fireEvent(aSimpleCommand(user2, "report", "win"));
 
-        assertThat(matchRepository.findMatchById(user1.getMatchId()).getGameStatus(), is(GameStatus.CONFLICT_STATE));
+        assertThat(matchRepository.findMatchById(user1.getMatchId()).get().getGameStatus(), is(GameStatus.CONFLICT_STATE));
     }
 
     @Test
@@ -198,7 +198,7 @@ public class UserCommandsTest extends AbstractDiscordCommandTest {
         final Long matchId = user1.getMatchId();
         commandRegistry.fireEvent(aSimpleCommand(user2, "report", "win"));
 
-        assertThat(matchRepository.findMatchById(matchId).getGameStatus(), is(GameStatus.GAME_PLAYED));
+        assertThat(matchRepository.findMatchById(matchId).get().getGameStatus(), is(GameStatus.GAME_PLAYED));
         assertThat(userRepository.findByDiscordId(user1.getDiscordId()).getMatchId(), is(nullValue()));
     }
 
@@ -232,8 +232,33 @@ public class UserCommandsTest extends AbstractDiscordCommandTest {
         commandRegistry.fireEvent(anIssueChallengeCommand(user1, user2));
         commandRegistry.fireEvent(aSimpleCommand(user1, "report", "win"));
 
-        assertThat(matchRepository.findMatchForUser(user1.getDiscordId()).getGameStatus(),
+        assertThat(matchRepository.findMatchForUser(user1.getDiscordId()).get().getGameStatus(),
                 is(GameStatus.CHALLENGE_EXTENDED));
+    }
+
+    @Test
+    public void challengerCancels_shouldRevokeMatch() {
+        commandRegistry.fireEvent(anIssueChallengeCommand(user1, user2));
+        commandRegistry.fireEvent(aSimpleCommand(user1, "cancel"));
+
+        assertThat(matchRepository.findMatchForUser(user1.getDiscordId()).get().getGameStatus(), is(GameStatus.CHALLENGE_REVOKED));
+    }
+
+    @Test
+    public void cancelOnAcceptedMatch_shouldNotChangeState() {
+        commandRegistry.fireEvent(anIssueChallengeCommand(user1, user2));
+        commandRegistry.fireEvent(aSimpleCommand(user2, "accept"));
+        commandRegistry.fireEvent(aSimpleCommand(user1, "cancel"));
+
+        assertThat(matchRepository.findMatchForUser(user1.getDiscordId()).get().getGameStatus(), is(GameStatus.CHALLENGE_ACCEPTED));
+    }
+
+    @Test
+    public void challengeeCancels_shouldRevokeMatch() {
+        commandRegistry.fireEvent(anIssueChallengeCommand(user1, user2));
+        commandRegistry.fireEvent(aSimpleCommand(user2, "cancel"));
+
+        assertThat(matchRepository.findMatchForUser(user1.getDiscordId()).get().getGameStatus(), is(GameStatus.CHALLENGE_REJECTED));
     }
 
     private DiscordMessage aSimpleCommand(final User user, final String command, final String... parameters) {

@@ -13,6 +13,8 @@ import com.planed.ctlBot.domain.User;
 import com.planed.ctlBot.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.Optional;
+
 @DiscordController
 public class UserCommands {
     @Autowired
@@ -43,6 +45,11 @@ public class UserCommands {
     }
 
     private Match findMatch(final User user) {
+        return matchRepository.findMatchById(user.getMatchId())
+                .orElse(null);
+    }
+
+    private Optional<Match> findMatchOptional(final User user) {
         return matchRepository.findMatchById(user.getMatchId());
     }
 
@@ -83,6 +90,23 @@ public class UserCommands {
                             ". Now get in touch with your opponent and battle it out. The format is Best-of-three, " +
                             "maps are loosers-pick, your opponent picks (the challengee) for the first map, the game is on. glhf");
         }
+    }
+
+    @DiscordCommand(name = {"cancel", "cancelMatch"}, help = "Cancels the current match")
+    public void cancelMatch(final DiscordMessage call) {
+        final User author = call.getAuthor();
+        findMatchOptional(author).ifPresent(match -> {
+            if (match.getGameStatus() != GameStatus.CHALLENGE_EXTENDED) {
+                discordService.whisperToUser(call.getDiscordUser(), "Only recently extended challenges can be canceled.");
+                return;
+            }
+
+            if (match.getPlayerA().equals(author)) {
+                userService.revokeChallenge(author);
+            } else {
+                userService.rejectChallenge(author);
+            }
+        });
     }
 
     private boolean needGameStatus(final DiscordMessage call, final String message, final GameStatus... statusses) {
