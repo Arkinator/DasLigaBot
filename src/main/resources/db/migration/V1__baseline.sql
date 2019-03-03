@@ -1,7 +1,7 @@
 DROP TABLE IF EXISTS `matches`;
 
 CREATE TABLE `matches` (
-  `match_id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `match_id` int(11) NOT NULL AUTO_INCREMENT,
   `final_score_playera` int(11) DEFAULT NULL,
   `final_score_playerb` int(11) DEFAULT NULL,
   `game_status` int(11) NOT NULL,
@@ -22,7 +22,7 @@ CREATE TABLE `user_table` (
   `discord_id` varchar(255) NOT NULL,
   `access_level` int(11) NOT NULL,
   `elo` double NOT NULL,
-  `match_id` bigint(20) DEFAULT NULL,
+  `match_id` int(11) DEFAULT NULL,
   `number_of_interactions` int(11) NOT NULL,
   `race` int(11) DEFAULT NULL,
   PRIMARY KEY (`discord_id`)

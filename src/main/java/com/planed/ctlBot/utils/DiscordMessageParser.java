@@ -44,7 +44,7 @@ public class DiscordMessageParser {
         if (!commandPrefix.isPresent()) {
             return messageBuilder.build();
         } else {
-            final List<String> commandParts = new ArrayList<>(Arrays.asList(messageContent.substring(1).split(" ")));
+            final List<String> commandParts = new ArrayList<>(Arrays.asList(messageContent.substring(commandPrefix.get().length()).split(" ")));
             return messageBuilder
                     .commandPhrase(commandParts.remove(0))
                     .parameters(commandParts)

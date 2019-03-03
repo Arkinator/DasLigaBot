@@ -12,6 +12,7 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import java.util.Arrays;
+import java.util.Optional;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.StringContains.containsString;
@@ -26,15 +27,18 @@ public class PrServiceTest {
     private static final User PLAYER_B = aUserWithName("fjdiofm43qlfjw");
 
     @Mock
-    DiscordService discordService;
-
+    private DiscordService discordService;
+    @Mock
+    private ServerService serverService;
     @InjectMocks
-    PrService prService;
+    private PrService prService;
 
     @Before
     public void setUp() {
         when(discordService.getDiscordName(eq(PLAYER_A.getDiscordId()), any())).thenReturn(PLAYER_A.getDiscordId());
         when(discordService.getDiscordName(eq(PLAYER_B.getDiscordId()), any())).thenReturn(PLAYER_B.getDiscordId());
+
+        when(serverService.findAnnouncerChannelIdForServer(any())).thenReturn(Optional.of(123l));
     }
 
     @Test
@@ -69,6 +73,8 @@ public class PrServiceTest {
         match.setFinalScorePlayerA(0);
         match.setFinalScorePlayerB(2);
         match.setPlayers(Arrays.asList(PLAYER_A, PLAYER_B));
+        match.setOriginatingChannelId(123l);
+        match.setOriginatingServerId(123l);
         return match;
     }
 

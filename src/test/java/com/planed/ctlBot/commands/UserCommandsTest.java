@@ -282,6 +282,7 @@ public class UserCommandsTest extends AbstractDiscordCommandTest {
                 .commandPhrase("challenge")
                 .mentions(Collections.singletonList(user2))
                 .channel(1234l)
+                .serverId(12l)
                 .build();
     }
 
@@ -292,6 +293,7 @@ public class UserCommandsTest extends AbstractDiscordCommandTest {
                 .parameters(Collections.singletonList("Protoss"))
                 .channel(1234l)
                 .mentions(Collections.emptyList())
+                .serverId(12l)
                 .build();
     }
 }

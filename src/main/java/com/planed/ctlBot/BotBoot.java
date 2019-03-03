@@ -1,6 +1,7 @@
 package com.planed.ctlBot;
 
 
+import com.planed.ctlBot.data.repositories.UserEntityRepository;
 import com.planed.ctlBot.discord.DiscordService;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.DiscordApiBuilder;
@@ -24,6 +25,8 @@ public class BotBoot {
     private String authorUserId;
     @Autowired
     private DiscordService discordService;
+    @Autowired
+    private UserEntityRepository userEntityRepository;
 
     public static void main(final String[] args) {
         SpringApplication.run(BotBoot.class, args);
@@ -31,6 +34,8 @@ public class BotBoot {
 
     @PostConstruct
     public void printApplicationReadyMessage() {
+        userEntityRepository.count();
+
         discordService.whisperToUser(authorUserId, "Reboot successful");
     }
 

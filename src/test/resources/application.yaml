@@ -1,6 +1,3 @@
-discord:
-    password: al3DsplDSIn47GZg7FKK
-    username: j_ulianpeters@gmx.de
 spring:
     datasource:
         # Per Default nicht initialisieren
