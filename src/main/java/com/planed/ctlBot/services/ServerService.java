@@ -52,4 +52,10 @@ public class ServerService {
                 .map(server -> findOrCreateServer(server))
                 .map(server -> server.getAnnouncerChannelId());
     }
+
+    public Optional<String> getServerPrefix(long id) {
+        return discordService.findServerById(id)
+                .map(server -> findOrCreateServer(server))
+                .map(server -> server.getCommandEscaper());
+    }
 }
