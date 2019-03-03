@@ -27,13 +27,14 @@ public class DiscordMessageParser {
         final DiscordMessage.DiscordMessageBuilder messageBuilder = DiscordMessage.builder()
                 .author(userService.findUserAndCreateIfNotFound(message.getAuthor().getIdAsString()))
                 .discordUser(message.getAuthor().asUser().get())
-                .channel(message.getChannel().getIdAsString())
+                .channel(message.getChannel().getId())
                 .messageId(Long.toString(message.getId()))
                 .serverId(message.getServer()
-                        .map(server -> server.getIdAsString())
+                        .map(server -> server.getId())
                         .orElse(null))
                 .textChannel(message.getChannel())
                 .message(message)
+                .mentionedChannels(message.getMentionedChannels())
                 .mentions(extractMentionsFromMessage(message));
 
         if (messageContent == null || messageContent.length() == 0 || !messageContent.startsWith("!")) {

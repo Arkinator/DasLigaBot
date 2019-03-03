@@ -4,6 +4,7 @@ import com.planed.ctlBot.commands.data.DiscordMessage;
 import com.planed.ctlBot.utils.DiscordMessageParser;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.channel.TextChannel;
+import org.javacord.api.entity.server.Server;
 import org.javacord.api.entity.user.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,7 +28,7 @@ public class DiscordService {
         return discordApi.getUserById(userId).join().isYourself();
     }
 
-    public DiscordMessage replyInChannel(final String serverId, final String channelId, final String message) {
+    public DiscordMessage replyInChannel(final Long serverId, final Long channelId, final String message) {
         logger.info(channelId + ": " + message);
         return discordApi.getServerById(serverId)
                 .flatMap(server -> server.getChannelById(channelId))
@@ -77,7 +78,7 @@ public class DiscordService {
         return message;
     }
 
-    public String getDiscordName(final String discordId, String serverId) {
+    public String getDiscordName(final String discordId, Long serverId) {
         return Optional.ofNullable(serverId)
                 .flatMap(sId -> discordApi.getServerById(sId))
                 .flatMap(server -> discordApi.getUserById(discordId).join().getNickname(server))
@@ -86,5 +87,9 @@ public class DiscordService {
 
     public String getInviteLink() {
         return discordApi.createBotInvite();
+    }
+
+    public Optional<Server> findServerById(Long serverId) {
+        return discordApi.getServerById(serverId);
     }
 }

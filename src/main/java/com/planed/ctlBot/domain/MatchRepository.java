@@ -36,7 +36,7 @@ public class MatchRepository {
         }
     }
 
-    public Match addMatch(final User author, final User challengee, String serverId, String channelId) {
+    public Match addMatch(final User author, final User challengee, Long serverId, Long channelId) {
         final List<User> playerList = new ArrayList<>();
         playerList.add(author);
         playerList.add(challengee);

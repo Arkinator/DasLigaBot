@@ -31,4 +31,6 @@ public @interface DiscordCommand {
     int minMentions() default 0;
 
     int minParameters() default 0;
+
+    int minChannelLinks() default 0;
 }

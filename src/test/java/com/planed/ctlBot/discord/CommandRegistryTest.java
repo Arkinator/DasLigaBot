@@ -1,17 +1,12 @@
 package com.planed.ctlBot.discord;
 
-/**
- * Created by Julian Peters on 23.04.16.
- *
- * @author julian.peters@westernacher.com
- */
-
 import com.planed.ctlBot.commands.data.DiscordMessage;
 import com.planed.ctlBot.common.AccessLevel;
 import com.planed.ctlBot.domain.User;
 import com.planed.ctlBot.services.UserService;
 import com.planed.ctlBot.utils.DiscordMessageParser;
 import org.javacord.api.DiscordApi;
+import org.javacord.api.event.server.ServerJoinEvent;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -29,7 +24,9 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.empty;
+import static org.junit.Assert.assertNull;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE,
@@ -37,6 +34,7 @@ import static org.mockito.Mockito.doReturn;
                 CommandRegistryTest.TestClass.class})
 public class CommandRegistryTest {
     private static List<Object> callParameters;
+    private static ServerJoinEvent serverJoinEvent;
     @Autowired
     private CommandRegistry commandRegistry;
     @MockBean
@@ -53,6 +51,7 @@ public class CommandRegistryTest {
     public void setUp() {
         doReturn(aStandardUser()).when(userService).findUserAndCreateIfNotFound(Matchers.eq(discordId));
         callParameters = new ArrayList<>();
+        serverJoinEvent = null;
     }
 
     private User aStandardUser() {
@@ -102,6 +101,14 @@ public class CommandRegistryTest {
     }
 
     @Test
+    public void serverEvent_shouldRegisterWithListener() {
+        assertNull(serverJoinEvent);
+        ServerJoinEvent joinEvent = mock(ServerJoinEvent.class);
+        commandRegistry.onServerJoin(joinEvent);
+        assertThat(serverJoinEvent, is(joinEvent));
+    }
+
+    @Test
     public void shouldCallTestCommandForMultiNameMethod() {
         final DiscordMessage call1 = DiscordMessage.builder()
                 .commandPhrase("test1")
@@ -136,6 +143,11 @@ public class CommandRegistryTest {
         @DiscordCommand(name = "admin", roleRequired = AccessLevel.ADMIN)
         public void adminCommand(final DiscordMessage call) {
             callParameters.add(call);
+        }
+
+        @DiscordCustomEvent(eventType = DiscordEventType.SERVER_JOIN_EVENT)
+        public void onServerJoin(ServerJoinEvent serverJoinEvent) {
+            CommandRegistryTest.serverJoinEvent = serverJoinEvent;
         }
     }
 }
