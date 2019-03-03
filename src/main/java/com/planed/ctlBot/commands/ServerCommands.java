@@ -46,4 +46,23 @@ public class ServerCommands {
 
         discordService.replyInChannel(call.getTextChannel(), "Announcement channel changed to <#" + targetChannel.getIdAsString() + ">");
     }
+
+    @DiscordCommand(name = {"setPrefix"}, help = "Change the command prefix for this server. Can only be invoked by server owner.", minParameters = 1)
+    public void setServerPrefix(final DiscordMessage call) {
+        if (call.isPrivateMessage()) {
+            discordService.whisperToUser(call.getDiscordUser(), "This command can only be called on a server.");
+            return;
+        }
+
+        final Server server = call.getMessage().getServer().get();
+        final User serverOwner = server.getOwner();
+        if (!serverOwner.equals(call.getDiscordUser())) {
+            discordService.whisperToUser(call.getDiscordUser(), "This command can only be called by the server owner!");
+            return;
+        }
+
+        serverService.setServerPrefix(server, call.getParameters().get(0));
+
+        discordService.replyInChannel(call.getTextChannel(), "Server prefix for this server changed to '" + call.getParameters().get(0) + "'");
+    }
 }

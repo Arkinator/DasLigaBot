@@ -31,6 +31,12 @@ public class ServerService {
         serverRepository.save(discordServer);
     }
 
+    public void setServerPrefix(Server server, String prefix) {
+        DiscordServer discordServer = findOrCreateServer(server);
+        discordServer.setCommandEscaper(prefix);
+        serverRepository.save(discordServer);
+    }
+
     public Optional<Long> findAnnouncerChannelIdForServer(Long originatingServerId) {
         final Optional<Long> channelOptional = serverRepository.findById(originatingServerId)
                 .map(server -> server.getAnnouncerChannelId());

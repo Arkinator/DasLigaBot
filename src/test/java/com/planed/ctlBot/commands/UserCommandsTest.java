@@ -265,7 +265,7 @@ public class UserCommandsTest extends AbstractDiscordCommandTest {
         return DiscordMessage.builder()
                 .author(user)
                 .commandPhrase(command)
-                .channel("fjkdsl")
+                .channel(1234l)
                 .parameters(Arrays.asList(parameters))
                 .mentions(Collections.emptyList())
                 .build();
@@ -281,7 +281,7 @@ public class UserCommandsTest extends AbstractDiscordCommandTest {
                 .author(user1)
                 .commandPhrase("challenge")
                 .mentions(Collections.singletonList(user2))
-                .channel("fjkdsl")
+                .channel(1234l)
                 .build();
     }
 
@@ -290,7 +290,7 @@ public class UserCommandsTest extends AbstractDiscordCommandTest {
                 .author(user)
                 .commandPhrase("changeRace")
                 .parameters(Collections.singletonList("Protoss"))
-                .channel("fjkdsl")
+                .channel(1234l)
                 .mentions(Collections.emptyList())
                 .build();
     }

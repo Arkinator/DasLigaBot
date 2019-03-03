@@ -10,7 +10,6 @@ import org.springframework.stereotype.Component;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Component
@@ -22,7 +21,7 @@ public class DiscordMessageParser {
         this.userService = userService;
     }
 
-    public Optional<DiscordMessage> deconstructMessage(final Message message) {
+    public DiscordMessage deconstructMessage(final Message message) {
         final String messageContent = message.getContent();
         final DiscordMessage.DiscordMessageBuilder messageBuilder = DiscordMessage.builder()
                 .author(userService.findUserAndCreateIfNotFound(message.getAuthor().getIdAsString()))
@@ -38,13 +37,13 @@ public class DiscordMessageParser {
                 .mentions(extractMentionsFromMessage(message));
 
         if (messageContent == null || messageContent.length() == 0 || !messageContent.startsWith("!")) {
-            return Optional.of(messageBuilder.build());
+            return messageBuilder.build();
         } else {
             final List<String> commandParts = new ArrayList<>(Arrays.asList(messageContent.substring(1).split(" ")));
-            return Optional.of(messageBuilder
+            return messageBuilder
                     .commandPhrase(commandParts.remove(0))
                     .parameters(commandParts)
-                    .build());
+                    .build();
         }
     }
 
