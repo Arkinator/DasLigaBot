@@ -20,7 +20,7 @@ DROP TABLE IF EXISTS `user_table`;
 
 CREATE TABLE `user_table` (
   `discord_id` varchar(255) NOT NULL,
-  `access_level` int(11) NOT NULL,
+  `access_level` varchar(255) NOT NULL,
   `elo` double NOT NULL,
   `match_id` int(11) DEFAULT NULL,
   `number_of_interactions` int(11) NOT NULL,

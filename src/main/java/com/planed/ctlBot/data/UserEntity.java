@@ -7,10 +7,7 @@ import com.planed.ctlBot.common.Race;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 @Entity
 @Data
@@ -23,6 +20,7 @@ public class UserEntity {
     @Column(nullable = false)
     private int numberOfInteractions = 0;
     @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
     private AccessLevel accessLevel = AccessLevel.USER;
     @Column
     private Race race;
