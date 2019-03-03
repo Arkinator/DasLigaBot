@@ -96,8 +96,7 @@ public class CommandRegistry implements MessageCreateListener, ServerJoinListene
         if (event.getMessageAuthor().isYourself())
             return;
 
-        discordMessageParser.deconstructMessage(event.getMessage())
-                .ifPresent(this::fireEvent);
+        fireEvent(discordMessageParser.deconstructMessage(event.getMessage()));
     }
 
     public void fireEvent(final DiscordMessage call) {

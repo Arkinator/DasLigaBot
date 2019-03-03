@@ -1,7 +1,6 @@
 package com.planed.ctlBot.services;
 
 import com.planed.ctlBot.commands.BasicCommands;
-import com.planed.ctlBot.commands.data.DiscordMessage;
 import com.planed.ctlBot.common.*;
 import com.planed.ctlBot.discord.DiscordService;
 import com.planed.ctlBot.domain.Match;
@@ -60,13 +59,17 @@ public class UserService {
         }
 
         discordService.whisperToUser(discordId, BasicCommands.infoString);
-        final DiscordMessage message = discordService.whisperToUser(discordId, WELCOME_MESSAGE);
-        discordService.addReactionWithMapper(message, Arrays.asList(TERRAN_EMOJI, ZERG_EMOJI, PROTOSS_EMOJI, RANDOM_EMOJI), str -> updateUserRaceByEmoji(str, discordId));
+        discordService.whisperToUser(discordId, WELCOME_MESSAGE)
+                .map(msg -> discordService.addReactionWithMapper(msg,
+                        Arrays.asList(TERRAN_EMOJI, ZERG_EMOJI, PROTOSS_EMOJI, RANDOM_EMOJI),
+                        str -> updateUserRaceByEmoji(str, discordId)));
     }
 
     public void whisperChangeRaceMessageToUser(User author) {
-        final DiscordMessage message = discordService.whisperToUser(author.getDiscordId(), RACE_CHANGE_MESSAGE);
-        discordService.addReactionWithMapper(message, Arrays.asList(TERRAN_EMOJI, ZERG_EMOJI, PROTOSS_EMOJI, RANDOM_EMOJI), str -> updateUserRaceByEmoji(str, author.getDiscordId()));
+        discordService.whisperToUser(author.getDiscordId(), RACE_CHANGE_MESSAGE)
+                .map(msg -> discordService.addReactionWithMapper(msg,
+                        Arrays.asList(TERRAN_EMOJI, ZERG_EMOJI, PROTOSS_EMOJI, RANDOM_EMOJI),
+                        str -> updateUserRaceByEmoji(str, author.getDiscordId())));
     }
 
     private void updateUserRaceByEmoji(String emoji, String userDiscordId) {
