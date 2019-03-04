@@ -16,6 +16,9 @@ public class User {
     private Race race;
     private Long matchId;
     private Double elo = LigaConstants.INITIAL_ELO;
+    private String loginAuthorizationCode;
+    private String battleNetId;
+    private String battleNetTokenValue;
 
     public User() {
     }

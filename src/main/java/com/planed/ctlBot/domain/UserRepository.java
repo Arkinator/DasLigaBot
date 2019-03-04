@@ -59,4 +59,10 @@ public class UserRepository {
                 .map(userEntity -> mapFromEntity(userEntity))
                 .orElseThrow(() -> new RuntimeException("Error while refreshing user: " + user.toString()));
     }
+
+    public User findUserByAuthCode(String authCode) {
+        return userEntityRepository.findByLoginAuthorizationCode(authCode)
+                .map(userEntity -> mapFromEntity(userEntity))
+                .orElseThrow(() -> new RuntimeException("Unable to find user with matching Login Authorization Code: '" + authCode + "'"));
+    }
 }

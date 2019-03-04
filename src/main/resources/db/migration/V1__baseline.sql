@@ -25,5 +25,8 @@ CREATE TABLE `user_table` (
   `match_id` int(11) DEFAULT NULL,
   `number_of_interactions` int(11) NOT NULL,
   `race` int(11) DEFAULT NULL,
+  `login_authorization_code` varchar(255) DEFAULT NULL,
+  `battle_net_id` varchar(255) DEFAULT NULL,
+  `battle_net_token_value` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`discord_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;

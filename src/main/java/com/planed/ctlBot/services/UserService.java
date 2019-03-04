@@ -7,7 +7,9 @@ import com.planed.ctlBot.domain.MatchRepository;
 import com.planed.ctlBot.domain.User;
 import com.planed.ctlBot.domain.UserRepository;
 import com.planed.ctlBot.utils.StringConstants;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
@@ -24,6 +26,9 @@ public class UserService {
     private static final String ZERG_EMOJI = "\uD83D\uDC09";
     private static final String PROTOSS_EMOJI = "\uD83D\uDCA0";
     private static final String RANDOM_EMOJI = "\uD83C\uDFB2";
+
+    @Value("${dasLigaBot.loginBaseUrl}")
+    private String loginBaseUrl;
 
     @Autowired
     private DiscordService discordService;
@@ -214,5 +219,22 @@ public class UserService {
 
     public String shortInfo(final User user) {
         return shortInfo(user, null);
+    }
+
+    public String generateLoginLink(User user) {
+        String loginAuthorizationCode = RandomStringUtils.randomAlphanumeric(20);
+        user.setLoginAuthorizationCode(loginAuthorizationCode);
+        userRepository.save(user);
+
+        return loginBaseUrl + "?authCode=" + loginAuthorizationCode;
+    }
+
+    public void loginUserByAuthCode(String authCode, String battleNetId, String tokenValue) {
+        User user = userRepository.findUserByAuthCode(authCode);
+
+        user.setBattleNetId(battleNetId);
+        user.setBattleNetTokenValue(tokenValue);
+
+        userRepository.save(user);
     }
 }

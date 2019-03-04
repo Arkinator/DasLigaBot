@@ -28,4 +28,10 @@ public class UserEntity {
     private Double elo = LigaConstants.INITIAL_ELO;
     @Column
     private Long matchId;
+    @Column
+    private String loginAuthorizationCode;
+    @Column
+    private String battleNetId;
+    @Column
+    private String battleNetTokenValue;
 }

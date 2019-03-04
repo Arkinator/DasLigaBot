@@ -11,11 +11,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.security.oauth2.client.EnableOAuth2Sso;
 import org.springframework.context.annotation.Bean;
+import org.springframework.scheduling.annotation.EnableAsync;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 import javax.annotation.PostConstruct;
+import java.util.concurrent.Executor;
 
 @SpringBootApplication(scanBasePackages = {"sx.blah.discord", "com.planed.ctlBot"})
+@EnableOAuth2Sso
+@EnableAsync
 public class BotBoot {
     private static final Logger logger = LoggerFactory.getLogger(BotBoot.class);
 
@@ -44,5 +50,16 @@ public class BotBoot {
         final DiscordApi api = new DiscordApiBuilder().setToken(token).login().join();
         logger.info("Succesfully logged in. Invitation link: " + api.createBotInvite());
         return api;
+    }
+
+    @Bean
+    public Executor battleNetLookupExecutor() {
+        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+        executor.setCorePoolSize(2);
+        executor.setMaxPoolSize(4);
+        executor.setQueueCapacity(500);
+        executor.setThreadNamePrefix("BattleNetLookup");
+        executor.initialize();
+        return executor;
     }
 }
