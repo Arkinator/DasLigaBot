@@ -2,7 +2,9 @@ package com.planed.ctlBot.discord;
 
 import com.planed.ctlBot.commands.data.DiscordMessage;
 import com.planed.ctlBot.utils.DiscordMessageParser;
+import com.planed.ctlBot.utils.StringConstants;
 import org.javacord.api.DiscordApi;
+import org.javacord.api.entity.channel.PrivateChannel;
 import org.javacord.api.entity.channel.TextChannel;
 import org.javacord.api.entity.message.Message;
 import org.javacord.api.entity.server.Server;
@@ -12,6 +14,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
@@ -21,6 +24,7 @@ import java.util.function.Supplier;
 @Component
 public class DiscordService {
     private static final Logger logger = LoggerFactory.getLogger(DiscordService.class);
+    private static final String INFO_EMOJI = "ℹ";
 
     @Autowired
     private DiscordApi discordApi;
@@ -38,13 +42,15 @@ public class DiscordService {
                 .flatMap(channel -> channel.asTextChannel())
                 .map(channel -> channel.sendMessage(message))
                 .flatMap(future -> joinAndParseMessageSafe(future,
-                        () -> "Error while sending message to server " + serverId + " and channel " + channelId + "!"));
+                        () -> "Error while sending message to server " + serverId + " and channel " + channelId + "!"))
+                .map(msg -> addInfoItemAndListenerToMessage(msg));
     }
 
     public Optional<DiscordMessage> replyInChannel(TextChannel channel, final String message) {
         logger.debug(channel + ": " + message);
         return joinAndParseMessageSafe(channel.sendMessage(message),
-                () -> "Error while sending message to channel " + channel + "!");
+                () -> "Error while sending message to channel " + channel + "!")
+                .map(msg -> addInfoItemAndListenerToMessage(msg));
     }
 
     public Optional<DiscordMessage> whisperToUser(final String userId, final String message) {
@@ -53,7 +59,8 @@ public class DiscordService {
                 .getCurrentCachedInstance()
                 .map(channel -> channel.sendMessage(message))
                 .flatMap(future -> joinAndParseMessageSafe(future,
-                        () -> "Error while sending whisper message to user " + userId + "!"));
+                        () -> "Error while sending whisper message to user " + userId + "!"))
+                .map(msg -> addInfoItemAndListenerToMessage(msg));
     }
 
     public Optional<DiscordMessage> whisperToUser(final User user, final String message) {
@@ -62,7 +69,8 @@ public class DiscordService {
                 .getCurrentCachedInstance()
                 .map(channel -> channel.sendMessage(message))
                 .flatMap(future -> joinAndParseMessageSafe(future,
-                        () -> "Error while sending whisper message to user " + user.getName() + "!"));
+                        () -> "Error while sending whisper message to user " + user.getName() + "!"))
+                .map(msg -> addInfoItemAndListenerToMessage(msg));
     }
 
     public DiscordMessage addReactionWithMapper(final DiscordMessage message,
@@ -85,6 +93,15 @@ public class DiscordService {
                 .flatMap(sId -> discordApi.getServerById(sId))
                 .flatMap(server -> discordApi.getUserById(discordId).join().getNickname(server))
                 .orElse(discordApi.getUserById(discordId).join().getName());
+    }
+
+    private DiscordMessage addInfoItemAndListenerToMessage(DiscordMessage msg) {
+        addReactionWithMapper(msg, Collections.singletonList(INFO_EMOJI),
+                s -> {
+                    final User otherUser = ((PrivateChannel) msg.getTextChannel()).getRecipient();
+                    whisperToUser(otherUser, StringConstants.INFO_STRING);
+                });
+        return msg;
     }
 
     public String getInviteLink() {

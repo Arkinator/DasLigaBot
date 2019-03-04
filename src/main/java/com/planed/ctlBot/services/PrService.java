@@ -3,6 +3,7 @@ package com.planed.ctlBot.services;
 import com.planed.ctlBot.discord.DiscordService;
 import com.planed.ctlBot.domain.Match;
 import com.planed.ctlBot.domain.User;
+import com.planed.ctlBot.utils.StringConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,27 +17,6 @@ import java.util.Optional;
 public class PrService {
     private static final Logger logger = LoggerFactory.getLogger(PrService.class);
 
-    private static final String CODE_ESCAPE = "```";
-    private static final String matchFormatter =
-            "\n*******************************************************************************\n" +
-                    "  The showdown is real! A Challenge has been accepted, it is g0-time boisss!   \n" +
-                    "   {0} ()==[:::::::::> VS <::::::::::||===) {1}     \n" +
-                    "*******************************************************************************";
-    private static final String extendedFormatter =
-            "A challenge has been extended from {0}. Will {1} man up or will he wuzz out?";
-    private static final String rejectedFormatter =
-            "The honor of {1} has taken another hit. He rejected the challenge from {0}";
-    private static final String resultFormatter =
-            "\n*******************************************************************************\n" +
-                    "             @         That just in:  \n" +
-                    "          @:::@                    \n" +
-                    "       @.:/\\:/\\:.@         {1}   \n" +
-                    "      ':\\@ @ @ @/:'                      \n" +
-                    "        [@W@W@W@]                 got beaten     \n" +
-                    "        `\"\"\"\"\"\"\"`           by the glorious    \n" +
-                    "          {0}       \n" +
-                    "*******************************************************************************";
-
     @Value("${pr.channel.name:116271758763491336}")
     public String prChannelName;
     @Autowired
@@ -48,7 +28,7 @@ public class PrService {
         findAnnouncerChannelForServer(match.getOriginatingServerId())
                 .ifPresent(announcerChannelForServer ->
                         discordService.replyInChannel(match.getOriginatingServerId(), announcerChannelForServer,
-                                MessageFormat.format(extendedFormatter,
+                                MessageFormat.format(StringConstants.EXTENDED_FORMATTER,
                                         match.getPlayerA().toString(),
                                         match.getPlayerB().toString())));
     }
@@ -56,9 +36,9 @@ public class PrService {
     public void printGameIsOnMessage(final Match match) {
         findAnnouncerChannelForServer(match.getOriginatingServerId())
                 .ifPresent(announcerChannelForServer -> {
-                    String message = CODE_ESCAPE + MessageFormat.format(matchFormatter,
+                    String message = StringConstants.CODE_ESCAPE + MessageFormat.format(StringConstants.MATCH_FORMATTER,
                             getPlayerName(match.getPlayerA(), match.getOriginatingServerId()),
-                            getPlayerName(match.getPlayerB(), match.getOriginatingServerId())) + CODE_ESCAPE;
+                            getPlayerName(match.getPlayerB(), match.getOriginatingServerId())) + StringConstants.CODE_ESCAPE;
                     discordService.replyInChannel(match.getOriginatingServerId(), announcerChannelForServer, message);
                 });
     }
@@ -67,7 +47,7 @@ public class PrService {
         findAnnouncerChannelForServer(match.getOriginatingServerId())
                 .ifPresent(announcerChannelForServer ->
                         discordService.replyInChannel(match.getOriginatingServerId(), announcerChannelForServer,
-                                MessageFormat.format(rejectedFormatter,
+                                MessageFormat.format(StringConstants.REJECTED_FORMATTER,
                                         match.getPlayerA().toString(),
                                         match.getPlayerB().toString())));
     }
@@ -78,13 +58,13 @@ public class PrService {
                     final double outcome = match.getEloResult();
                     String resultMessage = null;
                     if (outcome < 0.1) {
-                        resultMessage = CODE_ESCAPE + MessageFormat.format(resultFormatter,
+                        resultMessage = StringConstants.CODE_ESCAPE + MessageFormat.format(StringConstants.RESULT_FORMATTER,
                                 getPlayerName(match.getPlayerB(), match.getOriginatingServerId()),
-                                getPlayerName(match.getPlayerA(), match.getOriginatingServerId())) + CODE_ESCAPE;
+                                getPlayerName(match.getPlayerA(), match.getOriginatingServerId())) + StringConstants.CODE_ESCAPE;
                     } else if (outcome > 0.9) {
-                        resultMessage = CODE_ESCAPE + MessageFormat.format(resultFormatter,
+                        resultMessage = StringConstants.CODE_ESCAPE + MessageFormat.format(StringConstants.RESULT_FORMATTER,
                                 getPlayerName(match.getPlayerA(), match.getOriginatingServerId()),
-                                getPlayerName(match.getPlayerB(), match.getOriginatingServerId())) + CODE_ESCAPE;
+                                getPlayerName(match.getPlayerB(), match.getOriginatingServerId())) + StringConstants.CODE_ESCAPE;
                     }
                     discordService.replyInChannel(match.getOriginatingServerId(), announcerChannelForServer, resultMessage);
                 });

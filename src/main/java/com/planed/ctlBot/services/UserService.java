@@ -1,12 +1,12 @@
 package com.planed.ctlBot.services;
 
-import com.planed.ctlBot.commands.BasicCommands;
 import com.planed.ctlBot.common.*;
 import com.planed.ctlBot.discord.DiscordService;
 import com.planed.ctlBot.domain.Match;
 import com.planed.ctlBot.domain.MatchRepository;
 import com.planed.ctlBot.domain.User;
 import com.planed.ctlBot.domain.UserRepository;
+import com.planed.ctlBot.utils.StringConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -58,7 +58,7 @@ public class UserService {
             return;
         }
 
-        discordService.whisperToUser(discordId, BasicCommands.infoString);
+        discordService.whisperToUser(discordId, StringConstants.INFO_STRING);
         discordService.whisperToUser(discordId, WELCOME_MESSAGE)
                 .map(msg -> discordService.addReactionWithMapper(msg,
                         Arrays.asList(TERRAN_EMOJI, ZERG_EMOJI, PROTOSS_EMOJI, RANDOM_EMOJI),
