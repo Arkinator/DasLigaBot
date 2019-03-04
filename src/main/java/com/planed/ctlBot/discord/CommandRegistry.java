@@ -100,8 +100,8 @@ public class CommandRegistry implements MessageCreateListener, ServerJoinListene
     }
 
     public void fireEvent(final DiscordMessage call) {
-        final DiscordCommand command = commandNameMap.get(call.getCommandPhrase());
-        logger.info("Command from " + call.getAuthor()
+        final DiscordCommand command = commandNameMap.get(call.getCommandPhrase().toLowerCase());
+        logger.info("Command from " + call.getDiscordUser().getName()
                 + " with command " + call.getCommandPhrase()
                 + " and Mentions " + call.getMentions()
                 + " and Parameters " + call.getParameters());
@@ -169,7 +169,7 @@ public class CommandRegistry implements MessageCreateListener, ServerJoinListene
     private void registerDiscordCommand(final DiscordCommand command, final Method method, final Object bean) {
         commandMap.put(command, method);
         for (final String commandName : command.name()) {
-            commandNameMap.put(commandName, command);
+            commandNameMap.put(commandName.toLowerCase(), command);
         }
         controllerMap.put(command, bean);
     }
