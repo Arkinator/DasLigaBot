@@ -1,6 +1,5 @@
 package com.planed.ctlBot.controller;
 
-import com.mashape.unirest.http.Unirest;
 import com.planed.ctlBot.services.BattleNetService;
 import com.planed.ctlBot.services.UserService;
 import org.slf4j.Logger;
@@ -33,10 +32,8 @@ public class BattleNetController {
         String battleNetId = userAuthentication.getPrincipal().toString();
         String tokenValue = ((OAuth2AuthenticationDetails) oAuth2Authentication.getDetails()).getTokenValue();
 
-        userService.loginUserByAuthCode(authCode, battleNetId, tokenValue);
+        String discordId = userService.loginUserByAuthCode(authCode, battleNetId, tokenValue);
 
-        Unirest.setDefaultHeader("Authorization", "Bearer " + tokenValue);
-
-        battleNetService.retrieveAndSafeUserLadderInformation(battleNetId);
+        battleNetService.retrieveAndSafeUserLadderInformation(battleNetId, tokenValue, discordId);
     }
 }

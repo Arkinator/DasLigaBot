@@ -109,7 +109,7 @@ public class UserCommands {
         });
     }
 
-    @DiscordCommand(name = {"linkToSc2"}, help = "Displays a link to link the current user to a battle.net profile")
+    @DiscordCommand(name = {"linkToSc2", "linksc2"}, help = "Displays a link to link the current user to a battle.net profile")
     public void linkToSc2(final DiscordMessage call) {
         discordService.whisperToUser(call.getDiscordUser(), "Use this link to log into battle.net. " +
                 "The DasLiga-Server will then retrieve your league information from the Blizzard-API to correctly set your ELO-values, the league and guess your race.\n"

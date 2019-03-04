@@ -26,6 +26,7 @@ public class UserService {
     private static final String ZERG_EMOJI = "\uD83D\uDC09";
     private static final String PROTOSS_EMOJI = "\uD83D\uDCA0";
     private static final String RANDOM_EMOJI = "\uD83C\uDFB2";
+    private static final double ELO_TO_MMR_FACTOR = 2.5;
 
     @Value("${dasLigaBot.loginBaseUrl}")
     private String loginBaseUrl;
@@ -229,12 +230,26 @@ public class UserService {
         return loginBaseUrl + "?authCode=" + loginAuthorizationCode;
     }
 
-    public void loginUserByAuthCode(String authCode, String battleNetId, String tokenValue) {
+    public String loginUserByAuthCode(String authCode, String battleNetId, String tokenValue) {
         User user = userRepository.findUserByAuthCode(authCode);
 
         user.setBattleNetId(battleNetId);
         user.setBattleNetTokenValue(tokenValue);
+        user.setLoginAuthorizationCode(null);
 
         userRepository.save(user);
+
+        return user.getDiscordId();
+    }
+
+    public User updateUserLeagueInformation(String discordId, String race, Long mmr) {
+        User user = userRepository.findByDiscordId(discordId);
+
+        user.setRace(Race.valueOf(race.toUpperCase()));
+        user.setElo(mmr / ELO_TO_MMR_FACTOR);
+
+        userRepository.save(user);
+
+        return user;
     }
 }
