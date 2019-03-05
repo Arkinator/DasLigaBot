@@ -43,6 +43,15 @@ public class StringConstants {
             "*              |___/                 glhf                              *\n" +
             "*                                                                      *\n" +
             "*                                   DAS Liga Bot                       *\n" +
+            "*                                                                      *\n" +
+/*            "*   The bot is still under development. If you you have feedback or    *\n" +
+            "*   bug reports please feel free to contact the author                 *\n" +
+            "*                                                                      *\n" +
+            "*   If you are looking for people to challenge or want to dig further  *\n" +
+            "*   into the world of DAS Liga please join our server:                 *\n" +
+            "*                                                                      *\n" +*/
+            "*    Join our server: https://discord.gg/pRvasZG                       *\n" +
+            "*                                                                      *\n" +
             "----------------------------------------------------------------------\n```";
     public static final String HELP_STRING = "```-------------------------Help Menu------------------------------------\n" +
             "*\n" +
