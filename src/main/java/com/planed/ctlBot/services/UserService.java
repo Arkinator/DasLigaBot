@@ -2,7 +2,7 @@ package com.planed.ctlBot.services;
 
 import com.planed.ctlBot.common.*;
 import com.planed.ctlBot.data.BattleNetInformation;
-import com.planed.ctlBot.data.repositories.MatchEntityRepository;
+import com.planed.ctlBot.data.repositories.MatchRepository;
 import com.planed.ctlBot.data.repositories.UserRepository;
 import com.planed.ctlBot.discord.DiscordService;
 import com.planed.ctlBot.domain.Match;
@@ -36,7 +36,7 @@ public class UserService {
     @Autowired
     private UserRepository userRepository;
     @Autowired
-    private MatchEntityRepository matchRepository;
+    private MatchRepository matchRepository;
     @Autowired
     private PrService prService;
     @Autowired

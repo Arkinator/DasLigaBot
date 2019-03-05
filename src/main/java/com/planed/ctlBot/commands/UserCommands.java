@@ -4,7 +4,7 @@ import com.planed.ctlBot.commands.data.DiscordMessage;
 import com.planed.ctlBot.common.AccessLevel;
 import com.planed.ctlBot.common.GameResult;
 import com.planed.ctlBot.common.GameStatus;
-import com.planed.ctlBot.data.repositories.MatchEntityRepository;
+import com.planed.ctlBot.data.repositories.MatchRepository;
 import com.planed.ctlBot.discord.DiscordCommand;
 import com.planed.ctlBot.discord.DiscordController;
 import com.planed.ctlBot.discord.DiscordService;
@@ -20,7 +20,7 @@ public class UserCommands {
     @Autowired
     private UserService userService;
     @Autowired
-    private MatchEntityRepository matchRepository;
+    private MatchRepository matchRepository;
     @Autowired
     private DiscordService discordService;
 

@@ -5,7 +5,7 @@ import org.springframework.data.repository.CrudRepository;
 
 import java.util.Optional;
 
-public interface MatchEntityRepository extends CrudRepository<Match, Long> {
+public interface MatchRepository extends CrudRepository<Match, Long> {
     Optional<Match> findMatchByPlayerA(String discordId);
 
     Optional<Match> findMatchByPlayerB(String discordId);

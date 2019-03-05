@@ -3,7 +3,7 @@ package com.planed.ctlBot.commands;
 import com.planed.ctlBot.commands.data.DiscordMessage;
 import com.planed.ctlBot.common.GameStatus;
 import com.planed.ctlBot.common.Race;
-import com.planed.ctlBot.data.repositories.MatchEntityRepository;
+import com.planed.ctlBot.data.repositories.MatchRepository;
 import com.planed.ctlBot.data.repositories.UserRepository;
 import com.planed.ctlBot.discord.CommandRegistry;
 import com.planed.ctlBot.domain.User;
@@ -29,7 +29,7 @@ public class UserCommandsTest extends AbstractDiscordCommandTest {
     @Autowired
     private UserRepository userRepository;
     @Autowired
-    private MatchEntityRepository matchRepository;
+    private MatchRepository matchRepository;
     private User user1;
     private User user2;
 

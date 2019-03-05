@@ -2,7 +2,7 @@ package com.planed.ctlBot.commands;
 
 import com.planed.ctlBot.commands.data.DiscordMessage;
 import com.planed.ctlBot.common.AccessLevel;
-import com.planed.ctlBot.data.repositories.MatchEntityRepository;
+import com.planed.ctlBot.data.repositories.MatchRepository;
 import com.planed.ctlBot.data.repositories.UserRepository;
 import com.planed.ctlBot.discord.DiscordCommand;
 import com.planed.ctlBot.discord.DiscordController;
@@ -14,7 +14,7 @@ public class AdminCommands {
     @Autowired
     private DiscordService discordService;
     @Autowired
-    private MatchEntityRepository matchRepository;
+    private MatchRepository matchRepository;
     @Autowired
     private UserRepository userRepository;
 
