@@ -20,8 +20,6 @@ import java.util.List;
 
 @Component
 public class UserService {
-    private static final String WELCOME_MESSAGE = "I would like to know which race you are playing in your Starcraft 2 endeavours? " +
-            "(Click on one of the symbols. They signify Terran, Zerg and Protoss)";
     private static final String RACE_CHANGE_MESSAGE = "Want to change your race? Just let me know which race you are playing in your Starcraft 2 endeavours! " +
             "(Click on one of the symbols. They signify Terran, Zerg and Protoss)";
     private static final String TERRAN_EMOJI = "🏢";
@@ -41,6 +39,8 @@ public class UserService {
     private MatchEntityRepository matchRepository;
     @Autowired
     private PrService prService;
+    @Autowired
+    private BattleNetService battleNetService;
 
     public void giveUserAccessLevel(final String discordId, final AccessLevel accessLevel) {
         User user = findUserAndCreateIfNotFound(discordId);
@@ -59,11 +59,7 @@ public class UserService {
         User result = userRepository.save(entity);
 
         discordService.whisperToUser(discordId, StringConstants.INFO_STRING);
-        discordService.whisperToUser(discordId, WELCOME_MESSAGE)
-                .map(msg -> discordService.addReactionWithMapper(msg,
-                        Arrays.asList(TERRAN_EMOJI, ZERG_EMOJI, PROTOSS_EMOJI, RANDOM_EMOJI),
-                        str -> updateUserRaceByEmoji(str, discordId)));
-
+        discordService.whisperToUser(discordId, "Please link your battle.net profile using the following link: " + generateLoginLink(entity));
         return result;
     }
 
@@ -93,6 +89,7 @@ public class UserService {
                 return;
         }
         userRepository.save(user);
+        battleNetService.changeRaceIconForUser(userDiscordId, user.getRace());
         sendRaceChangeMessage(user);
     }
 
@@ -114,8 +111,11 @@ public class UserService {
     }
 
     public void changeRace(final User author, final String newRace) {
-        author.setRace(Race.valueOf(newRace.toUpperCase()));
+        final Race race = Race.valueOf(newRace.toUpperCase());
+        author.setRace(race);
         userRepository.save(author);
+
+        battleNetService.changeRaceIconForUser(author.getDiscordId(), race);
     }
 
     public void issueChallenge(final User author, final User challengee, Long serverId, Long channelId) {

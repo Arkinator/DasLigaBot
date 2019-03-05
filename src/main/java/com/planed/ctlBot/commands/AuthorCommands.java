@@ -22,6 +22,13 @@ public class AuthorCommands {
     @Autowired
     private MetricsEndpoint metricsEndpoint;
 
+    @DiscordCommand(name = {"whois", "decipher"}, help = "Decipher a discord User ID", roleRequired = AccessLevel.AUTHOR, minParameters = 1)
+    public void decipherUserId(final DiscordMessage call) {
+        final String name = discordService.getDiscordName(call.getParameters().get(0));
+
+        discordService.whisperToUser(call.getDiscordUser(), "The id '" + call.getParameters().get(0) + " belongs to '" + name + "'");
+    }
+
     @DiscordCommand(name = {"serverStatus"}, help = "Display server status", roleRequired = AccessLevel.AUTHOR)
     public void displayServerStatus(final DiscordMessage call) {
         discordService.whisperToUser(call.getAuthor().getDiscordId(),

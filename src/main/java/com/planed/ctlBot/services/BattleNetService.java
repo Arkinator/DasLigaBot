@@ -39,17 +39,25 @@ public class BattleNetService {
         final User user = userService.updateUserLeagueInformation(discordId, detailsOfBestLeagueOfUser);
         double newElo = user.getElo();
 
-        discordService.removeRolesFromUser(discordId, Stream.of(League.values())
-                .map(Object::toString)
-                .collect(Collectors.toList()));
-        discordService.removeRolesFromUser(discordId, Stream.of(Race.values())
-                .map(Object::toString)
-                .collect(Collectors.toList()));
-        discordService.addRoleToUser(discordId, detailsOfBestLeagueOfUser.getLeague().toString());
-        discordService.addRoleToUser(discordId, detailsOfBestLeagueOfUser.getRace().toString());
+        changeRaceIconForUser(discordId, detailsOfBestLeagueOfUser.getRace());
+        changeLeagueIconForUser(discordId, detailsOfBestLeagueOfUser);
 
         final String message = MessageFormat.format(UPDATE_MESSAGE_BLUEPRINT, detailsOfBestLeagueOfUser.getRace(), detailsOfBestLeagueOfUser.getMmr(), newElo);
         discordService.whisperToUser(discordId, message);
         logger.info("Finished battle.net query for user with battleNetId '" + battleNetId + "'!");
+    }
+
+    public void changeLeagueIconForUser(String discordId, BattleNetInformation detailsOfBestLeagueOfUser) {
+        discordService.removeRolesFromUser(discordId, Stream.of(League.values())
+                .map(Object::toString)
+                .collect(Collectors.toList()));
+        discordService.addRoleToUser(discordId, detailsOfBestLeagueOfUser.getLeague().toString());
+    }
+
+    public void changeRaceIconForUser(String discordId, Race newRace) {
+        discordService.removeRolesFromUser(discordId, Stream.of(Race.values())
+                .map(Object::toString)
+                .collect(Collectors.toList()));
+        discordService.addRoleToUser(discordId, newRace.toString());
     }
 }

@@ -100,21 +100,26 @@ public class CommandRegistry implements MessageCreateListener, ServerJoinListene
     }
 
     public void fireEvent(final DiscordMessage call) {
-        final DiscordCommand command = commandNameMap.get(call.getCommandPhrase().toLowerCase());
-        logger.info("Command from " + call.getDiscordUser().getName()
-                + " with command " + call.getCommandPhrase()
-                + " and Mentions " + call.getMentions()
-                + " and Parameters " + call.getParameters());
-        final User user = call.getAuthor();
+        Optional.ofNullable(call)
+                .map(DiscordMessage::getCommandPhrase)
+                .map(String::toLowerCase)
+                .map(commandName -> commandNameMap.get(commandName))
+                .ifPresent(command -> {
+                    logger.debug("Command from " + call.getDiscordUser().getName()
+                            + " with command " + call.getCommandPhrase()
+                            + " and Mentions " + call.getMentions()
+                            + " and Parameters " + call.getParameters());
+                    final User user = call.getAuthor();
 
-        if (command != null
-                && checkUserAuthorization(call, command, user)
-                && checkMinimumMentions(call, command)
-                && checkMinimumParameters(call, command)
-                && checkMinimumChannelLinks(call, command)) {
-            userService.incrementCallsForUserByDiscordId(user.getDiscordId());
-            invokeCommand(call, command);
-        }
+                    if (command != null
+                            && checkUserAuthorization(call, command, user)
+                            && checkMinimumMentions(call, command)
+                            && checkMinimumParameters(call, command)
+                            && checkMinimumChannelLinks(call, command)) {
+                        userService.incrementCallsForUserByDiscordId(user.getDiscordId());
+                        invokeCommand(call, command);
+                    }
+                });
     }
 
     private boolean checkMinimumChannelLinks(DiscordMessage call, DiscordCommand command) {

@@ -78,7 +78,7 @@ public class DiscordService {
     }
 
     public DiscordMessage addReactionWithMapper(final DiscordMessage message,
-                                                List<String> reactions, Consumer<String> reactionAddConsumer) {
+                                                final List<String> reactions, Consumer<String> reactionAddConsumer) {
         message.getMessage().addReactionAddListener(event -> {
             if (event.getUser().isYourself()) {
                 return;
@@ -128,8 +128,10 @@ public class DiscordService {
     private DiscordMessage addInfoItemAndListenerToMessage(DiscordMessage msg) {
         addReactionWithMapper(msg, Collections.singletonList(INFO_EMOJI),
                 s -> {
-                    final User otherUser = ((PrivateChannel) msg.getTextChannel()).getRecipient();
-                    whisperToUser(otherUser, StringConstants.INFO_STRING);
+                    if (s.equals(INFO_EMOJI)) {
+                        final User otherUser = ((PrivateChannel) msg.getTextChannel()).getRecipient();
+                        whisperToUser(otherUser, StringConstants.INFO_STRING);
+                    }
                 });
         return msg;
     }
@@ -150,5 +152,10 @@ public class DiscordService {
                     return Optional.empty();
                 })
                 .join();
+    }
+
+    public String getDiscordName(String discordId) {
+        User user = discordApi.getUserById(discordId).join();
+        return user.getName();
     }
 }
