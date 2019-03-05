@@ -2,17 +2,18 @@ package com.planed.ctlBot.discord;
 
 import com.planed.ctlBot.commands.data.DiscordMessage;
 import com.planed.ctlBot.utils.DiscordMessageParser;
+import com.planed.ctlBot.utils.StringConstants;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.channel.TextChannel;
 import org.javacord.api.entity.message.Message;
 import org.javacord.api.entity.permission.Role;
 import org.javacord.api.entity.server.Server;
 import org.javacord.api.entity.user.User;
+import org.javacord.api.event.message.reaction.ReactionAddEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
 
 import java.util.Collections;
 import java.util.List;
@@ -20,7 +21,7 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
 
-@Component
+@DiscordController
 public class DiscordService {
     private static final Logger logger = LoggerFactory.getLogger(DiscordService.class);
     private static final String INFO_EMOJI = "ℹ";
@@ -123,6 +124,12 @@ public class DiscordService {
                     }
                 }); */
         return msg;
+    }
+
+    @DiscordReactionAddedEvent(emoji = {INFO_EMOJI})
+    public void infoRequestedListener(final ReactionAddEvent event) {
+        final User otherUser = event.getUser();
+        whisperToUser(otherUser, StringConstants.INFO_STRING);
     }
 
     public String getInviteLink() {

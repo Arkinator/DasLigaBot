@@ -22,37 +22,32 @@ public class StringConstants {
                                                     "          {0}       \n" +
                                                     "*******************************************************************************";
     public static final String INFO_STRING = "```\n" +
-            "----------------------------------------------------------------------\n" +
-            "*    __________________ .___.___                                       *\n" +
-            "*   /   _____/\\_   ___ \\|   |   |      Starcraft 2 - DAS Liga          *\n" +
-            "*   \\_____  \\ /    \\  \\/|   |   |                                      *\n" +
-            "*   /        \\\\     \\___|   |   |   !hello, I'm a Discord-Bot.         *\n" +
-            "*  /_______  / \\______  /___|___|   I run an automated starcraft       *\n" +
-            "*          \\/         \\/            tournament. Just type !challenge   *\n" +
-            "*   (D) iscord            to challenge anybody to play. The other      *\n" +
-            "*   (A) utomated          person has to !accept the challenge. Then    *\n" +
-            "*   (S) tarcraft          you battle it out in SCII and !report the    *\n" +
-            "*                         result back to me. Every win or loss will    *\n" +
-            "*      _     _            gain or loose you ELO points, impacting      *\n" +
-            "*     | |   (_)                 your ranking. With !league you can     *\n" +
-            "*     | |    _  __ _  __ _      take a look at the current rankings.   *\n" +
-            "*     | |   | |/ _` |/ _` |                                            *\n" +
-            "*     | |___| | (_| | (_| |         If you have any question, ask for  *\n" +
-            "*     \\_____/_|\\__, |\\__,_|         !help                              *\n" +
-            "*               __/ |                                                  *\n" +
-            "*              |___/                 glhf                              *\n" +
-            "*                                                                      *\n" +
-            "*                                   DAS Liga Bot                       *\n" +
-            "*                                                                      *\n" +
-/*            "*   The bot is still under development. If you you have feedback or    *\n" +
-            "*   bug reports please feel free to contact the author                 *\n" +
-            "*                                                                      *\n" +
-            "*   If you are looking for people to challenge or want to dig further  *\n" +
-            "*   into the world of DAS Liga please join our server:                 *\n" +
-            "*                                                                      *\n" +*/
-            "*    Join our server: https://discord.gg/pRvasZG                       *\n" +
-            "*                                                                      *\n" +
-            "----------------------------------------------------------------------\n```";
+            "-------------------------------------------------------------------------\n" +
+            "*    __________________ .___.___                                        *\n" +
+            "*   /   _____/\\_   ___ \\|   |   |      Starcraft 2 - DAS Liga           *\n" +
+            "*   \\_____  \\ /    \\  \\/|   |   |                                       *\n" +
+            "*   /        \\\\     \\___|   |   |   !hello, I'm a Discord-Bot.          *\n" +
+            "*  /_______  / \\______  /___|___|   I run an automated starcraft        *\n" +
+            "*          \\/         \\/            tournament. Just type !challenge    *\n" +
+            "*   (D) iscord            to challenge anybody to play. The other       *\n" +
+            "*   (A) utomated          person has to !accept the challenge. Then     *\n" +
+            "*   (S) tarcraft          you battle it out in SCII and !report the     *\n" +
+            "*                         result back to me. Every win or loss will     *\n" +
+            "*      _     _            gain or loose you ELO points, impacting       *\n" +
+            "*     | |   (_)                 your ranking. With !league you can      *\n" +
+            "*     | |    _  __ _  __ _      take a look at the current rankings.    *\n" +
+            "*     | |   | |/ _` |/ _` |                                             *\n" +
+            "*     | |___| | (_| | (_| |         If you have any question, ask for   *\n" +
+            "*     \\_____/_|\\__, |\\__,_|         !help                               *\n" +
+            "*               __/ |                                                   *\n" +
+            "*              |___/                 glhf                               *\n" +
+            "*                                                                       *\n" +
+            "*                                   DAS Liga Bot                        *\n" +
+            "*                                                                       *\n" +
+            "*    Join our server: https://discord.gg/pRvasZG                        *\n" +
+            "* Readme: https://gitlab.com/Zoomstorm/DasLigaBot/blob/master/README.md *\n" +
+            "*                                                                       *\n" +
+            "-------------------------------------------------------------------------\n```";
     public static final String HELP_STRING = "```-------------------------Help Menu------------------------------------\n" +
             "*\n" +
             "* !league                 This displays the current league standings\n" +
