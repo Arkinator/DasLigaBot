@@ -11,7 +11,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import java.util.Arrays;
 import java.util.Optional;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -72,7 +71,8 @@ public class PrServiceTest {
         Match match = new Match();
         match.setFinalScorePlayerA(0);
         match.setFinalScorePlayerB(2);
-        match.setPlayers(Arrays.asList(PLAYER_A, PLAYER_B));
+        match.setPlayerA(PLAYER_A.getDiscordId());
+        match.setPlayerB(PLAYER_B.getDiscordId());
         match.setOriginatingChannelId(123l);
         match.setOriginatingServerId(123l);
         return match;

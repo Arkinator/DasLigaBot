@@ -1,13 +1,13 @@
 package com.planed.ctlBot.data.repositories;
 
-import com.planed.ctlBot.data.MatchEntity;
+import com.planed.ctlBot.domain.Match;
 import org.springframework.data.repository.CrudRepository;
 
-import java.util.Collection;
+import java.util.Optional;
 
-public interface MatchEntityRepository extends CrudRepository<MatchEntity, Long> {
-    Collection<MatchEntity> findMatchByPlayerA(String discordId);
+public interface MatchEntityRepository extends CrudRepository<Match, Long> {
+    Optional<Match> findMatchByPlayerA(String discordId);
 
-    Collection<MatchEntity> findMatchByPlayerB(String discordId);
+    Optional<Match> findMatchByPlayerB(String discordId);
 }
 

@@ -4,11 +4,11 @@ import com.planed.ctlBot.commands.data.DiscordMessage;
 import com.planed.ctlBot.common.AccessLevel;
 import com.planed.ctlBot.common.GameResult;
 import com.planed.ctlBot.common.GameStatus;
+import com.planed.ctlBot.data.repositories.MatchEntityRepository;
 import com.planed.ctlBot.discord.DiscordCommand;
 import com.planed.ctlBot.discord.DiscordController;
 import com.planed.ctlBot.discord.DiscordService;
 import com.planed.ctlBot.domain.Match;
-import com.planed.ctlBot.domain.MatchRepository;
 import com.planed.ctlBot.domain.User;
 import com.planed.ctlBot.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +20,7 @@ public class UserCommands {
     @Autowired
     private UserService userService;
     @Autowired
-    private MatchRepository matchRepository;
+    private MatchEntityRepository matchRepository;
     @Autowired
     private DiscordService discordService;
 
@@ -45,12 +45,12 @@ public class UserCommands {
     }
 
     private Match findMatch(final User user) {
-        return matchRepository.findMatchById(user.getMatchId())
+        return matchRepository.findById(user.getMatchId())
                 .orElse(null);
     }
 
     private Optional<Match> findMatchOptional(final User user) {
-        return matchRepository.findMatchById(user.getMatchId());
+        return matchRepository.findById(user.getMatchId());
     }
 
     @DiscordCommand(name = {"reject", "rejectchallenge", "swipeleft"}, help = "Reject your current challenge")
@@ -75,17 +75,18 @@ public class UserCommands {
 
     @DiscordCommand(name = {"accept", "acceptchallenge", "swiperight"}, help = "Accept the challenge extended to you!")
     public void acceptChallenge(final DiscordMessage call) {
+        final Match match = findMatch(call.getAuthor());
         if (needMatch(call, "This command is to accept a challenge, that has been extended to you. Currently there is none") &&
-                needToBeChallengee(call, "You can not accept a challenge that you have extended! Your current match is " + findMatch(call.getAuthor())) &&
-                needGameStatus(call, "You can only recently extended challenges. Current match is " + findMatch(call.getAuthor()), GameStatus.CHALLENGE_EXTENDED)) {
-            final User challengee = findMatch(call.getAuthor()).getPlayers().get(0);
+                needToBeChallengee(call, "You can not accept a challenge that you have extended! Your current match is " + match) &&
+                needGameStatus(call, "You can only recently extended challenges. Current match is " + match, GameStatus.CHALLENGE_EXTENDED)) {
+            final String challengeeDiscordId = match.getPlayerB();
             final User challenger = call.getAuthor();
             userService.acceptChallenge(call.getAuthor());
             discordService.whisperToUser(challenger.getDiscordId(), "You just accepted a challenge from "
-                    + userService.shortInfo(challengee, call.getServerId()) +
+                    + userService.shortInfo(challengeeDiscordId, call.getServerId()) +
                     ". Now get in touch with your opponent and battle it out. The format is Best-of-three, " +
                     "maps are loosers-pick, your pick (the challengee) for the first map, the game is on. glhf");
-            discordService.whisperToUser(challengee.getDiscordId(),
+            discordService.whisperToUser(challengeeDiscordId,
                     "Your challenge to " + userService.shortInfo(challenger, call.getServerId()) + " just got accepted! " +
                             ". Now get in touch with your opponent and battle it out. The format is Best-of-three, " +
                             "maps are loosers-pick, your opponent picks (the challengee) for the first map, the game is on. glhf");
@@ -136,7 +137,7 @@ public class UserCommands {
 
     private boolean needToBeChallengee(final DiscordMessage call, final String message) {
         final String callAuthorId = call.getAuthor().getDiscordId();
-        final String matchChallengeeId = findMatch(call.getAuthor()).getPlayers().get(0).getDiscordId();
+        final String matchChallengeeId = findMatch(call.getAuthor()).getPlayerA();
 
         if (callAuthorId.equals(matchChallengeeId)) {
             discordService.whisperToUser(callAuthorId, message);
@@ -147,7 +148,7 @@ public class UserCommands {
     }
 
     private boolean needToBeChallenger(final DiscordMessage call, final String message) {
-        if (call.getAuthor().getDiscordId().equals(findMatch(call.getAuthor()).getPlayers().get(1).getDiscordId())) {
+        if (call.getAuthor().getDiscordId().equals(findMatch(call.getAuthor()).getPlayerB())) {
             discordService.whisperToUser(call.getAuthor().getDiscordId(), message);
             return false;
         }

@@ -1,7 +1,7 @@
 package com.planed.ctlBot;
 
 
-import com.planed.ctlBot.data.repositories.UserEntityRepository;
+import com.planed.ctlBot.data.repositories.UserRepository;
 import com.planed.ctlBot.discord.DiscordService;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.DiscordApiBuilder;
@@ -19,7 +19,7 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import javax.annotation.PostConstruct;
 import java.util.concurrent.Executor;
 
-@SpringBootApplication(scanBasePackages = {"sx.blah.discord", "com.planed.ctlBot"})
+@SpringBootApplication(scanBasePackages = {"sx.blah.discord", "com.planed.ctlBot", "org.springframework.data.jpa.convert.threeten"})
 @EnableOAuth2Sso
 @EnableAsync
 public class BotBoot {
@@ -32,7 +32,7 @@ public class BotBoot {
     @Autowired
     private DiscordService discordService;
     @Autowired
-    private UserEntityRepository userEntityRepository;
+    private UserRepository userRepository;
 
     public static void main(final String[] args) {
         SpringApplication.run(BotBoot.class, args);
@@ -40,7 +40,7 @@ public class BotBoot {
 
     @PostConstruct
     public void printApplicationReadyMessage() {
-        userEntityRepository.count();
+        userRepository.count();
 
         discordService.whisperToUser(authorUserId, "Reboot successful");
     }

@@ -4,23 +4,46 @@ import com.planed.ctlBot.common.GameResult;
 import com.planed.ctlBot.common.GameStatus;
 import com.planed.ctlBot.common.Race;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
-import java.util.List;
+import javax.persistence.*;
 
+@Entity
 @Data
+@NoArgsConstructor
+@Table(name = "MATCHES")
 public class Match {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long matchId;
-    private List<User> players;
+
+    @Column
+    private String playerA;
+    @Column
+    private String playerB;
+    @Column(nullable = false)
     private GameStatus gameStatus;
+    @Column
     private Integer finalScorePlayerA;
+    @Column
     private Integer finalScorePlayerB;
+    @Column
     private Race racePlayerA;
+    @Column
     private Race racePlayerB;
+
+    @Column
     private Integer playerAreportedScoreForPlayerA;
+    @Column
     private Integer playerAreportedScoreForPlayerB;
+    @Column
     private Integer playerBreportedScoreForPlayerA;
+    @Column
     private Integer playerBreportedScoreForPlayerB;
+
+    @Column
     private Long originatingServerId;
+    @Column
     private Long originatingChannelId;
 
     public boolean didUserReportResult(final User player) {
@@ -59,11 +82,11 @@ public class Match {
     }
 
     private boolean isPlayerA(final User player) {
-        return player.getDiscordId().equals(players.get(0).getDiscordId());
+        return player.getDiscordId().equals(playerA);
     }
 
     private boolean isPlayerB(final User player) {
-        return player.getDiscordId().equals(players.get(1).getDiscordId());
+        return player.getDiscordId().equals(playerB);
     }
 
     public boolean reportsAreMatching() {
@@ -94,24 +117,10 @@ public class Match {
             scoreA = "(" + finalScorePlayerA + ")";
             scoreB = "(" + finalScorePlayerB + ")";
         }
-        String playerA = "<>";
-        String playerB = "<>";
-        if (players.size() == 2) {
-            playerA = players.get(0).toString();
-            playerB = players.get(1).toString();
-        }
         return playerA + scoreA + vs + scoreB + playerB + status;
     }
 
     public double getEloResult() {
         return ((finalScorePlayerA - finalScorePlayerB) + 1) / 2;
-    }
-
-    public User getPlayerA() {
-        return players.get(0);
-    }
-
-    public User getPlayerB() {
-        return players.get(1);
     }
 }

@@ -1,13 +1,15 @@
 package com.planed.ctlBot.services;
 
+import com.planed.ctlBot.data.repositories.UserRepository;
 import com.planed.ctlBot.discord.DiscordService;
 import com.planed.ctlBot.domain.User;
-import com.planed.ctlBot.domain.UserRepository;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+
+import java.util.Optional;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -36,7 +38,7 @@ public class UserServiceTest {
         anotherMockDiscordId = RandomStringUtils.randomAlphanumeric(20);
         initMocks(this);
 
-        when(userRepository.findByDiscordId(eq(mockDiscordId))).thenReturn(mockUser);
+        when(userRepository.findByDiscordId(eq(mockDiscordId))).thenReturn(Optional.of(mockUser));
         when(mockUser.getDiscordId()).thenReturn(mockDiscordId);
 
         when(anotherMockUser.getDiscordId()).thenReturn(anotherMockDiscordId);
@@ -52,7 +54,7 @@ public class UserServiceTest {
 
     @Test
     public void findNonExistentUser_ShouldReturnMatchingUser(){
-        when(userRepository.findByDiscordId(eq(anotherMockDiscordId))).thenReturn(null, anotherMockUser);
+        when(userRepository.findByDiscordId(eq(anotherMockDiscordId))).thenReturn(Optional.empty(), Optional.of(anotherMockUser));
 
         assertThat(userService.findUserAndCreateIfNotFound(anotherMockDiscordId).getDiscordId(), equalTo(anotherMockDiscordId));
         verify(userRepository, times(2)).findByDiscordId(eq(anotherMockDiscordId));

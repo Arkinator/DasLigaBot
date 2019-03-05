@@ -2,7 +2,7 @@ package com.planed.ctlBot;
 
 import com.planed.ctlBot.commands.data.DiscordMessage;
 import com.planed.ctlBot.common.AccessLevel;
-import com.planed.ctlBot.data.repositories.UserEntityRepository;
+import com.planed.ctlBot.data.repositories.UserRepository;
 import com.planed.ctlBot.discord.CommandRegistry;
 import com.planed.ctlBot.discord.DiscordCommand;
 import com.planed.ctlBot.discord.DiscordController;
@@ -37,11 +37,11 @@ public class DiscordIntegrationTest {
     @Autowired
     private UserService userService;
     @Autowired
-    private UserEntityRepository userEntityRepository;
+    private UserRepository userRepository;
 
     @Before
     public void setUp() {
-        userEntityRepository.deleteAll();
+        userRepository.deleteAll();
         lastCall = null;
 
         userService.findUserAndCreateIfNotFound(ADMIN_ID);
@@ -52,10 +52,10 @@ public class DiscordIntegrationTest {
     public void shouldCreateUserWhenAnyCommandIsInvoked() {
         final DiscordMessage call = aDiscordMessageFromAuthor().build();
 
-        assertThat(userEntityRepository.findById(call.getAuthor().getDiscordId()).isPresent(), is(false));
+        assertThat(userRepository.findById(call.getAuthor().getDiscordId()).isPresent(), is(false));
         commandRegistry.fireEvent(call);
 
-        assertThat(userEntityRepository.findById(call.getAuthor().getDiscordId()).get(), is(not(nullValue())));
+        assertThat(userRepository.findById(call.getAuthor().getDiscordId()).get(), is(not(nullValue())));
     }
 
     @Test

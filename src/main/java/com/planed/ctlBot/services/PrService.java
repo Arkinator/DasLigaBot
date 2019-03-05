@@ -2,7 +2,6 @@ package com.planed.ctlBot.services;
 
 import com.planed.ctlBot.discord.DiscordService;
 import com.planed.ctlBot.domain.Match;
-import com.planed.ctlBot.domain.User;
 import com.planed.ctlBot.utils.StringConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,8 +28,8 @@ public class PrService {
                 .ifPresent(announcerChannelForServer ->
                         discordService.replyInChannel(match.getOriginatingServerId(), announcerChannelForServer,
                                 MessageFormat.format(StringConstants.EXTENDED_FORMATTER,
-                                        match.getPlayerA().toString(),
-                                        match.getPlayerB().toString())));
+                                        match.getPlayerA(),
+                                        match.getPlayerB())));
     }
 
     public void printGameIsOnMessage(final Match match) {
@@ -48,8 +47,8 @@ public class PrService {
                 .ifPresent(announcerChannelForServer ->
                         discordService.replyInChannel(match.getOriginatingServerId(), announcerChannelForServer,
                                 MessageFormat.format(StringConstants.REJECTED_FORMATTER,
-                                        match.getPlayerA().toString(),
-                                        match.getPlayerB().toString())));
+                                        match.getPlayerA(),
+                                        match.getPlayerB())));
     }
 
     public void printMessageResultMessage(final Match match) {
@@ -79,7 +78,7 @@ public class PrService {
         return announcerChannelIdForServer;
     }
 
-    private String getPlayerName(final User user, Long serverId) {
-        return discordService.getDiscordName(user.getDiscordId(), serverId);
+    private String getPlayerName(final String userDiscordId, Long serverId) {
+        return discordService.getDiscordName(userDiscordId, serverId);
     }
 }

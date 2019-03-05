@@ -1,26 +1,13 @@
 package com.planed.ctlBot.domain;
 
-import com.planed.ctlBot.common.GameStatus;
-import com.planed.ctlBot.data.MatchEntity;
-import com.planed.ctlBot.data.repositories.MatchEntityRepository;
-import com.planed.ctlBot.data.repositories.UserEntityRepository;
-import org.dozer.DozerBeanMapper;
-import org.dozer.Mapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
 
 @Repository
 public class MatchRepository {
-    private final Mapper mapper = new DozerBeanMapper();
+/*    private final Mapper mapper = new DozerBeanMapper();
 
     @Autowired
     private MatchEntityRepository matchEntityRepository;
-    @Autowired
-    private UserEntityRepository userEntityRepository;
     @Autowired
     private UserRepository userRepository;
 
@@ -85,5 +72,5 @@ public class MatchRepository {
         final List<Match> result = new ArrayList<>();
         matchEntityRepository.findAll().forEach(m -> result.add(mapperFromEntity(m)));
         return result;
-    }
+    }*/
 }

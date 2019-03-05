@@ -1,20 +1,22 @@
 package com.planed.ctlBot.services;
 
 import com.planed.ctlBot.common.*;
+import com.planed.ctlBot.data.BattleNetInformation;
+import com.planed.ctlBot.data.repositories.MatchEntityRepository;
+import com.planed.ctlBot.data.repositories.UserRepository;
 import com.planed.ctlBot.discord.DiscordService;
 import com.planed.ctlBot.domain.Match;
-import com.planed.ctlBot.domain.MatchRepository;
 import com.planed.ctlBot.domain.User;
-import com.planed.ctlBot.domain.UserRepository;
 import com.planed.ctlBot.utils.StringConstants;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import java.time.OffsetDateTime;
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Comparator;
-import java.util.stream.Collectors;
+import java.util.List;
 
 @Component
 public class UserService {
@@ -36,7 +38,7 @@ public class UserService {
     @Autowired
     private UserRepository userRepository;
     @Autowired
-    private MatchRepository matchRepository;
+    private MatchEntityRepository matchRepository;
     @Autowired
     private PrService prService;
 
@@ -47,28 +49,22 @@ public class UserService {
     }
 
     public User findUserAndCreateIfNotFound(final String discordId) {
-        User result = userRepository.findByDiscordId(discordId);
-        if (result == null) {
-            addNewUser(discordId);
-            result = userRepository.findByDiscordId(discordId);
-        }
-        return result;
+        return userRepository.findByDiscordId(discordId)
+                .orElseGet(() -> addNewUser(discordId));
     }
 
-    public void addNewUser(final String discordId) {
+    public User addNewUser(final String discordId) {
         final User entity = new User();
         entity.setDiscordId(discordId);
-        userRepository.save(entity);
-
-        if (discordService.isUserYourself(discordId)) {
-            return;
-        }
+        User result = userRepository.save(entity);
 
         discordService.whisperToUser(discordId, StringConstants.INFO_STRING);
         discordService.whisperToUser(discordId, WELCOME_MESSAGE)
                 .map(msg -> discordService.addReactionWithMapper(msg,
                         Arrays.asList(TERRAN_EMOJI, ZERG_EMOJI, PROTOSS_EMOJI, RANDOM_EMOJI),
                         str -> updateUserRaceByEmoji(str, discordId)));
+
+        return result;
     }
 
     public void whisperChangeRaceMessageToUser(User author) {
@@ -123,10 +119,12 @@ public class UserService {
     }
 
     public void issueChallenge(final User author, final User challengee, Long serverId, Long channelId) {
-        final Match match = matchRepository.addMatch(author, challengee, serverId, channelId);
+        final Match match = addMatch(author, challengee, serverId, channelId);
         author.setMatchId(match.getMatchId());
         challengee.setMatchId(match.getMatchId());
-        userRepository.save(author, challengee);
+        userRepository.save(author);
+        userRepository.save(challengee);
+
         discordService.whisperToUser(challengee.getDiscordId(),
                 "You have been challenged by "
                         + shortInfo(author, serverId)
@@ -134,34 +132,48 @@ public class UserService {
         prService.printChallengeExtendedMessage(match);
     }
 
+    private Match addMatch(User author, User challengee, Long serverId, Long channelId) {
+        final List<User> playerList = new ArrayList<>();
+        playerList.add(author);
+        playerList.add(challengee);
+
+        final Match match = new Match();
+        match.setPlayerA(author.getDiscordId());
+        match.setPlayerB(challengee.getDiscordId());
+        match.setGameStatus(GameStatus.CHALLENGE_EXTENDED);
+        match.setOriginatingServerId(serverId);
+        match.setOriginatingChannelId(channelId);
+        return matchRepository.save(match);
+    }
+
     public void rejectChallenge(final User author) {
-        matchRepository.findMatchById(author.getMatchId())
+        matchRepository.findById(author.getMatchId())
                 .ifPresent(match -> {
                     prService.printChallengeRejectedMessage(match);
                     match.setGameStatus(GameStatus.CHALLENGE_REJECTED);
-                    matchRepository.saveMatch(match);
+                    matchRepository.save(match);
                     clearMatchOfInvolvedPlayers(match);
                 });
     }
 
     public void revokeChallenge(final User author) {
-        matchRepository.findMatchById(author.getMatchId())
+        matchRepository.findById(author.getMatchId())
                 .ifPresent(match -> {
                     match.setGameStatus(GameStatus.CHALLENGE_REVOKED);
-                    matchRepository.saveMatch(match);
+                    matchRepository.save(match);
                     clearMatchOfInvolvedPlayers(match);
                     discordService.whisperToUser(author.getDiscordId(), "Your challenge has been revoked.");
-                    discordService.whisperToUser(match.getPlayerB().getDiscordId(),
+                    discordService.whisperToUser(match.getPlayerB(),
                             "The challenge from " + author.toString() + " has just been revoked.");
                 });
     }
 
     public void acceptChallenge(final User author) {
-        matchRepository.findMatchById(author.getMatchId())
+        matchRepository.findById(author.getMatchId())
                 .ifPresent(match -> {
                     prService.printGameIsOnMessage(match);
                     match.setGameStatus(GameStatus.CHALLENGE_ACCEPTED);
-                    matchRepository.saveMatch(match);
+                    matchRepository.save(match);
                 });
     }
 
@@ -171,13 +183,15 @@ public class UserService {
             prService.printMessageResultMessage(match);
             finalizeGame(match);
         }
-        matchRepository.saveMatch(match);
+        matchRepository.save(match);
     }
 
     private void finalizeGame(final Match match) {
         if (match.getGameStatus() == GameStatus.GAME_PLAYED) {
-            final User playerA = match.getPlayerA();
-            final User playerB = match.getPlayerB();
+            final User playerA = userRepository.findByDiscordId(match.getPlayerA())
+                    .orElseThrow(() -> new RuntimeException("Couldn't find player with DiscordID '" + match.getPlayerA() + "' linked in match '" + match.getMatchId() + "'!"));
+            final User playerB = userRepository.findByDiscordId(match.getPlayerB())
+                    .orElseThrow(() -> new RuntimeException("Couldn't find player with DiscordID '" + match.getPlayerB() + "' linked in match '" + match.getMatchId() + "'!"));
 
             final double expectancy = 1 / (1 + Math.pow(10,
                     (playerB.getElo() - playerA.getElo()) / 400.));
@@ -186,23 +200,29 @@ public class UserService {
             playerA.setElo(playerA.getElo() + LigaConstants.K_FACTOR * (result - expectancy));
             playerB.setElo(playerB.getElo() + LigaConstants.K_FACTOR * ((1 - result) - (1 - expectancy)));
 
-            userRepository.save(playerA, playerB);
+            userRepository.save(playerA);
+            userRepository.save(playerB);
             clearMatchOfInvolvedPlayers(match);
         }
     }
 
     private void clearMatchOfInvolvedPlayers(final Match match) {
-        match.getPlayers().forEach(p -> {
-            p.setMatchId(null);
-            userRepository.save(p);
-        });
+        userRepository.findByDiscordId(match.getPlayerA())
+                .ifPresent(player -> {
+                    player.setMatchId(null);
+                    userRepository.save(player);
+                });
+
+        userRepository.findByDiscordId(match.getPlayerB())
+                .ifPresent(player -> {
+                    player.setMatchId(null);
+                    userRepository.save(player);
+                });
     }
 
     public String getLeagueString() {
-        return userRepository.findAll().stream()
-                .sorted(Comparator.comparing(User::getElo))
-                .map(user -> shortInfo(user))
-                .collect(Collectors.joining("\n"));
+        return "";
+        //TODO function needed here!
     }
 
     public void incrementCallsForUserByDiscordId(String discordId) {
@@ -211,6 +231,10 @@ public class UserService {
         userRepository.save(user);
     }
 
+
+    public String shortInfo(final String discordId, Long serverId) {
+        return shortInfo(userRepository.findByDiscordId(discordId).get(), serverId);
+    }
 
     public String shortInfo(final User user, Long serverId) {
         String result = discordService.getDiscordName(user.getDiscordId(), serverId);
@@ -231,7 +255,8 @@ public class UserService {
     }
 
     public String loginUserByAuthCode(String authCode, String battleNetId, String tokenValue) {
-        User user = userRepository.findUserByAuthCode(authCode);
+        User user = userRepository.findByLoginAuthorizationCode(authCode)
+                .orElseThrow(() -> new RuntimeException("Couldn't find user by login Authorization code '" + authCode + "'!"));
 
         user.setBattleNetId(battleNetId);
         user.setBattleNetTokenValue(tokenValue);
@@ -242,11 +267,14 @@ public class UserService {
         return user.getDiscordId();
     }
 
-    public User updateUserLeagueInformation(String discordId, String race, Long mmr) {
-        User user = userRepository.findByDiscordId(discordId);
+    public User updateUserLeagueInformation(String discordId, BattleNetInformation information) {
+        User user = userRepository.findByDiscordId(discordId)
+                .orElseThrow(() -> new RuntimeException("Couldn't find user by Discord ID '" + discordId + "'!"));
 
-        user.setRace(Race.valueOf(race.toUpperCase()));
-        user.setElo(mmr / ELO_TO_MMR_FACTOR);
+        user.setRace(information.getRace());
+        user.setElo(information.getMmr() / ELO_TO_MMR_FACTOR);
+        user.setLeague(information.getLeague());
+        user.setBattleNetLastUpdate(OffsetDateTime.now());
 
         userRepository.save(user);
 

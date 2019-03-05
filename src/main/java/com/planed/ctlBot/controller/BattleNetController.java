@@ -8,13 +8,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.security.oauth2.provider.authentication.OAuth2AuthenticationDetails;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
 
 import java.security.Principal;
 
-@RestController
+@Controller
 public class BattleNetController {
     private static final Logger logger = LoggerFactory.getLogger(BattleNetController.class);
 
@@ -36,6 +36,6 @@ public class BattleNetController {
 
         battleNetService.retrieveAndSafeUserLadderInformation(battleNetId, tokenValue, discordId);
 
-        return "index";
+        return "redirect:/loginSuccess.html";
     }
 }

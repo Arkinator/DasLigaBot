@@ -1,5 +1,7 @@
 dasLigaBot:
   loginBaseUrl: "http://dasLiga.ddns.us:8080/linkBattleNet"
+  dasLigaServer:
+    id: "168007460173381632"
 
 spring:
   jpa:

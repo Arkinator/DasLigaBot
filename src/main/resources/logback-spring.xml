@@ -18,6 +18,8 @@
         </encoder>
     </appender>
 
+    <logger name="com.planed.ctlBot" level="debug"/>
+
     <root level="INFO">
       <appender-ref ref="CONSOLE" />
       <appender-ref ref="FILE" />

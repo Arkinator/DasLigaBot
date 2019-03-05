@@ -2,11 +2,11 @@ package com.planed.ctlBot.commands;
 
 import com.planed.ctlBot.commands.data.DiscordMessage;
 import com.planed.ctlBot.common.AccessLevel;
+import com.planed.ctlBot.data.repositories.MatchEntityRepository;
+import com.planed.ctlBot.data.repositories.UserRepository;
 import com.planed.ctlBot.discord.DiscordCommand;
 import com.planed.ctlBot.discord.DiscordController;
 import com.planed.ctlBot.discord.DiscordService;
-import com.planed.ctlBot.domain.MatchRepository;
-import com.planed.ctlBot.domain.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 
 @DiscordController
@@ -14,7 +14,7 @@ public class AdminCommands {
     @Autowired
     private DiscordService discordService;
     @Autowired
-    private MatchRepository matchRepository;
+    private MatchEntityRepository matchRepository;
     @Autowired
     private UserRepository userRepository;
 
