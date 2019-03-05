@@ -23,9 +23,9 @@ public class BattleNetController {
     @Autowired
     private BattleNetService battleNetService;
 
-    @RequestMapping("/")
-    public void user(@RequestParam(value = "authCode") final String authCode,
-                     Principal principal) {
+    @RequestMapping("/linkBattleNet")
+    public String user(@RequestParam(value = "authCode") final String authCode,
+                       Principal principal) {
         final OAuth2Authentication oAuth2Authentication = (OAuth2Authentication) principal;
         final Authentication userAuthentication = oAuth2Authentication.getUserAuthentication();
 
@@ -35,5 +35,7 @@ public class BattleNetController {
         String discordId = userService.loginUserByAuthCode(authCode, battleNetId, tokenValue);
 
         battleNetService.retrieveAndSafeUserLadderInformation(battleNetId, tokenValue, discordId);
+
+        return "index";
     }
 }

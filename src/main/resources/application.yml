@@ -1,7 +1,5 @@
-################################################################
-# Spring-Data properties
-################################################################
-# Always force db migration
+dasLigaBot:
+  loginBaseUrl: "http://dasLiga.ddns.us:8080/linkBattleNet"
 
 spring:
   jpa:
@@ -11,5 +9,6 @@ spring:
 
 discord:
   authorUserId: "116296552204599298"
+
 #flyway.enabled: true
 #flyway.locations: classpath:db/migration
