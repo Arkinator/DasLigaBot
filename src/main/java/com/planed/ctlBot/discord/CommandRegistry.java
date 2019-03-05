@@ -8,9 +8,12 @@ import com.planed.ctlBot.utils.DiscordMessageParser;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.javacord.api.DiscordApi;
+import org.javacord.api.entity.message.Message;
 import org.javacord.api.event.message.MessageCreateEvent;
+import org.javacord.api.event.message.reaction.ReactionAddEvent;
 import org.javacord.api.event.server.ServerJoinEvent;
 import org.javacord.api.listener.message.MessageCreateListener;
+import org.javacord.api.listener.message.reaction.ReactionAddListener;
 import org.javacord.api.listener.server.ServerJoinListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,14 +30,16 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 @Service
-public class CommandRegistry implements MessageCreateListener, ServerJoinListener {
+public class CommandRegistry implements MessageCreateListener, ServerJoinListener, ReactionAddListener {
     private static final Logger logger = LoggerFactory.getLogger(CommandRegistry.class);
 
     private final Map<String, DiscordCommand> commandNameMap = new HashMap<>();
     private final Map<DiscordCommand, Method> commandMap = new HashMap<>();
     private final Map<DiscordCommand, Object> controllerMap = new HashMap<>();
+    private final Map<String, Pair<Method, Object>> reactionAddedListener = new HashMap<>();
 
     @Autowired
     private ApplicationContext applicationContext;
@@ -54,6 +59,7 @@ public class CommandRegistry implements MessageCreateListener, ServerJoinListene
     public void registerDiscordControllers() {
         discordApi.addMessageCreateListener(this);
         discordApi.addServerJoinListener(this);
+        discordApi.addReactionAddListener(this);
 
         findAndCollectDiscordCommandBeans();
 
@@ -69,8 +75,11 @@ public class CommandRegistry implements MessageCreateListener, ServerJoinListene
                 Optional.ofNullable(method.getAnnotation(DiscordCommand.class))
                         .ifPresent(command -> registerDiscordCommand(command, method, bean));
 
-                Optional.ofNullable(method.getAnnotation(DiscordCustomEvent.class))
-                        .ifPresent(customEvent -> registerDiscordEvent(customEvent, method, bean));
+                Optional.ofNullable(method.getAnnotation(DiscordServerJoinEvent.class))
+                        .ifPresent(customEvent -> registerServerJoinEvent(customEvent, method, bean));
+
+                Optional.ofNullable(method.getAnnotation(DiscordReactionAddedEvent.class))
+                        .ifPresent(customEvent -> registerReactionAddedEvent(customEvent, method, bean));
             }
         }
     }
@@ -179,10 +188,13 @@ public class CommandRegistry implements MessageCreateListener, ServerJoinListene
         controllerMap.put(command, bean);
     }
 
-    private void registerDiscordEvent(DiscordCustomEvent customEvent, Method method, Object bean) {
-        if (customEvent.eventType() == DiscordEventType.SERVER_JOIN_EVENT) {
-            serverJoinListener = Pair.of(method, bean);
-        }
+    private void registerServerJoinEvent(DiscordServerJoinEvent customEvent, Method method, Object bean) {
+        serverJoinListener = Pair.of(method, bean);
+    }
+
+    private void registerReactionAddedEvent(DiscordReactionAddedEvent customEvent, Method method, Object bean) {
+        Stream.of(customEvent.emoji())
+                .forEach(emoji -> reactionAddedListener.put(emoji, Pair.of(method, bean)));
     }
 
     public Collection<DiscordCommand> getAllCommands() {
@@ -194,6 +206,31 @@ public class CommandRegistry implements MessageCreateListener, ServerJoinListene
         if (serverJoinListener != null) {
             ReflectionUtils.invokeMethod(serverJoinListener.getKey(), serverJoinListener.getValue(), event);
         }
+    }
+
+    @Override
+    public void onReactionAdd(ReactionAddEvent event) {
+        if (event.getUser().isYourself()) {
+            return;
+        }
+
+        final Message message = discordApi.getMessageById(event.getMessageId(), event.getChannel()).join();
+        if (!message.getAuthor().isYourself()) {
+            return;
+        }
+
+        String emoji = null;
+        if (event.getEmoji().isCustomEmoji()) {
+            emoji = event.getEmoji().asCustomEmoji().get().getMentionTag();
+        } else {
+            emoji = event.getEmoji().asUnicodeEmoji().get();
+        }
+        final Pair<Method, Object> listenerPair = reactionAddedListener.get(emoji);
+        if (listenerPair == null) {
+            return;
+        }
+
+        ReflectionUtils.invokeMethod(listenerPair.getKey(), listenerPair.getValue(), event);
     }
 
     private class InternalServerException extends RuntimeException {

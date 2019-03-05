@@ -7,10 +7,12 @@ import com.planed.ctlBot.common.GameStatus;
 import com.planed.ctlBot.data.repositories.MatchRepository;
 import com.planed.ctlBot.discord.DiscordCommand;
 import com.planed.ctlBot.discord.DiscordController;
+import com.planed.ctlBot.discord.DiscordReactionAddedEvent;
 import com.planed.ctlBot.discord.DiscordService;
 import com.planed.ctlBot.domain.Match;
 import com.planed.ctlBot.domain.User;
 import com.planed.ctlBot.services.UserService;
+import org.javacord.api.event.message.reaction.ReactionAddEvent;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Optional;
@@ -31,6 +33,11 @@ public class UserCommands {
         } else {
             userService.whisperChangeRaceMessageToUser(call.getAuthor());
         }
+    }
+
+    @DiscordReactionAddedEvent(emoji = {UserService.RANDOM_EMOJI, UserService.TERRAN_EMOJI, UserService.PROTOSS_EMOJI, UserService.ZERG_EMOJI})
+    public void changeRaceReactionListener(final ReactionAddEvent event) {
+        userService.updateUserRaceByEmoji(event.getEmoji().asUnicodeEmoji().get(), event.getUser().getIdAsString());
     }
 
     @DiscordCommand(name = {"challenge"}, help = "Challenge a player. Just type @ and his name!", minMentions = 1)

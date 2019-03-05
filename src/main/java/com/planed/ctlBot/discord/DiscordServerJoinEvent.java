@@ -7,6 +7,5 @@ import java.lang.annotation.Target;
 
 @Target({ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
-public @interface DiscordCustomEvent {
-    DiscordEventType eventType();
+public @interface DiscordServerJoinEvent {
 }

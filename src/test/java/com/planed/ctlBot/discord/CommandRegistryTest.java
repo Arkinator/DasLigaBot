@@ -145,7 +145,7 @@ public class CommandRegistryTest {
             callParameters.add(call);
         }
 
-        @DiscordCustomEvent(eventType = DiscordEventType.SERVER_JOIN_EVENT)
+        @DiscordServerJoinEvent
         public void onServerJoin(ServerJoinEvent serverJoinEvent) {
             CommandRegistryTest.serverJoinEvent = serverJoinEvent;
         }

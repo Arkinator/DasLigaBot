@@ -2,9 +2,7 @@ package com.planed.ctlBot.discord;
 
 import com.planed.ctlBot.commands.data.DiscordMessage;
 import com.planed.ctlBot.utils.DiscordMessageParser;
-import com.planed.ctlBot.utils.StringConstants;
 import org.javacord.api.DiscordApi;
-import org.javacord.api.entity.channel.PrivateChannel;
 import org.javacord.api.entity.channel.TextChannel;
 import org.javacord.api.entity.message.Message;
 import org.javacord.api.entity.permission.Role;
@@ -20,7 +18,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
-import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 @Component
@@ -77,16 +74,7 @@ public class DiscordService {
                 .map(msg -> addInfoItemAndListenerToMessage(msg));
     }
 
-    public DiscordMessage addReactionWithMapper(final DiscordMessage message,
-                                                final List<String> reactions, Consumer<String> reactionAddConsumer) {
-        message.getMessage().addReactionAddListener(event -> {
-            if (event.getUser().isYourself()) {
-                return;
-            }
-            final String emojiAsUnicode = event.getEmoji().asUnicodeEmoji().get();
-            reactionAddConsumer.accept(emojiAsUnicode);
-        });
-
+    public DiscordMessage addReactionWithMapper(final DiscordMessage message, final List<String> reactions) {
         reactions.stream().forEach(reaction -> message.getMessage().addReaction(reaction).join());
 
         return message;
@@ -126,13 +114,14 @@ public class DiscordService {
     }
 
     private DiscordMessage addInfoItemAndListenerToMessage(DiscordMessage msg) {
-        addReactionWithMapper(msg, Collections.singletonList(INFO_EMOJI),
-                s -> {
+        addReactionWithMapper(msg, Collections.singletonList(INFO_EMOJI));
+        //TODO umbasteln
+/*                s -> {
                     if (s.equals(INFO_EMOJI)) {
                         final User otherUser = ((PrivateChannel) msg.getTextChannel()).getRecipient();
                         whisperToUser(otherUser, StringConstants.INFO_STRING);
                     }
-                });
+                }); */
         return msg;
     }
 

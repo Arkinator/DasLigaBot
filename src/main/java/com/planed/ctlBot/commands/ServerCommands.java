@@ -1,7 +1,10 @@
 package com.planed.ctlBot.commands;
 
 import com.planed.ctlBot.commands.data.DiscordMessage;
-import com.planed.ctlBot.discord.*;
+import com.planed.ctlBot.discord.DiscordCommand;
+import com.planed.ctlBot.discord.DiscordController;
+import com.planed.ctlBot.discord.DiscordServerJoinEvent;
+import com.planed.ctlBot.discord.DiscordService;
 import com.planed.ctlBot.services.ServerService;
 import org.javacord.api.entity.channel.ServerTextChannel;
 import org.javacord.api.entity.server.Server;
@@ -18,7 +21,7 @@ public class ServerCommands {
     @Autowired
     private ServerService serverService;
 
-    @DiscordCustomEvent(eventType = DiscordEventType.SERVER_JOIN_EVENT)
+    @DiscordServerJoinEvent
     public void onServerJoin(ServerJoinEvent serverJoinEvent) {
         discordService.whisperToUser(serverJoinEvent.getServer().getOwner(), SERVER_OWNER_WELCOME_MESSAGE);
 

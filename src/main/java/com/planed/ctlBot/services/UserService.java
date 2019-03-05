@@ -22,10 +22,10 @@ import java.util.List;
 public class UserService {
     private static final String RACE_CHANGE_MESSAGE = "Want to change your race? Just let me know which race you are playing in your Starcraft 2 endeavours! " +
             "(Click on one of the symbols. They signify Terran, Zerg and Protoss)";
-    private static final String TERRAN_EMOJI = "🏢";
-    private static final String ZERG_EMOJI = "\uD83D\uDC09";
-    private static final String PROTOSS_EMOJI = "\uD83D\uDCA0";
-    private static final String RANDOM_EMOJI = "\uD83C\uDFB2";
+    public static final String TERRAN_EMOJI = "🏢";
+    public static final String ZERG_EMOJI = "\uD83D\uDC09";
+    public static final String PROTOSS_EMOJI = "\uD83D\uDCA0";
+    public static final String RANDOM_EMOJI = "\uD83C\uDFB2";
     private static final double ELO_TO_MMR_FACTOR = 2.5;
 
     @Value("${dasLigaBot.loginBaseUrl}")
@@ -65,12 +65,10 @@ public class UserService {
 
     public void whisperChangeRaceMessageToUser(User author) {
         discordService.whisperToUser(author.getDiscordId(), RACE_CHANGE_MESSAGE)
-                .map(msg -> discordService.addReactionWithMapper(msg,
-                        Arrays.asList(TERRAN_EMOJI, ZERG_EMOJI, PROTOSS_EMOJI, RANDOM_EMOJI),
-                        str -> updateUserRaceByEmoji(str, author.getDiscordId())));
+                .map(msg -> discordService.addReactionWithMapper(msg, Arrays.asList(TERRAN_EMOJI, ZERG_EMOJI, PROTOSS_EMOJI, RANDOM_EMOJI)));
     }
 
-    private void updateUserRaceByEmoji(String emoji, String userDiscordId) {
+    public void updateUserRaceByEmoji(String emoji, String userDiscordId) {
         User user = findUserAndCreateIfNotFound(userDiscordId);
         switch (emoji) {
             case TERRAN_EMOJI:
